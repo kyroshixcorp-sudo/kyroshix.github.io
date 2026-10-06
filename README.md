@@ -2,7 +2,7 @@
 
 Plataforma de música, vídeo e comunidade em português. Produção do proprietário: https://releases.kyroshixcorp.workers.dev/. Hospedagem estática no Worker Cloudflare do usuário; Firebase Authentication; Supabase Database/Storage com integração Firebase. Não requer build para servir `dist/`.
 
-O repositório original associado ao Sites guarda o código. A versão antiga em ChatGPT Sites não é a produção e não deve ser republicada automaticamente.
+Código completo: https://github.com/kyroshixcorp-sudo/kyroshix.github.io. A produção usa o Worker `releases` da Cloudflare.
 
 ## Atualização da experiência de música
 
@@ -10,7 +10,7 @@ A página Descobrir reúne destaque, artistas do catálogo (representados pelas 
 
 No celular, a navegação inferior fica separada do player. O player ampliado tem resumo compacto, título completo expansível quando longo e abas Fila / Som e transição. Ícones SVG consistentes e textos maiores também se aplicam às telas de conta, vídeos, perfil e Estúdio.
 
-**Atualização somente pelo ZIP da Cloudflare; nenhum SQL novo.** Histórico de música é privado deste navegador, limitado às 50 últimas faixas distintas, com opção Limpar histórico. Guia: [docs/experiencia-musical.md](docs/experiencia-musical.md).
+**Esta atualização não precisa de SQL novo.** Publique o ZIP completo na Cloudflare ou prepare os seis arquivos de texto alterados com [scripts/export-worker.py](scripts/export-worker.py), conforme [docs/publicar-worker.md](docs/publicar-worker.md). Histórico de música é privado deste navegador, limitado às 50 últimas faixas distintas, com opção Limpar histórico. Guia: [docs/experiencia-musical.md](docs/experiencia-musical.md).
 
 ## Atualização de som e transição
 
@@ -26,7 +26,7 @@ Para atualizar a produção existente: execute **somente `backend/09-media-upgra
 
 ## Instalação da plataforma
 
-Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). O upgrade foi implementado e verificado localmente; a instalação das migrações e o upload na Cloudflare dependem do proprietário, pois não há sessão administrativa conectada.
+Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização visual 4.2 exige somente a publicação dos arquivos públicos.
 
 1. No Supabase, execute `backend/03-corrigir-envios-e-dono.sql`, depois `04`, `05`, `06` e `07`, em ordem.
 2. Exporte somente `dist/` com `scripts/export-pages.py` e envie o ZIP ao Worker **releases**.
