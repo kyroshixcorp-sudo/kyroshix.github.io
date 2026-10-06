@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "firebase": {
+    "apiKey": "AIzaSyCGABzLVJ6askOPBZMVvNX8sD5-Za-G_VQ",
+    "authDomain": "kyroshix-releases.firebaseapp.com",
+    "projectId": "kyroshix-releases",
+    "appId": "1:575800990212:web:ca1645109c5282f675f351"
+  },
+  "providers": [
+    "google.com"
+  ],
+  "phoneEnabled": false,
+  "emailLinkEnabled": false,
+  "security": {
+    "requireEmailCode": false,
+    "endpoint": ""
+  }
+}

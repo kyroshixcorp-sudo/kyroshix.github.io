@@ -1,0 +1,3 @@
+# Merge into supabase/config.toml. The function validates Firebase RS256 JWTs itself.
+[functions.login-code]
+verify_jwt = false

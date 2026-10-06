@@ -1,0 +1,19 @@
+{
+  "name": "kyroshix-releases",
+  "private": true,
+  "version": "4.2.0",
+  "type": "module",
+  "scripts": {
+    "test:security": "node tests/security.cjs",
+    "test:browser": "node tests/browser.cjs",
+    "test:codes": "node tests/login-code.cjs",
+    "test:platform": "node tests/platform.cjs",
+    "test:media": "node tests/media.mjs",
+    "test:sound": "node tests/sound.cjs",
+    "test:discovery": "node tests/discovery.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.3.14",
+    "playwright": "1.51.1"
+  }
+}
