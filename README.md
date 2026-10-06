@@ -1,4 +1,6 @@
-# KYROSHIX RELEASES — versão 4.2 · Descobrir + Player
+# KYROSHIX RELEASES — versão 4.3 · Atelier
+
+A versão 4.3 combina um painel claro, biblioteca em carvão e controles de reprodução amarelos com o player expandido existente. O tema também cobre login, cadastro, recuperação de acesso, perfis, comentários, vídeos e estúdio. Ícones de reproduzir, pausar e pular faixas são os mesmos em todos os players. Veja [docs/visual-atelier.md](docs/visual-atelier.md).
 
 Plataforma de música, vídeo e comunidade em português. Produção do proprietário: https://releases.kyroshixcorp.workers.dev/. Hospedagem estática no Worker Cloudflare do usuário; Firebase Authentication; Supabase Database/Storage com integração Firebase. Não requer build para servir `dist/`.
 
@@ -10,7 +12,7 @@ A página Descobrir reúne destaque, artistas do catálogo (representados pelas 
 
 No celular, a navegação inferior fica separada do player. O player ampliado tem resumo compacto, título completo expansível quando longo e abas Fila / Som e transição. Ícones SVG consistentes e textos maiores também se aplicam às telas de conta, vídeos, perfil e Estúdio.
 
-**Esta atualização não precisa de SQL novo.** Publique o ZIP completo na Cloudflare ou prepare os seis arquivos de texto alterados com [scripts/export-worker.py](scripts/export-worker.py), conforme [docs/publicar-worker.md](docs/publicar-worker.md). Histórico de música é privado deste navegador, limitado às 50 últimas faixas distintas, com opção Limpar histórico. Guia: [docs/experiencia-musical.md](docs/experiencia-musical.md).
+**Esta atualização não precisa de SQL novo.** Publique o ZIP completo na Cloudflare ou prepare os arquivos de interface com [scripts/export-worker.py](scripts/export-worker.py), conforme [docs/publicar-worker.md](docs/publicar-worker.md). Histórico de música é privado deste navegador, limitado às 50 últimas faixas distintas, com opção Limpar histórico. Guia: [docs/experiencia-musical.md](docs/experiencia-musical.md).
 
 ## Atualização de som e transição
 
@@ -26,7 +28,7 @@ Para atualizar a produção existente: execute **somente `backend/09-media-upgra
 
 ## Instalação da plataforma
 
-Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização visual 4.2 exige somente a publicação dos arquivos públicos.
+Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização visual 4.3 exige somente a publicação dos arquivos públicos.
 
 1. No Supabase, execute `backend/03-corrigir-envios-e-dono.sql`, depois `04`, `05`, `06` e `07`, em ordem.
 2. Exporte somente `dist/` com `scripts/export-pages.py` e envie o ZIP ao Worker **releases**.
@@ -55,7 +57,7 @@ Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends 
 | Caminho | Responsabilidade |
 | --- | --- |
 | `dist/app.js`, `style.css`, `modern.css`, `glass.css`, `music-player.js` | Catálogo, perfis, música e estrutura visual |
-| `dist/listening-room.js`, `experience.css` | Descoberta, histórico local, painel lateral e interface responsiva |
+| `dist/listening-room.js`, `experience.css`, `atelier.css` | Descoberta, histórico local, painel lateral e interface responsiva |
 | `dist/audio-engine.js`, `sound-panel.js` | Crossfade, equalizador, efeitos, controles e preferências locais |
 | `dist/platform.js`, `video-player.js`, `drm.js` | Canais, reações, inscrições, Studio de vídeo e player |
 | `dist/auth-controller.js`, `firebase-client.js` | Interface de contas e Firebase |

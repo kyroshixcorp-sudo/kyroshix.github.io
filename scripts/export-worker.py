@@ -8,8 +8,8 @@ from pathlib import Path
 from zipfile import ZipFile
 
 DEFAULT_FILES = [
-    'index.html', 'app.js', 'experience.css', 'listening-room.js',
-    'music-player.js', 'platform.js',
+    'index.html', 'app.js', 'experience.css', 'atelier.css', 'listening-room.js',
+    'music-player.js', 'video-player.js', 'platform.js',
 ]
 TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -46,8 +46,8 @@ metadata = {
     'assets': {'config': {'run_worker_first': routes}},
     'bindings': [{'name': 'ASSETS', 'type': 'assets'}],
     'annotations': {
-        'workers/message': 'KYROSHIX Releases 4.2: discovery and responsive player',
-        'workers/tag': 'kyroshix-4.2',
+        'workers/message': 'KYROSHIX Releases 4.3: Atelier interface and playback controls',
+        'workers/tag': 'kyroshix-4.3',
     },
 }
 (args.output / 'metadata.json').write_text(

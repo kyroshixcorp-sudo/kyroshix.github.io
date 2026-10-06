@@ -1,9 +1,9 @@
 # Publicar a atualização no Worker releases
 
-A versão 4.2 também pode ser publicada como um módulo do Worker, preservando
-os assets estáticos existentes. O módulo entrega somente os seis arquivos de
+A versão 4.3 também pode ser publicada como um módulo do Worker, preservando
+os assets estáticos existentes. O módulo entrega somente os oito arquivos de
 texto alterados; imagens, MP3 e configurações de conta continuam no armazenamento
-estático. As sete rotas listadas em `metadata.json` passam pelo Worker e contam
+estático. As nove rotas listadas em `metadata.json` passam pelo Worker e contam
 como invocações no plano da Cloudflare. As mídias continuam sendo servidas
 diretamente pelo serviço de assets.
 
