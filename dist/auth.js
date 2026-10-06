@@ -6,7 +6,7 @@ document.addEventListener('kyro:auth', event => { authState.user = event.detail;
 const ui = mountAuth(document);
 export const authReady = (async () => {
 try {
-  const response = await fetch('./auth-config.json', { cache: 'no-store' });
+  const response = await fetch('/auth-config.json', { cache: 'no-store' });
   if (!response.ok) throw new Error('Configuration unavailable');
   const config = await response.json();
   const required = ['apiKey', 'authDomain', 'projectId', 'appId'];

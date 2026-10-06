@@ -1,0 +1,32 @@
+# Only document routes are proxied; audio, images, scripts and configuration
+# files keep their own responses, including real 404s for missing assets.
+/inicio /index.html 200
+/musicas /index.html 200
+/recentes /index.html 200
+/favoritas /index.html 200
+/studio /index.html 200
+/perfil /index.html 200
+/videos /index.html 200
+/inscricoes /index.html 200
+/biblioteca /index.html 200
+/track /index.html 200
+/watch /index.html 200
+/canal /index.html 200
+/perfil/* /index.html 200
+/track/* /index.html 200
+/watch/* /index.html 200
+/canal/* /index.html 200
+/faixa/* /index.html 200
+/assistir/* /index.html 200
+/inicio/ /index.html 200
+/musicas/ /index.html 200
+/recentes/ /index.html 200
+/favoritas/ /index.html 200
+/studio/ /index.html 200
+/perfil/ /index.html 200
+/videos/ /index.html 200
+/inscricoes/ /index.html 200
+/biblioteca/ /index.html 200
+/track/ /index.html 200
+/watch/ /index.html 200
+/canal/ /index.html 200

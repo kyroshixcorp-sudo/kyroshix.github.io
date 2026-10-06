@@ -1,11 +1,13 @@
-import { FILES } from './patches.mjs';
+import { FILES, APP_ROUTES } from './patches.mjs';
 
 // Small text updates are served here. Existing images, audio and other assets
 // stay in Cloudflare's asset store and continue to be served directly.
 export default {
   async fetch(request, env) {
     const pathname = new URL(request.url).pathname;
-    const path = pathname === '/' ? '/index.html' : pathname;
+    const documentRoute = APP_ROUTES.some(route => route.endsWith('*')
+      ? pathname.startsWith(route.slice(0, -1)) : pathname === route);
+    const path = pathname === '/' || documentRoute ? '/index.html' : pathname;
     if (!Object.hasOwn(FILES, path)) return env.ASSETS.fetch(request);
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method not allowed', {

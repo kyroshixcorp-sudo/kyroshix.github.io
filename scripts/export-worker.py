@@ -9,7 +9,8 @@ from zipfile import ZipFile
 
 DEFAULT_FILES = [
     'index.html', 'app.js', 'experience.css', 'atelier.css', 'listening-room.js',
-    'music-player.js', 'video-player.js', 'platform.js',
+    'music-player.js', 'video-player.js', 'platform.js', 'router.js', 'theme.js',
+    'themes.css', 'auth.js', 'data-client.js', 'drm.js',
 ]
 TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -23,6 +24,18 @@ parser.add_argument('--files', nargs='+', default=DEFAULT_FILES)
 args = parser.parse_args()
 files = {}
 with ZipFile(args.archive) as archive:
+    app_routes = []
+    for line in archive.read('_redirects').decode('utf-8').splitlines():
+        line = line.strip()
+        if not line or line.startswith('#'):
+            continue
+        parts = line.split()
+        if len(parts) != 3 or parts[1:] != ['/index.html', '200']:
+            parser.error('Only application document proxies are accepted')
+        route = parts[0]
+        if not route.startswith('/') or route == '/*' or '..' in route or '?' in route:
+            parser.error(f'Invalid application route: {route}')
+        app_routes.append(route)
     for name in args.files:
         path = Path(name)
         if path.is_absolute() or '..' in path.parts or path.suffix not in TYPES:
@@ -37,17 +50,18 @@ args.output.mkdir(parents=True, exist_ok=True)
 shutil.copyfile(Path(__file__).resolve().parents[1] / 'cloudflare/worker.mjs',
                 args.output / 'worker.mjs')
 (args.output / 'patches.mjs').write_text(
-    'export const FILES = ' + json.dumps(files, ensure_ascii=True) + ';\n',
+    'export const FILES = ' + json.dumps(files, ensure_ascii=True) + ';\n'
+    + 'export const APP_ROUTES = ' + json.dumps(app_routes) + ';\n',
     encoding='utf-8')
-routes = sorted(set(files) | {'/'})
+routes = sorted(set(files) | set(app_routes) | {'/'})
 metadata = {
-    'main_module': 'worker.mjs', 'compatibility_date': '2026-10-05',
+    'main_module': 'worker.mjs', 'compatibility_date': '2026-10-06',
     'keep_assets': True,
     'assets': {'config': {'run_worker_first': routes}},
     'bindings': [{'name': 'ASSETS', 'type': 'assets'}],
     'annotations': {
-        'workers/message': 'KYROSHIX Releases 4.3: Atelier interface and playback controls',
-        'workers/tag': 'kyroshix-4.3',
+        'workers/message': 'KYROSHIX Releases 4.4: readable URLs and light/dark theme',
+        'workers/tag': 'kyroshix-4.4',
     },
 }
 (args.output / 'metadata.json').write_text(

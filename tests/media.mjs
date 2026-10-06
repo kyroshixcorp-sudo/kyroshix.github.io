@@ -23,7 +23,7 @@ assert.equal(audioExtension({name:'Original.FLAC'}),'flac');assert.match(downloa
 let filter,configured,tokenReads=0,config={drmEnabled:true,licenseAuth:'firebase',licenseServers:{'com.widevine.alpha':base+'/functions/v1/drm-license'}};
 const player={getNetworkingEngine:()=>({registerRequestFilter:fn=>filter=fn}),configure:c=>configured=c};
 const shaka={Player:{probeSupport:async()=>({drm:{'com.widevine.alpha':{}}})},net:{NetworkingEngine:{RequestType:{LICENSE:2,SEGMENT:1}}}};
-const options={secureContext:true,getToken:async()=>{tokenReads++;return 'signed-firebase-token';},fetcher:async u=>new Response(JSON.stringify(u==='video-config.json'?config:{supabaseUrl:base}))};
+const options={secureContext:true,getToken:async()=>{tokenReads++;return 'signed-firebase-token';},fetcher:async u=>new Response(JSON.stringify(u==='/video-config.json'?config:{supabaseUrl:base}))};
 const item={id:'test-video',video_source:'dash',drm_system:'widevine'};
 await configureDrm(player,shaka,item,options);assert.equal(configured.drm.servers['com.widevine.alpha'],base+'/functions/v1/drm-license');
 const segment={uris:['https://cdn.invalid/media'],headers:{}};await filter(1,segment);assert.deepEqual(segment.headers,{});assert.equal(tokenReads,0);

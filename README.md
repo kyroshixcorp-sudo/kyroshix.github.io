@@ -1,6 +1,6 @@
-# KYROSHIX RELEASES — versão 4.3 · Atelier
+# KYROSHIX RELEASES — versão 4.4 · Atelier
 
-A versão 4.3 combina um painel claro, biblioteca em carvão e controles de reprodução amarelos com o player expandido existente. O tema também cobre login, cadastro, recuperação de acesso, perfis, comentários, vídeos e estúdio. Ícones de reproduzir, pausar e pular faixas são os mesmos em todos os players. Veja [docs/visual-atelier.md](docs/visual-atelier.md).
+A versão 4.4 mantém a interface Atelier e acrescenta URLs como `/inicio` e `/track/remember`, além do seletor animado de tema claro/escuro. O tema cobre catálogo, login, cadastro, perfis, vídeos, Estúdio e player expandido. A escolha fica salva no navegador; antes de escolher, o site acompanha o tema do sistema. Veja [docs/urls-e-temas.md](docs/urls-e-temas.md) e [docs/visual-atelier.md](docs/visual-atelier.md).
 
 Plataforma de música, vídeo e comunidade em português. Produção do proprietário: https://releases.kyroshixcorp.workers.dev/. Hospedagem estática no Worker Cloudflare do usuário; Firebase Authentication; Supabase Database/Storage com integração Firebase. Não requer build para servir `dist/`.
 
@@ -28,7 +28,7 @@ Para atualizar a produção existente: execute **somente `backend/09-media-upgra
 
 ## Instalação da plataforma
 
-Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização visual 4.3 exige somente a publicação dos arquivos públicos.
+Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização 4.4 exige somente a publicação dos arquivos públicos, incluindo `_redirects`.
 
 1. No Supabase, execute `backend/03-corrigir-envios-e-dono.sql`, depois `04`, `05`, `06` e `07`, em ordem.
 2. Exporte somente `dist/` com `scripts/export-pages.py` e envie o ZIP ao Worker **releases**.
@@ -43,7 +43,7 @@ UID de dono solicitado: `8Q7S8FgBZjTrg4Mkf46ntcYvl0Q2`. A migração 03 remove a
 - Transição entre faixas, EQ de 60 Hz a 10 kHz, perfis e efeitos opcionais; reprodução com dois elementos de áudio e um grafo Web Audio compartilhado.
 - Perfis com avatar/banner convertidos para WebP, bio, cor, pronomes e status; canais com handle exclusivo e links HTTPS.
 - Comentários, respostas, edição própria e moderação pelo dono; reações por emoji e inscrições persistidas no banco.
-- Catálogo/páginas de vídeo, compartilhamento por hash URL, player nativo MP4/WebM e Shaka para HLS/DASH; incorporação YouTube com consentimento ao tocar.
+- Catálogo/páginas de vídeo, compartilhamento por URLs legíveis, player nativo MP4/WebM e Shaka para HLS/DASH; incorporação YouTube com consentimento ao tocar. Links antigos com hash continuam funcionando.
 - Velocidade, capítulos, WebVTT, cinema, fullscreen/PiP quando suportados, qualidade adaptativa quando oferecida pelo manifesto e histórico local.
 - Estúdio exclusivo do dono: CRUD de música e vídeo, miniaturas, textos, créditos, arquivos e rascunhos de vídeo.
 - Login Google, e-mail/senha, cadastro, recuperação e verificação; provedores adicionais/SMS/link de e-mail configuráveis. Só métodos habilitados aparecem.
@@ -58,6 +58,7 @@ Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends 
 | --- | --- |
 | `dist/app.js`, `style.css`, `modern.css`, `glass.css`, `music-player.js` | Catálogo, perfis, música e estrutura visual |
 | `dist/listening-room.js`, `experience.css`, `atelier.css` | Descoberta, histórico local, painel lateral e interface responsiva |
+| `dist/router.js`, `_redirects`, `theme.js`, `themes.css` | URLs públicas, navegação sem recarregar, tema salvo e seletor animado |
 | `dist/audio-engine.js`, `sound-panel.js` | Crossfade, equalizador, efeitos, controles e preferências locais |
 | `dist/platform.js`, `video-player.js`, `drm.js` | Canais, reações, inscrições, Studio de vídeo e player |
 | `dist/auth-controller.js`, `firebase-client.js` | Interface de contas e Firebase |

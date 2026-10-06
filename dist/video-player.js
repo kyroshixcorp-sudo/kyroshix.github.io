@@ -4,7 +4,7 @@ const icon=name=>`<svg class="icon" aria-hidden="true"><use href="#i-${name}"/><
 let loader;
 export function secureUrl(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:'';}catch{return '';}}
 export function youtubeId(value){if(/^[\w-]{11}$/.test(value))return value;try{const u=new URL(value);const host=u.hostname.replace(/^www\./,'');if(host==='youtu.be')return /^[\w-]{11}$/.test(u.pathname.slice(1))?u.pathname.slice(1):'';if(['youtube.com','m.youtube.com'].includes(host)){const id=u.searchParams.get('v')||u.pathname.split('/')[2];return /^[\w-]{11}$/.test(id||'')?id:'';}}catch{}return '';}
-function loadShaka(){return loader||=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='vendor/shaka-player-5.2.12.js';script.onload=()=>resolve(window.shaka);script.onerror=()=>{loader=null;reject(new Error('Não foi possível carregar o player de streaming.'));};document.head.append(script);});}
+function loadShaka(){return loader||=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='/vendor/shaka-player-5.2.12.js';script.onload=()=>resolve(window.shaka);script.onerror=()=>{loader=null;reject(new Error('Não foi possível carregar o player de streaming.'));};document.head.append(script);});}
 export function readHistory(){try{return JSON.parse(localStorage.getItem('krs-watch-history')||'{}');}catch{return {};}}
 export async function mountVideoPlayer(root,item,{media,onPlay=()=>{},toast=()=>{},getToken=async()=>null}){
  let disposed=false,shakaPlayer=null,timer,lastSaved=0;const cleanup=[];

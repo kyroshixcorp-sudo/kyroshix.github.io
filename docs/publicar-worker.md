@@ -1,11 +1,13 @@
 # Publicar a atualização no Worker releases
 
-A versão 4.3 também pode ser publicada como um módulo do Worker, preservando
-os assets estáticos existentes. O módulo entrega somente os oito arquivos de
-texto alterados; imagens, MP3 e configurações de conta continuam no armazenamento
-estático. As nove rotas listadas em `metadata.json` passam pelo Worker e contam
-como invocações no plano da Cloudflare. As mídias continuam sendo servidas
-diretamente pelo serviço de assets.
+A versão 4.4 também pode ser publicada como um módulo do Worker, preservando
+os assets estáticos existentes. O módulo entrega os arquivos públicos de interface
+e encaminha caminhos como `/inicio` e `/track/remember` para a página principal.
+Imagens, MP3 e configurações JSON de conta continuam no armazenamento estático.
+Os caminhos listados em `metadata.json` passam pelo Worker e contam como
+invocações no plano da Cloudflare. As mídias continuam sendo servidas diretamente
+pelo serviço de assets. As rotas de páginas são geradas do `_redirects` do ZIP,
+sem substituir requisições de mídia ou configuração.
 
 ```sh
 python3 scripts/export-pages.py ../exports/KYROSHIX-Cloudflare-Pages.zip --origin https://releases.kyroshixcorp.workers.dev

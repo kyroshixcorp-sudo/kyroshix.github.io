@@ -1,7 +1,7 @@
 {
   "name": "kyroshix-releases",
   "private": true,
-  "version": "4.3.0",
+  "version": "4.4.0",
   "type": "module",
   "scripts": {
     "test:security": "node tests/security.cjs",
@@ -10,7 +10,9 @@
     "test:platform": "node tests/platform.cjs",
     "test:media": "node tests/media.mjs",
     "test:sound": "node tests/sound.cjs",
-    "test:discovery": "node tests/discovery.cjs"
+    "test:discovery": "node tests/discovery.cjs",
+    "test:navigation": "node tests/navigation-theme.mjs",
+    "test:worker": "node tests/worker.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.14",
