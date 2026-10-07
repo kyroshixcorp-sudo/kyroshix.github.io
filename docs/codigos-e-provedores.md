@@ -6,7 +6,7 @@ O site continua usando o Firebase **kyroshix-releases**. Não migre os usuários
 
 No Firebase → Authentication → Método de login, configure cada provedor desejado com as credenciais e callback indicados pelo próprio painel. Segredos ficam no painel do provedor/Firebase, nunca no site.
 
-Depois acrescente somente os provedores já configurados à lista `providers` de `auth-config.json` e envie o ZIP atualizado à Cloudflare:
+Depois acrescente somente os provedores já configurados à lista `providers` de `auth-config.json` e envie o ZIP atualizado à Cloudflare. A tela mostra Google, Facebook, GitHub, X/Twitter, Instagram e SMS; opções sem configuração aparecem desativadas, e apenas provedores habilitados no Firebase podem ser usados:
 
 | Nome | Identificador |
 | --- | --- |
@@ -18,7 +18,9 @@ Depois acrescente somente os provedores já configurados à lista `providers` de
 | X / Twitter | `twitter.com` |
 | Yahoo | `yahoo.com` |
 
-Exemplo: `"providers": ["google.com", "github.com"]`. Uma opção só deve ser exibida depois de configurar e testar o provedor. Apple e alguns provedores têm requisitos próprios de conta, aprovação ou cobrança. Não foram habilitados por esta atualização.
+Exemplo: `"providers": ["google.com", "github.com"]`. Apple e alguns provedores têm requisitos próprios de conta, aprovação ou cobrança. Não foram habilitados por esta atualização. Os botões ainda sem configuração ficam visíveis, mas desativados, para não sugerir que o login esteja pronto.
+
+**Instagram:** o fluxo Firebase atual não tem provedor Instagram nativo. O botão fica desativado; para torná-lo funcional será necessária uma integração OAuth própria, com aplicativo Meta, callback e troca segura de tokens no servidor. Não coloque segredos do Instagram no site estático.
 
 Mantenha `releases.kyroshixcorp.workers.dev` nos domínios autorizados. Se uma conta já existir com outro método, entre pelo método original e use **Minha conta → Conectar outro acesso**. Criar outra conta pode gerar outro UID e não transfere o papel de dono.
 

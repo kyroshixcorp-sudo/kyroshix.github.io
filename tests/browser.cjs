@@ -9,6 +9,7 @@ const fakeAuth=`export async function createFirebaseClient(){let user=null;const
  const browser=await chromium.launch({headless:true,...(packaged?{executablePath:await packaged.executablePath(),args:packaged.args.filter(a=>!['--single-process','--disable-web-security'].includes(a))}:{})});
  const errors=[];
  const context=await browser.newContext({viewport:{width:1440,height:1000}});
+ await context.addInitScript(()=>sessionStorage.setItem('krs-auth-prompted','1'));
  await context.route('**/community-config.json',r=>r.fulfill({json:{enabled:false,supabaseUrl:'',publishableKey:''}}));
  await context.route('**/firebase-client.js',r=>r.fulfill({contentType:'text/javascript',body:fakeAuth}));
  // A range-capable media origin, like production Storage/Cloudflare, for real seeks.
@@ -45,7 +46,7 @@ const fakeAuth=`export async function createFirebaseClient(){let user=null;const
  await page.locator('[data-now-select]').first().click();await page.waitForFunction(()=>document.querySelector('#now-title').textContent!=='Remember');
  await page.locator('[data-now-close]').click();
  await context.close();
- const c=await browser.newContext({viewport:{width:1440,height:1000}});await c.route('**/firebase-client.js',r=>r.fulfill({contentType:'text/javascript',body:fakeAuth}));
+ const c=await browser.newContext({viewport:{width:1440,height:1000}});await c.addInitScript(()=>sessionStorage.setItem('krs-auth-prompted','1'));await c.route('**/firebase-client.js',r=>r.fulfill({contentType:'text/javascript',body:fakeAuth}));
  await c.route('**/community-config.json',r=>r.fulfill({json:{enabled:true,supabaseUrl:'https://project-test.supabase.co',publishableKey:'public-test-key'}}));
  let tracks=(await import('file://'+root+'/dist/catalog-seed.js')).seedTracks.map(t=>({...t})),profile=null,comments=[],failSave=false,uploaded=[],failProfileUpload=false;
  await c.route('https://project-test.supabase.co/**',async route=>{const request=route.request(),url=new URL(request.url()),p=url.pathname;let data=null;const body=request.postData();const json=body&&request.headers()['content-type']?.includes('application/json')?JSON.parse(body):{};if(request.method()==='OPTIONS')return route.fulfill({status:204,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'POST,GET,DELETE'}});
