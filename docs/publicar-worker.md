@@ -1,6 +1,6 @@
 # Publicar a atualização no Worker releases
 
-A versão 4.4 também pode ser publicada como um módulo do Worker, preservando
+A versão 4.5 também pode ser publicada como um módulo do Worker, preservando
 os assets estáticos existentes. O módulo entrega os arquivos públicos de interface
 e encaminha caminhos como `/inicio` e `/track/remember` para a página principal.
 Imagens, MP3 e configurações JSON de conta continuam no armazenamento estático.

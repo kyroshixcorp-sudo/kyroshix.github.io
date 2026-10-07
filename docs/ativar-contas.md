@@ -20,7 +20,7 @@ Publique o ZIP atualizado no mesmo Worker `releases` da Cloudflare. A versão an
 
 ## Primeira visita e privacidade
 
-Quando o Firebase informa que não há uma sessão autenticada, o site abre a tela de entrada/cadastro automaticamente. A abertura é mostrada uma vez por sessão da aba; a pessoa pode fechar a tela e continuar ouvindo como visitante. Uma sessão Firebase já existente não recebe o aviso. O navegador guarda apenas essa preferência temporária em `sessionStorage` — não usamos endereço IP, impressão digital do dispositivo, e-mail ou telefone para decidir se alguém já visitou o site. Os dados de autenticação só são enviados ao Firebase quando a pessoa escolhe iniciar uma sessão ou criar uma conta.
+Na primeira visita sem marcador salvo, quando o Firebase informa que não há uma sessão autenticada, o site abre a tela de entrada/cadastro automaticamente. A abertura de cadastro é mostrada uma vez neste navegador; a pessoa pode fechar a tela e continuar ouvindo como visitante. Uma sessão Firebase já existente não recebe o aviso. O navegador guarda apenas o marcador `krs-access-seen-v1` em `localStorage` — não usamos endereço IP, impressão digital do dispositivo, e-mail ou telefone para decidir se alguém já visitou o site. Os dados de autenticação só são enviados ao Firebase quando a pessoa escolhe iniciar uma sessão ou criar uma conta.
 
 ## Verificação antes de anunciar como ativo
 
@@ -37,3 +37,5 @@ As contas não restringem as músicas nem sincronizam favoritos. Todos os MP3 co
 - https://firebase.google.com/docs/auth/web/google-signin
 - https://firebase.google.com/docs/auth/web/manage-users
 - https://firebase.google.com/docs/auth/web/redirect-best-practices
+
+Guia atualizado de disponibilidade e primeira visita: [acesso-4.5.md](acesso-4.5.md).

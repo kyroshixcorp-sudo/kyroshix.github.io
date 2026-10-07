@@ -37,29 +37,29 @@ const fakeAuth=`export async function createFirebaseClient(_config,options={}){
  }
  try{
   // A new browser session gets the account welcome screen, while all methods
-  // that are not configured are visible but safely disabled.
+  // that are not configured show their unavailable status without starting OAuth.
   const first=await makeContext();
   const page=first.page;
   await page.locator('#account-dialog[open]').waitFor();
-  assert.equal(await page.locator('#account-title').innerText(),'Entre na sua conta.');
-  assert.equal(await page.evaluate(()=>sessionStorage.getItem('krs-auth-prompted')),'1');
+  assert.equal(await page.locator('#account-title').innerText(),'Sua frequência começa aqui.');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('krs-access-seen-v1')),'1');
   assert.equal(await page.locator('#auth-google').isDisabled(),false,'Google is the only configured provider in this test.');
-  assert.equal(await page.locator('#auth-submit').innerText(),'Entrar');
+  assert.equal(await page.locator('#auth-submit').innerText(),'Criar minha conta');
   for(const id of ['auth-facebook','auth-github','auth-twitter','auth-instagram','auth-phone-open']){
    assert(await page.locator('#'+id).isVisible(),`${id} is shown in the entry screen`);
-   assert.equal(await page.locator('#'+id).isDisabled(),true,`${id} is inactive until configured`);
+   assert.equal(await page.locator('#'+id).getAttribute('aria-disabled'),'true',`${id} is inactive until configured`);
   }
-  assert.match(await page.locator('#auth-provider-note').innerText(),/Instagram/);
+  await page.locator('#auth-instagram').click();assert.match(await page.locator('#auth-message').innerText(),/Instagram não está disponível/);
   await page.locator('[data-auth-mode="signup"]').click();
-  assert.equal(await page.locator('#auth-submit').innerText(),'Criar conta');
+  assert.equal(await page.locator('#auth-submit').innerText(),'Criar minha conta');
   assert(await page.locator('#auth-name-field').isVisible());
   assert(await page.locator('#auth-confirm-field').isVisible());
   assert.equal(await page.locator('#auth-password').getAttribute('minlength'),'12');
   await page.locator('#auth-guest-continue').click();
   await page.waitForFunction(()=>!document.querySelector('#account-dialog').open);
   await page.reload();await page.locator('.release-card').nth(3).waitFor();
-  await page.waitForFunction(()=>document.querySelector('#auth-google-status').textContent==='Disponível');
-  assert.equal(await page.locator('#account-dialog').evaluate(dialog=>dialog.open),false,'The prompt does not reopen during the same tab session.');
+  await page.waitForFunction(()=>document.querySelector('#auth-google')?.dataset.available==='true');
+  assert.equal(await page.locator('#account-dialog').evaluate(dialog=>dialog.open),false,'The prompt does not reopen for a returning anonymous browser.');
   await page.locator('#account-open').click();
   assert.equal(await page.locator('#account-dialog').evaluate(dialog=>dialog.open),true,'The account button can reopen the dialog.');
   await page.locator('#account-dialog .dialog-close').click();
@@ -70,11 +70,11 @@ const fakeAuth=`export async function createFirebaseClient(_config,options={}){
   const readyPage=ready.page;
   await readyPage.locator('#account-dialog[open]').waitFor();
   for(const id of ['auth-google','auth-facebook','auth-github','auth-twitter','auth-phone-open'])assert.equal(await readyPage.locator('#'+id).isDisabled(),false,`${id} is enabled from config`);
-  assert.equal(await readyPage.locator('#auth-instagram').isDisabled(),true,'Instagram stays inactive until a dedicated integration exists.');
+  assert.equal(await readyPage.locator('#auth-instagram').getAttribute('aria-disabled'),'true','Instagram stays inactive until a dedicated integration exists.');
   await readyPage.locator('#auth-phone-open').click();
   assert(await readyPage.locator('#auth-phone-panel').isVisible());
   await readyPage.locator('#auth-phone-back').click();
-  assert(await readyPage.locator('#auth-methods').isVisible());
+  assert(await readyPage.locator('#auth-alternatives').isVisible());
   await readyPage.locator('#auth-github').click();
   await readyPage.locator('#auth-profile').waitFor();
   assert.equal(await readyPage.locator('#profile-email').innerText(),'github-listener@example.test');
@@ -84,6 +84,6 @@ const fakeAuth=`export async function createFirebaseClient(_config,options={}){
   assert(await readyPage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'No horizontal overflow on mobile.');
   assert.deepEqual(errors,[]);
   await ready.context.close();await browser.close();
-  console.log('PASS: first-visit account prompt, session-only dismissal, guest access, login/register tabs, visible-but-disabled provider states, enabled OAuth/SMS controls and mobile layout. Authentication is simulated; no real sign-in was performed.');
+  console.log('PASS: first-visit signup, browser-local dismissal, guest access, login/register tabs, explicit unavailable provider states, configured OAuth/SMS controls and mobile layout. Authentication is simulated; no real sign-in was performed.');
  }catch(error){await browser.close();throw error;}
 })().catch(error=>{console.error(error);process.exit(1);});

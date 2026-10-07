@@ -8,9 +8,10 @@ from pathlib import Path
 from zipfile import ZipFile
 
 DEFAULT_FILES = [
-    'index.html', 'app.js', 'account.css', 'auth-controller.js', 'experience.css', 'atelier.css', 'listening-room.js',
+    'index.html', 'app.js', 'experience.css', 'atelier.css', 'listening-room.js',
     'music-player.js', 'video-player.js', 'platform.js', 'router.js', 'theme.js',
-    'themes.css', 'auth.js', 'data-client.js', 'drm.js',
+    'themes.css', 'auth.js', 'auth-controller.js', 'firebase-client.js',
+    'access-policy.js', 'account.css', 'data-client.js', 'drm.js',
 ]
 TYPES = {
     '.html': 'text/html; charset=utf-8',
@@ -55,13 +56,13 @@ shutil.copyfile(Path(__file__).resolve().parents[1] / 'cloudflare/worker.mjs',
     encoding='utf-8')
 routes = sorted(set(files) | set(app_routes) | {'/'})
 metadata = {
-    'main_module': 'worker.mjs', 'compatibility_date': '2026-10-06',
+    'main_module': 'worker.mjs', 'compatibility_date': '2026-10-07',
     'keep_assets': True,
     'assets': {'config': {'run_worker_first': routes}},
     'bindings': [{'name': 'ASSETS', 'type': 'assets'}],
     'annotations': {
-        'workers/message': 'KYROSHIX Releases 4.4: readable URLs and light/dark theme',
-        'workers/tag': 'kyroshix-4.4',
+        'workers/message': 'KYROSHIX Releases 4.5: account design, welcome and access methods',
+        'workers/tag': 'kyroshix-4.5',
     },
 }
 (args.output / 'metadata.json').write_text(

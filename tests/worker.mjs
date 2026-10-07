@@ -21,6 +21,13 @@ try {
     assert((await response.text()).includes('/theme.js')); assert.equal(response.headers.get('Cache-Control'),'no-cache');
   }
   const script = await worker.fetch(new Request('https://site.test/router.js'),env);
+  for(const path of ['/account.css','/access-policy.js','/auth-controller.js','/firebase-client.js']) {
+    const response = await worker.fetch(new Request('https://site.test'+path),env);
+    assert.equal(response.status,200,path);
+    assert.match(response.headers.get('Content-Type'),path.endsWith('.css') ? /^text\/css/ : /^application\/javascript/);
+    assert((await response.text()).length>100,path);
+    assert(metadata.assets.config.run_worker_first.includes(path));
+  }
   assert.match(script.headers.get('Content-Type'),/^application\/javascript/);
   const etag = script.headers.get('ETag');
   const conditional = await worker.fetch(new Request('https://site.test/router.js',{headers:{'If-None-Match':etag}}),env);

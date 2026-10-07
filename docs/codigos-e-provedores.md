@@ -6,7 +6,7 @@ O site continua usando o Firebase **kyroshix-releases**. Não migre os usuários
 
 No Firebase → Authentication → Método de login, configure cada provedor desejado com as credenciais e callback indicados pelo próprio painel. Segredos ficam no painel do provedor/Firebase, nunca no site.
 
-Depois acrescente somente os provedores já configurados à lista `providers` de `auth-config.json` e envie o ZIP atualizado à Cloudflare. A tela mostra Google, Facebook, GitHub, X/Twitter, Instagram e SMS; opções sem configuração aparecem desativadas, e apenas provedores habilitados no Firebase podem ser usados:
+Depois acrescente somente os provedores já configurados à lista `providers` de `auth-config.json` e envie o ZIP atualizado à Cloudflare. A tela mostra Google, Facebook, GitHub, X/Twitter, Instagram e SMS; opções sem configuração aparecem com aviso de indisponibilidade, e apenas provedores habilitados no Firebase podem ser usados:
 
 | Nome | Identificador |
 | --- | --- |
@@ -18,9 +18,9 @@ Depois acrescente somente os provedores já configurados à lista `providers` de
 | X / Twitter | `twitter.com` |
 | Yahoo | `yahoo.com` |
 
-Exemplo: `"providers": ["google.com", "github.com"]`. Apple e alguns provedores têm requisitos próprios de conta, aprovação ou cobrança. Não foram habilitados por esta atualização. Os botões ainda sem configuração ficam visíveis, mas desativados, para não sugerir que o login esteja pronto.
+Exemplo: `"providers": ["google.com", "github.com"]`. Apple e alguns provedores têm requisitos próprios de conta, aprovação ou cobrança. Não foram habilitados por esta atualização. Os botões ainda sem configuração ficam visíveis, com status e explicação ao clicar, para não sugerir que o login esteja pronto.
 
-**Instagram:** o fluxo Firebase atual não tem provedor Instagram nativo. O botão fica desativado; para torná-lo funcional será necessária uma integração OAuth própria, com aplicativo Meta, callback e troca segura de tokens no servidor. Não coloque segredos do Instagram no site estático.
+**Instagram:** o fluxo Firebase atual não tem provedor Instagram nativo. O botão informa a indisponibilidade; para torná-lo funcional será necessária uma integração OAuth própria, com aplicativo Meta, callback e troca segura de tokens no servidor. Não coloque segredos do Instagram no site estático.
 
 Mantenha `releases.kyroshixcorp.workers.dev` nos domínios autorizados. Se uma conta já existir com outro método, entre pelo método original e use **Minha conta → Conectar outro acesso**. Criar outra conta pode gerar outro UID e não transfere o papel de dono.
 
@@ -81,3 +81,5 @@ SMS está desligado porque exige Firebase Blaze e pode gerar custos. Se você de
 Para acesso por link de e-mail, habilite essa opção no Firebase e depois use `emailLinkEnabled: true`. A cota atual do Spark para envio de links de login é baixa; consulte o painel antes de ativar para todo o público. Código numérico por e-mail é a função acima, não o mesmo recurso do link de acesso.
 
 Fontes: https://firebase.google.com/docs/auth/limits · https://supabase.com/docs/guides/functions/quickstart-dashboard · https://supabase.com/docs/guides/functions/deploy · https://resend.com/docs/dashboard/domains/introduction
+
+Guia atualizado dos métodos e da primeira visita: [acesso-4.5.md](acesso-4.5.md).

@@ -1,6 +1,8 @@
-# KYROSHIX RELEASES — versão 4.4 · Atelier
+# KYROSHIX RELEASES — versão 4.5 · Contas
 
-A versão 4.4 mantém a interface Atelier e acrescenta URLs como `/inicio` e `/track/remember`, além do seletor animado de tema claro/escuro. O tema cobre catálogo, login, cadastro, perfis, vídeos, Estúdio e player expandido. A escolha fica salva no navegador; antes de escolher, o site acompanha o tema do sistema. Veja [docs/urls-e-temas.md](docs/urls-e-temas.md) e [docs/visual-atelier.md](docs/visual-atelier.md).
+A versão 4.5 refaz o acesso com um cartão de duas colunas, arte KYROSHIX e formulário que acompanha o tema claro/escuro. Na primeira visita anônima deste navegador, o cadastro abre depois da restauração da sessão. Há opções de Google, Facebook, GitHub, telefone/SMS, Instagram e X, com disponibilidade explícita. Google e e-mail continuam configurados; os outros métodos dependem das etapas de ativação em [docs/acesso-4.5.md](docs/acesso-4.5.md). Continuar sem conta mantém a escuta pública.
+
+As URLs `/inicio` e `/track/remember`, o seletor animado de tema, o catálogo, o player expandido e o Estúdio permanecem disponíveis. Veja [docs/urls-e-temas.md](docs/urls-e-temas.md) e [docs/visual-atelier.md](docs/visual-atelier.md).
 
 Plataforma de música, vídeo e comunidade em português. Produção do proprietário: https://releases.kyroshixcorp.workers.dev/. Hospedagem estática no Worker Cloudflare do usuário; Firebase Authentication; Supabase Database/Storage com integração Firebase. Não requer build para servir `dist/`.
 
@@ -28,7 +30,7 @@ Para atualizar a produção existente: execute **somente `backend/09-media-upgra
 
 ## Instalação da plataforma
 
-Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização 4.4 exige somente a publicação dos arquivos públicos, incluindo `_redirects`.
+Veja [docs/upgrade-plataforma.md](docs/upgrade-plataforma.md). As etapas abaixo se aplicam à instalação inicial; a atualização 4.5 exige somente a publicação dos arquivos públicos, incluindo `_redirects`. Não execute SQL para atualizar a tela de acesso.
 
 1. No Supabase, execute `backend/03-corrigir-envios-e-dono.sql`, depois `04`, `05`, `06` e `07`, em ordem.
 2. Exporte somente `dist/` com `scripts/export-pages.py` e envie o ZIP ao Worker **releases**.
@@ -46,8 +48,7 @@ UID de dono solicitado: `8Q7S8FgBZjTrg4Mkf46ntcYvl0Q2`. A migração 03 remove a
 - Catálogo/páginas de vídeo, compartilhamento por URLs legíveis, player nativo MP4/WebM e Shaka para HLS/DASH; incorporação YouTube com consentimento ao tocar. Links antigos com hash continuam funcionando.
 - Velocidade, capítulos, WebVTT, cinema, fullscreen/PiP quando suportados, qualidade adaptativa quando oferecida pelo manifesto e histórico local.
 - Estúdio exclusivo do dono: CRUD de música e vídeo, miniaturas, textos, créditos, arquivos e rascunhos de vídeo.
-- Tela de entrada/cadastro automática para visitantes sem sessão autenticada, com opção explícita de continuar como visitante; o estado temporário fica no `sessionStorage`, sem usar IP para identificar pessoas.
-- Login Google, e-mail/senha, cadastro e recuperação; botões para Facebook, GitHub, X/Twitter, Instagram e SMS. Somente os métodos ativados funcionam; provedores pendentes aparecem desativados. Instagram requer integração própria.
+- Login Google, e-mail/senha, cadastro, recuperação e verificação; primeira visita anônima abre cadastro. As seis alternativas solicitadas aparecem com status; apenas métodos configurados iniciam autenticação. Outros provedores/SMS/link de e-mail são configuráveis.
 - Código de e-mail pós-login implementado como Edge Function, desligado até configurar remetente e endpoint. O banco impõe o código quando a política opcional é ativada.
 - Interface responsiva translúcida, transições discretas e respeito a `prefers-reduced-motion`.
 
@@ -62,7 +63,7 @@ Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends 
 | `dist/router.js`, `_redirects`, `theme.js`, `themes.css` | URLs públicas, navegação sem recarregar, tema salvo e seletor animado |
 | `dist/audio-engine.js`, `sound-panel.js` | Crossfade, equalizador, efeitos, controles e preferências locais |
 | `dist/platform.js`, `video-player.js`, `drm.js` | Canais, reações, inscrições, Studio de vídeo e player |
-| `dist/auth-controller.js`, `firebase-client.js`, `account.css` | Interface de contas, provedores de login e Firebase |
+| `dist/auth-controller.js`, `firebase-client.js`, `access-policy.js`, `account.css` | Interface de contas, primeira visita e Firebase |
 | `dist/data-client.js`, `resumable-upload.js` | API Supabase e uploads |
 | `dist/*-config.json` | Configurações públicas; nunca segredos |
 | `backend/` | Migrações PostgreSQL e funções de servidor |
@@ -77,7 +78,7 @@ DRM é uma integração de player, não um serviço de licenças/criptografia. N
 
 ## Segurança e dados
 
-Firebase cuida das senhas/OAuth/tokens. A integração Supabase valida a assinatura Firebase; `krs_uid()` também confere issuer, audience, identidade verificada e, quando ativado, código válido para aquela sessão. JWT Firebase sem claim de papel usa `anon`; isso não concede escrita sem identidade validada.
+Firebase cuida das senhas/OAuth/tokens. A integração Supabase valida a assinatura Firebase; `krs_uid()` também confere issuer, audience, identidade verificada e, quando ativado, código válido para aquela sessão. JWT Firebase sem claim de papel usa `anon`; isso não concede escrita sem identidade validada. O marcador de visita é local e não registra IP, e-mail ou telefone nem autoriza uma conta.
 
 Tabelas de donos/códigos são privadas. Reações e inscrições só são acessadas por RPCs específicas. Uploads de perfil são restritos ao UID/path/tipo/tamanho. A pré-validação do Storage usa `contentLength`, e o metadado persistido usa `size`; ambos são tratados. Comentários têm limites de frequência e regras de propriedade. O frontend escapa o conteúdo inserido por usuários.
 
@@ -96,7 +97,10 @@ Em outro terminal:
 ```sh
 npm run test:security
 npm run test:codes
+npm run test:access
 npm run test:auth-ui
+npm run test:navigation
+npm run test:worker
 npm run test:browser
 npm run test:platform
 npm run test:media
@@ -106,7 +110,9 @@ npm run test:discovery
 
 `KRS_CHROMIUM_MODULE` permite apontar para uma instalação existente de `@sparticuz/chromium` em ambientes restritos. O WebM curto em `tests/fixtures` é apenas um padrão de teste, nunca entra na produção. Capturas intermediárias ficam em `.test-artifacts`.
 
-PGlite executa PostgreSQL/RLS. Testes da função verificam JWT RSA assinado, projeto, expiração, HMAC, origem, destinatário e código; APIs de e-mail/banco são simuladas. Chromium verifica reprodução real, capítulos, velocidade, telas móveis, campos de login, confirmação por código, uploads/edição, canais, inscrições e permissões de interface com provedores simulados. A verificação de login/upload de produção deve ser concluída após instalar os arquivos.
+PGlite executa PostgreSQL/RLS. Testes da função verificam JWT RSA assinado, projeto, expiração, HMAC, origem, destinatário e código; APIs de e-mail/banco são simuladas. `test:access` verifica o controlador e o adaptador Firebase com DOM/SDK simulados: primeira visita, restauração, corrida de carregamento, métodos pendentes, escopos OAuth, validação de senha/SMS e confirmação de código. Esses testes não enviam SMS/e-mail nem autenticam em produção.
+
+A suíte Chromium existente cobre reprodução, capítulos, velocidade, telas móveis, campos de login, confirmação por código, uploads/edição, canais, inscrições e permissões de interface com provedores simulados. A versão 4.5 não teve verificação visual em navegador nem login real neste ambiente; confira após publicar o ZIP.
 
 `test:sound` verifica a sobreposição real de dois áudios, fim da transição, cancelamento por pausa/busca, repetição, velocidade, preferências e painel móvel. Renderização com OfflineAudioContext confirma a resposta dos filtros e o bypass; as curvas de crossfade mantêm a soma dos ganhos em no máximo 1. Os áudios sintéticos usados nessa verificação não entram no ZIP público.
 

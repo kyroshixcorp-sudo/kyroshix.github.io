@@ -14,6 +14,8 @@ try {
     const client = await createFirebaseClient(config.firebase,config);
     authState.client = client;
     ui.connect(client);
+  } else {
+    ui.unavailable('O acesso às contas ainda não foi ativado. Você pode continuar ouvindo sem uma conta.');
   }
 } catch {
   ui.unavailable('O acesso às contas está indisponível no momento. Recarregue a página para tentar novamente.');
