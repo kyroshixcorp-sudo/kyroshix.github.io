@@ -6,6 +6,7 @@
   "scripts": {
     "test:security": "node tests/security.cjs",
     "test:browser": "node tests/browser.cjs",
+    "test:auth-ui": "node tests/auth-ui.cjs",
     "test:codes": "node tests/login-code.cjs",
     "test:platform": "node tests/platform.cjs",
     "test:media": "node tests/media.mjs",

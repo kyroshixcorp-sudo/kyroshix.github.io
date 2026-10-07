@@ -46,7 +46,8 @@ UID de dono solicitado: `8Q7S8FgBZjTrg4Mkf46ntcYvl0Q2`. A migração 03 remove a
 - Catálogo/páginas de vídeo, compartilhamento por URLs legíveis, player nativo MP4/WebM e Shaka para HLS/DASH; incorporação YouTube com consentimento ao tocar. Links antigos com hash continuam funcionando.
 - Velocidade, capítulos, WebVTT, cinema, fullscreen/PiP quando suportados, qualidade adaptativa quando oferecida pelo manifesto e histórico local.
 - Estúdio exclusivo do dono: CRUD de música e vídeo, miniaturas, textos, créditos, arquivos e rascunhos de vídeo.
-- Login Google, e-mail/senha, cadastro, recuperação e verificação; provedores adicionais/SMS/link de e-mail configuráveis. Só métodos habilitados aparecem.
+- Tela de entrada/cadastro automática para visitantes sem sessão autenticada, com opção explícita de continuar como visitante; o estado temporário fica no `sessionStorage`, sem usar IP para identificar pessoas.
+- Login Google, e-mail/senha, cadastro e recuperação; botões para Facebook, GitHub, X/Twitter, Instagram e SMS. Somente os métodos ativados funcionam; provedores pendentes aparecem desativados. Instagram requer integração própria.
 - Código de e-mail pós-login implementado como Edge Function, desligado até configurar remetente e endpoint. O banco impõe o código quando a política opcional é ativada.
 - Interface responsiva translúcida, transições discretas e respeito a `prefers-reduced-motion`.
 
@@ -61,7 +62,7 @@ Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends 
 | `dist/router.js`, `_redirects`, `theme.js`, `themes.css` | URLs públicas, navegação sem recarregar, tema salvo e seletor animado |
 | `dist/audio-engine.js`, `sound-panel.js` | Crossfade, equalizador, efeitos, controles e preferências locais |
 | `dist/platform.js`, `video-player.js`, `drm.js` | Canais, reações, inscrições, Studio de vídeo e player |
-| `dist/auth-controller.js`, `firebase-client.js` | Interface de contas e Firebase |
+| `dist/auth-controller.js`, `firebase-client.js`, `account.css` | Interface de contas, provedores de login e Firebase |
 | `dist/data-client.js`, `resumable-upload.js` | API Supabase e uploads |
 | `dist/*-config.json` | Configurações públicas; nunca segredos |
 | `backend/` | Migrações PostgreSQL e funções de servidor |
@@ -95,6 +96,7 @@ Em outro terminal:
 ```sh
 npm run test:security
 npm run test:codes
+npm run test:auth-ui
 npm run test:browser
 npm run test:platform
 npm run test:media

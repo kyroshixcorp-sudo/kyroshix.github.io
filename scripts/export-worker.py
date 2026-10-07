@@ -8,7 +8,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 DEFAULT_FILES = [
-    'index.html', 'app.js', 'experience.css', 'atelier.css', 'listening-room.js',
+    'index.html', 'app.js', 'account.css', 'auth-controller.js', 'experience.css', 'atelier.css', 'listening-room.js',
     'music-player.js', 'video-player.js', 'platform.js', 'router.js', 'theme.js',
     'themes.css', 'auth.js', 'data-client.js', 'drm.js',
 ]

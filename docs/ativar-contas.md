@@ -18,6 +18,10 @@ Preencha `firebase.apiKey`, `firebase.authDomain`, `firebase.projectId` e `fireb
 
 Publique o ZIP atualizado no mesmo Worker `releases` da Cloudflare. A versão antiga hospedada no ChatGPT é independente e não será atualizada nesta ativação. Não altere as permissões dessa cópia antiga.
 
+## Primeira visita e privacidade
+
+Quando o Firebase informa que não há uma sessão autenticada, o site abre a tela de entrada/cadastro automaticamente. A abertura é mostrada uma vez por sessão da aba; a pessoa pode fechar a tela e continuar ouvindo como visitante. Uma sessão Firebase já existente não recebe o aviso. O navegador guarda apenas essa preferência temporária em `sessionStorage` — não usamos endereço IP, impressão digital do dispositivo, e-mail ou telefone para decidir se alguém já visitou o site. Os dados de autenticação só são enviados ao Firebase quando a pessoa escolhe iniciar uma sessão ou criar uma conta.
+
 ## Verificação antes de anunciar como ativo
 
 Com uma conta de teste autorizada, confirme: cadastro por e-mail, confirmação recebida, saída, entrada existente, senha errada, recuperação de senha recebida, Google, reabertura da sessão e saída. Teste Google no Chrome Android também. O fluxo usa popup para evitar falhas de redirecionamento com armazenamento de terceiros bloqueado; se o navegador bloquear a janela, a interface explica como permitir e oferece entrada por e-mail.
