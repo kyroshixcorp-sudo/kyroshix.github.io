@@ -6,6 +6,13 @@
   "compatibility_date": "2026-10-07",
   "workers_dev": true,
   "preview_urls": true,
+  // dist/_redirects stays in git for the production Worker (export-worker.py).
+  // Workers Static Assets rejects its "/x/* /index.html 200" rules, so the
+  // Cloudflare build container (WORKERS_CI=1) drops that copy before upload;
+  // the single-page-application fallback below serves those routes instead.
+  "build": {
+    "command": "if [ -n \"$WORKERS_CI\" ]; then rm -f dist/_redirects; fi"
+  },
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application"
