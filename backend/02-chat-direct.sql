@@ -164,14 +164,14 @@ create or replace function public.krs_chat_touch_conversation()
 returns trigger
 language plpgsql security definer
 set search_path = ''
-as $
+as $krs$
 begin
   update public.krs_conversations
   set last_message_at = new.created_at
   where id = new.conversation_id;
   return new;
 end;
-$;
+$krs$;
 revoke all on function public.krs_chat_touch_conversation() from public;
 
 drop trigger if exists krs_chat_message_touch_conversation on public.krs_messages;
