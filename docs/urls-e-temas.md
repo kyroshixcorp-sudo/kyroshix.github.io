@@ -38,9 +38,10 @@ abrir com o tema escuro selecionado. Equalizador, crossfade e reprodução são
 mantidos ao alternar.
 
 As regras de `dist/_redirects` encaminham somente as páginas conhecidas para
-`index.html`, usando sufixo `*` para cobrir caminhos com e sem barra final. Não
-use uma regra global `/* /index.html 200`: ela pode substituir respostas de
-arquivos por HTML. No preview, `wrangler.jsonc` faz o mesmo com
+`index.html`: rotas fixas aparecem com e sem barra final, e apenas caminhos de
+conteúdo (`/track/*`, `/watch/*`, `/canal/*`, etc.) usam splat. Não use uma
+regra global `/* /index.html 200`: ela pode substituir respostas de arquivos
+por HTML. No preview, `wrangler.jsonc` faz o mesmo com
 `not_found_handling: single-page-application`. Em outro servidor é necessário
 configurar rewrites equivalentes; o GitHub guarda o código e não aplica as
 regras `_redirects` ao hospedar Pages.

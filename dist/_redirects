@@ -1,15 +1,25 @@
 # A homepage agora é o Spatial UI (index.html).
-# Estas rotas legadas continuam entregando a página principal no Cloudflare.
-# Regras com * cobrem caminhos com e sem barra final; nunca use /* global.
-/inicio* /index.html 200
-/musicas* /index.html 200
-/videos* /index.html 200
-/favoritas* /index.html 200
-/recentes* /index.html 200
-/perfil* /index.html 200
-/studio* /index.html 200
-/inscricoes* /index.html 200
-/biblioteca* /index.html 200
+# Rotas legadas continuam entregando a página principal no Cloudflare.
+# Pares com/sem barra final evitam splats amplos; IDs usam splat no final.
+/inicio /index.html 200
+/inicio/ /index.html 200
+/musicas /index.html 200
+/musicas/ /index.html 200
+/videos /index.html 200
+/videos/ /index.html 200
+/favoritas /index.html 200
+/favoritas/ /index.html 200
+/recentes /index.html 200
+/recentes/ /index.html 200
+/perfil /index.html 200
+/perfil/ /index.html 200
+/perfil/* /index.html 200
+/studio /index.html 200
+/studio/ /index.html 200
+/inscricoes /index.html 200
+/inscricoes/ /index.html 200
+/biblioteca /index.html 200
+/biblioteca/ /index.html 200
 /track/* /index.html 200
 /video/* /index.html 200
 /watch/* /index.html 200
