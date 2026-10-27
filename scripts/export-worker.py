@@ -8,7 +8,12 @@ from pathlib import Path
 from zipfile import ZipFile
 
 DEFAULT_FILES = [
-    'index.html', 'app.js', 'experience.css', 'atelier.css', 'listening-room.js',
+    # Homepage Spatial UI e o alias /spatial-ui.html.
+    'index.html', 'spatial-ui.html', 'legacy.html',
+    # Páginas estáticas continuam acessíveis pelos links do rodapé.
+    'sobre.html', 'contato.html', 'privacidade.html', 'termos.html', 'direitos-autorais.html',
+    # Módulos mantidos para o app legado e para os testes existentes.
+    'app.js', 'experience.css', 'atelier.css', 'listening-room.js',
     'music-player.js', 'video-player.js', 'platform.js', 'router.js', 'theme.js',
     'themes.css', 'auth.js', 'auth-controller.js', 'firebase-client.js',
     'access-policy.js', 'account.css', 'brand-red.css', 'data-client.js', 'drm.js',
@@ -61,8 +66,8 @@ metadata = {
     'assets': {'config': {'run_worker_first': routes}},
     'bindings': [{'name': 'ASSETS', 'type': 'assets'}],
     'annotations': {
-        'workers/message': 'KYROSHIX Releases 4.5: account design, welcome and access methods',
-        'workers/tag': 'kyroshix-4.5',
+        'workers/message': 'KYROSHIX Spatial UI: glass homepage on Cloudflare',
+        'workers/tag': 'kyroshix-spatial-home',
     },
 }
 (args.output / 'metadata.json').write_text(

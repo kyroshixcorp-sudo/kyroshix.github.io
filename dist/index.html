@@ -1,109 +1,897 @@
-<!doctype html><html lang="pt-BR"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0b"><meta name="description" content="Música, remixes e comunidade. Ouça os lançamentos KYROSHIX, baixe as faixas e entre na conversa.">
-<meta name="robots" content="index,follow"><meta property="og:title" content="KYROSHIX RELEASES — Música e comunidade"><meta property="og:description" content="Nightcore, synthwave e remixes por KYROSHIX.">
-<meta property="og:image" content="https://releases.kyroshixcorp.workers.dev/assets/hero.webp"><meta property="og:url" content="https://releases.kyroshixcorp.workers.dev/">
-<title>KYROSHIX RELEASES — Música e comunidade</title><script src="/theme.js"></script><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/modern.css"><link rel="stylesheet" href="/glass.css"><link rel="stylesheet" href="/experience.css"><link rel="stylesheet" href="/atelier.css"><link rel="stylesheet" href="/themes.css"><link rel="stylesheet" href="/account.css"><link rel="stylesheet" href="/brand-red.css"><link rel="stylesheet" href="/upgrade.css"><link rel="stylesheet" href="/reference-redesign.css"><script type="module" src="/ads.js"></script><script type="module" src="/app.js"></script></head><body class="home-route">
-<a class="skip" href="#main-content">Pular para o conteúdo</a><svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
-    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
-    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.3 15.6A8 8 0 0 1 8.4 4.7 8.7 8.7 0 1 0 19.3 15.6Z"/><path d="M16 3v4m-2-2h4m2 3v2m-1-1h2"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8.5 4.75a.8.8 0 0 0-1.2.7v13.1a.8.8 0 0 0 1.2.7l10.6-6.55a.82.82 0 0 0 0-1.4Z" fill="currentColor" stroke="none"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></g></symbol>
-    <symbol id="i-next" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><path d="M5.25 5.25a.7.7 0 0 0-1.1.6v12.3a.7.7 0 0 0 1.1.6l9.4-6.150a.72.72 0 0 0 0-1.2Z"/><rect x="17.25" y="5" width="2.6" height="14" rx=".9"/></g></symbol>
-    <symbol id="i-prev" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><path d="M18.75 5.25a.7.7 0 0 1 1.1.6v12.3a.7.7 0 0 1-1.1.6l-9.4-6.15a.72.72 0 0 1 0-1.2Z"/><rect x="4.15" y="5" width="2.6" height="14" rx=".9"/></g></symbol>
-    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
-    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4m14-1v2a3 3 0 0 1-3 3H3"/></symbol>
-    <symbol id="i-volume" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Z"/><path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
-    <symbol id="i-muted" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4Z"/><path d="m16 9 5 6m0-6-5 6"/></symbol>
-    <symbol id="i-rewind" viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1 1 10M4 4v5h5"/></symbol>
-    <symbol id="i-forward" viewBox="0 0 24 24"><path d="M20 9a8 8 0 1 0-1 10m1-15v5h-5"/></symbol>
-    <symbol id="i-pip" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><rect x="12" y="11" width="6" height="6" rx="1"/></symbol>
-    <symbol id="i-theater" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/></symbol>
-    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.5 5.5a5 5 0 0 0-7 0L12 7l-1.5-1.5a5 5 0 0 0-7 7L12 21l8.5-8.5a5 5 0 0 0 0-7Z"/></symbol>
-    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
-    <symbol id="i-disc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M7 12a5 5 0 0 1 5-5m0 10a5 5 0 0 0 5-5"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
-<symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></symbol>
-<symbol id="i-library" viewBox="0 0 24 24"><path d="M4 4v16M9 4v16m5-16 6 16"/></symbol>
-<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
-<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
-<symbol id="i-list" viewBox="0 0 24 24"><path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1"/></symbol>
-<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v.1"/></symbol>
-<symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 6h3c4 0 8 12 12 12h3m-4-4 4 4-4 4M3 18h3c1.5 0 3-2 4.5-4m3-4C15 8 16.5 6 18 6h3m-4-4 4 4-4 4"/></symbol>
-<symbol id="i-headphones" viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="12" width="5" height="9" rx="2"/><rect x="16" y="12" width="5" height="9" rx="2"/></symbol>
-<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol><symbol id="i-comment" viewBox="0 0 24 24"><path d="M21 11a8 8 0 0 1-8 8H7l-5 3 2-7a8 8 0 1 1 17-4Z"/></symbol><symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></symbol><symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 4 5 5M3 21l5-1L21 7a2 2 0 0 0-5-5L3 15Z"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol><symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol><symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 3v7m0 4v7M12 3v11m0 4v3M20 3v3m0 4v11M1 10h6M9 18h6M17 6h6"/></symbol><symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 10v4m4-8v12m5-16v20m5-16v12m4-8v4"/></symbol><symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></symbol><symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="m10 9 5 3-5 3Z"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 21v-3a6 6 0 0 1 12 0v3m1-16a3 3 0 0 1 0 6m2 4a5 5 0 0 1 3 4v2"/></symbol></defs></svg>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0b09">
+<meta name="description" content="KYROSHIX em Spatial UI: uma experiência de escuta em vidro fosco, com formas de onda interativas e os lançamentos do catálogo.">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="KYROSHIX — Spatial UI">
+<meta property="og:description" content="Vidro fosco, luz quente e música flutuando no espaço.">
+<meta property="og:image" content="https://releases.kyroshixcorp.workers.dev/assets/spatial-room.jpg">
+<meta property="og:url" content="https://releases.kyroshixcorp.workers.dev/">
+<link rel="canonical" href="https://releases.kyroshixcorp.workers.dev/">
+<title>KYROSHIX — Spatial UI</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<style>
+  :root{
+    --white:#fff;
+    --white-96:rgba(255,255,255,.96);
+    --grey:94,94,94; /* #5E5E5E — usado em baixa opacidade */
+    --muted:rgba(255,255,255,.6);
+    --line:rgba(255,255,255,.14);
+    --accent:#ff5500;
+    --accent-2:#ff8a3d;
+    --blur:28px;
+    --radius:28px;
+    color-scheme:dark;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Inter,system-ui,sans-serif;
+    background:#0d0b09;color:var(--white);overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  }
+  button,input{font:inherit}
+  button{cursor:pointer;color:inherit}
+  a{color:inherit;text-decoration:none}
+  [hidden]{display:none!important}
+  :focus-visible{outline:2px solid #ffb27a;outline-offset:3px}
+  .skip{position:fixed;top:-80px;left:18px;z-index:60;background:var(--accent);padding:12px 18px;border-radius:12px}
+  .skip:focus{top:14px}
 
-<header class="topbar"><button class="icon-button menu-toggle" id="menu-toggle" aria-controls="sidebar" aria-label="Abrir navegação" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button><a class="brand" href="/inicio" aria-label="KYROSHIX RELEASES, início"><span class="brand-symbol"></span><img src="/assets/wordmark-short.svg" alt="KYROSHIX" width="930" height="83"></a>
-<nav class="header-links" aria-label="Explorar"><a href="/musicas" data-nav="musicas">Música</a><a href="/videos" data-nav="videos">Vídeos</a></nav>
-<button class="icon-button search-toggle" id="search-toggle" aria-label="Abrir busca" aria-expanded="false" aria-controls="site-search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></button><a class="header-listen secondary" href="/musicas">Ouvir <span aria-hidden="true">↗</span></a>
-<form class="search" id="site-search" role="search" hidden><label class="sr-only" for="search">Buscar no catálogo</label><input type="search" id="search" placeholder="Buscar músicas, vídeos, artistas" autocomplete="off"><button type="button" class="icon-button" id="clear-search" aria-label="Limpar busca" hidden><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button><button type="submit" aria-label="Buscar"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></button><button type="button" class="icon-button" id="close-search" aria-label="Fechar busca"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></form><button type="button" class="theme-toggle" id="theme-toggle" data-theme-toggle role="switch" aria-label="Tema escuro" aria-checked="false" title="Ativar tema escuro"><span class="theme-track" aria-hidden="true"><span class="theme-knob"><svg class="icon theme-sun"><use href="#i-sun"/></svg><svg class="icon theme-moon"><use href="#i-moon"/></svg></span></span></button><button class="account-trigger" id="account-open" aria-haspopup="dialog" aria-controls="account-dialog">Entrar</button></header>
-<button class="nav-scrim" id="nav-scrim" aria-label="Fechar navegação" hidden></button>
-<aside class="sidebar" id="sidebar"><p class="library-heading">Biblioteca</p><nav aria-label="Navegação principal"><a class="nav-item active" href="/inicio" data-nav="inicio"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>Descobrir</a><a class="nav-item" href="/musicas" data-nav="musicas"><svg class="icon" aria-hidden="true"><use href="#i-disc"/></svg>Músicas <span id="nav-count"></span></a><a class="nav-item" href="/favoritas" data-nav="favoritas"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>Favoritas <span id="favorites-count">0</span></a><a class="nav-item" href="/recentes" data-nav="recentes"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Ouvidas recentemente</a><div class="sidebar-divider"></div><p class="sidebar-label">SEU ESPAÇO</p><a class="nav-item" href="/perfil" data-nav="perfil"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Meu perfil</a><a class="nav-item" href="/studio" data-nav="studio"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg>Estúdio <span class="owner-dot" hidden></span></a></nav><div class="sidebar-bottom"><button class="secondary drawer-account" data-login><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Minha conta</button><span class="brand-symbol"></span><p>Música. Vídeo.<br><strong>Conexões.</strong></p><a href="https://www.youtube.com/@kyroshixcorp" target="_blank" rel="noopener noreferrer">KYROSHIX no YouTube ↗</a><small>Créditos em cada faixa.</small></div></aside>
-<main class="main" id="main-content" tabindex="-1">
-<section id="view-catalog" class="view"><div class="catalog-shell"><div class="catalog-content"><div class="welcome" id="welcome">
- <span class="brand-symbol hero-mark" aria-hidden="true"></span>
- <p class="eyebrow hero-eyebrow">NA SUA FREQUÊNCIA</p>
- <h1 class="hero-title"><img src="/assets/wordmark.svg" width="930" height="175" alt="KYROSHIX RELEASES" fetchpriority="high"></h1>
- <p class="hero-description">Nightcore, remixes e novas frequências.</p>
- <div class="welcome-links"><a class="primary" href="/musicas">Explorar músicas</a><a class="secondary" href="mailto:kyroshixcorp@gmail.com">Contato</a></div>
- <a class="hero-scroll" href="/musicas" aria-label="Explorar o catálogo"><span aria-hidden="true">↓</span></a>
-</div><div class="section-title"><div><p class="eyebrow">KYROSHIX COLLECTION</p><h1 id="catalog-heading">Descobrir</h1></div><div class="discovery-actions"><span class="subtle" id="catalog-total"></span><button id="discovery-shuffle" aria-label="Reproduzir músicas aleatoriamente" class="secondary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-shuffle"/></svg><span>Surpreenda-me</span></button></div></div>
-<div class="filters" role="group" aria-label="Filtrar estilo"><button class="active" data-filter="all">Tudo</button><button data-filter="nightcore">Nightcore</button><button data-filter="synthwave">Synthwave</button><button data-filter="remix">Remixes</button></div>
-<section class="spotlight" id="spotlight" aria-label="Faixa em destaque"></section>
-<section class="discovery-section" id="artist-section" hidden aria-labelledby="artist-heading"><div class="section-title"><h2 id="artist-heading">Artistas no catálogo</h2><span class="subtle">Explore os créditos</span></div><div id="artist-list" class="artist-list"></div></section>
-<section class="discovery-section" id="recent-section" aria-labelledby="recent-heading" hidden><div class="section-title"><h2 id="recent-heading">Ouvidas recentemente</h2><a class="text-button" href="/recentes">Ver histórico</a></div><div id="recent-list" class="recent-list"></div><p class="history-note">Histórico salvo somente neste navegador.</p></section>
-<div id="history-tools" class="history-tools" hidden><p>Seu histórico de músicas neste navegador.</p><button class="text-button" id="history-clear" type="button"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>Limpar histórico</button></div>
-<div class="section-title releases-heading"><div><p class="eyebrow">ESCOLHA SEU PRÓXIMO REPEAT</p><h2 id="release-heading">Todos os lançamentos</h2></div><div class="catalog-tools"><label class="sr-only" for="sort">Ordenação</label><select id="sort"><option value="featured">Destaques</option><option value="recent">Mais recentes</option><option value="title">Título A–Z</option><option value="duration">Mais curtas</option></select><button class="icon-button" id="view-toggle" aria-label="Alternar para lista"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button><button class="text-button" id="play-all" aria-label="Ouvir seleção"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg><span>Ouvir seleção</span></button></div></div>
-<p class="inline-message" id="catalog-message" hidden role="status"></p><div class="release-grid" id="release-grid"></div><div class="empty-state" id="empty-state" hidden><h3>Nenhuma faixa por aqui</h3><p id="empty-description">Tente outro título, artista ou estilo.</p><button id="reset-filters" class="secondary">Mostrar todas</button></div><div class="collection-note"><span id="collection-count"></span><span>Ouça aqui. Leve o áudio original.</span></div></div>
-<aside id="listening-rail" class="listening-rail" aria-label="Tocando agora"><div class="rail-heading"><h2><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg>Tocando agora</h2><button class="icon-button" id="rail-expand" aria-label="Expandir player"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></button></div><button id="rail-art" class="rail-art" aria-label="Abrir player de música"></button><div class="rail-track"><a id="rail-title" href="/musicas"></a><p id="rail-artist"></p></div><div class="rail-transport"><button class="icon-button" id="rail-prev" aria-label="Faixa anterior"><svg class="icon" aria-hidden="true"><use href="#i-prev"/></svg></button><button class="now-play" id="rail-play" aria-label="Reproduzir"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button><button class="icon-button" id="rail-next" aria-label="Próxima faixa"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></button></div><button id="rail-sound" class="rail-sound" type="button"><svg class="icon" aria-hidden="true"><use href="#i-sliders"/></svg><span>Som e transição<small id="rail-sound-summary"></small></span></button><div class="rail-queue-title"><h3 id="rail-queue-title">A seguir</h3><button id="rail-queue-open" class="text-button" type="button">Ver fila</button></div><div id="rail-queue"></div></aside></div>
-</section>
-<section class="view" id="view-not-found" hidden><div class="empty-state"><h1>Página não encontrada</h1><p>Este endereço não está disponível. Encontre seu próximo play no catálogo.</p><a class="primary" href="/inicio">Voltar ao início</a></div></section>
-<section class="view" id="view-track" hidden><a class="back-link" href="/musicas">‹ Todos os lançamentos</a><div class="track-layout"><div class="track-main"><div id="track-detail"></div><section class="comments-section" aria-labelledby="comments-heading"><div class="section-title"><h2 id="comments-heading">Comentários</h2><button class="text-button" id="comments-refresh">Atualizar</button></div><p class="inline-message" id="comments-status" role="status" hidden></p><form id="comment-form"><div class="comment-composer"><span id="composer-avatar" class="avatar">K</span><div class="composer-input"><p id="reply-label" hidden></p><label class="sr-only" for="comment-body">Seu comentário</label><textarea id="comment-body" rows="3" maxlength="2000" placeholder="O que você achou dessa faixa?" required></textarea><div class="composer-actions"><span id="comment-help">Entre para participar da conversa.</span><button type="button" class="text-button" id="comment-cancel" hidden>Cancelar</button><button class="primary" id="comment-send">Comentar</button></div></div></div></form><div id="comments-list"></div><button class="secondary" id="comments-more" hidden>Carregar mais comentários</button></section></div><aside class="up-next"><p class="eyebrow">CONTINUE OUVINDO</p><h2>Na mesma frequência</h2><div id="related-tracks"></div></aside></div></section>
-<section class="view" id="view-profile" hidden><a class="back-link" href="/inicio">‹ Descobrir</a><div id="public-profile"></div><div id="profile-gate" class="empty-state" hidden><h1>Seu espaço na comunidade.</h1><p>Entre para personalizar seu perfil e participar dos comentários.</p><button class="primary" data-login>Entrar ou criar conta</button></div></section>
-<section class="view" id="view-studio" hidden><div class="section-title"><div><p class="eyebrow">KYROSHIX STUDIO</p><h1>Seu catálogo, do seu jeito.</h1></div><button id="add-track" class="primary" hidden><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Adicionar música</button></div><div id="studio-gate" class="empty-state"><span class="studio-icon"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg></span><h2>O espaço de quem cria.</h2><p id="studio-status">Entre com a conta do dono para gerenciar músicas.</p><button class="primary" data-login>Entrar na conta</button></div><div id="studio-content" hidden><div class="studio-stats"><div><span id="studio-count">0</span><p>Músicas no catálogo</p></div><div><span>Até 50 MB</span><p>Envio direto de arquivos</p></div><div><span>Seu espaço</span><p>Títulos, capas e descrições</p></div></div><p class="subtle">As alterações publicadas aparecem para todos os visitantes.</p><div id="studio-list"></div></div></section>
-<footer><div class="footer-brand"><span class="brand-symbol" aria-hidden="true"></span><img src="/assets/wordmark.svg" alt="KYROSHIX RELEASES" width="930" height="175"></div><p>Remixes por KYROSHIX.<br>Créditos das obras originais em cada faixa.</p><div class="footer-links"><a href="/musicas">Música ↗</a><a href="/videos">Vídeos ↗</a><a href="/spatial-ui.html">Spatial UI ↗</a><a href="/sobre.html">Sobre</a><a href="/privacidade.html">Privacidade</a><a href="/termos.html">Termos</a><a href="/direitos-autorais.html">Direitos autorais</a><a href="/contato.html">Contato ↗</a></div></footer></main>
-<aside class="player" aria-label="Player de música"><div class="player-track"><button class="mini-cover cover-remember" id="player-cover" aria-label="Expandir player de música"></button><div class="player-track-text"><button id="player-title" aria-label="Expandir player de música">Remember</button><span id="player-artist">Levianth & Axol feat. The Tech Thieves</span></div><button class="icon-button" id="favorite" aria-label="Favoritar música" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg></button></div><div class="player-center"><div class="transport"><button class="icon-button" id="shuffle" aria-label="Reprodução aleatória" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-shuffle"/></svg></button><button class="icon-button" id="previous" aria-label="Faixa anterior"><svg class="icon" aria-hidden="true"><use href="#i-prev"/></svg></button><button class="player-play" id="play-toggle" aria-label="Reproduzir"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button><button class="icon-button" id="next" aria-label="Próxima faixa"><svg class="icon" aria-hidden="true"><use href="#i-next"/></svg></button><button class="icon-button" id="repeat" aria-label="Repetir faixa" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-repeat"/></svg></button></div><div class="progress"><span id="elapsed">0:00</span><input id="seek" type="range" min="0" max="172" value="0" step="0.1" aria-label="Posição da música"><span id="duration">2:51</span></div></div><div class="player-extras"><button class="icon-button" id="player-expand" aria-label="Expandir player" aria-haspopup="dialog" aria-controls="music-player"><svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg></button><a class="icon-button" id="player-download" href="/assets/remember.mp3" download aria-label="Baixar áudio"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg></a><button class="icon-button" id="queue-toggle" aria-label="Fila de reprodução"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button><svg class="icon" aria-hidden="true"><use href="#i-volume"/></svg><input type="range" id="volume" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></div></aside><nav class="mobile-nav" aria-label="Navegação do celular"><a href="/inicio" data-nav="inicio" class="active"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg><span>Descobrir</span></a><a href="/musicas" data-nav="musicas"><svg class="icon" aria-hidden="true"><use href="#i-disc"/></svg><span>Músicas</span></a><a href="/favoritas" data-nav="favoritas"><svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span>Favoritas</span></a><a href="/perfil" data-nav="perfil"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg><span>Perfil</span></a></nav><audio id="audio" crossorigin="anonymous" preload="metadata" src="/assets/remember.mp3"></audio>
-<dialog id="queue" aria-labelledby="queue-title"><button class="icon-button dialog-close" aria-label="Fechar"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button><h2 id="queue-title">Fila de reprodução</h2><div id="queue-list"></div></dialog>
-<dialog id="account-dialog" class="account-dialog" aria-labelledby="account-title" aria-describedby="account-subtitle">
-<button type="button" class="icon-button dialog-close" aria-label="Fechar acesso"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
-<div class="access-layout">
-<aside class="access-art" aria-label="Na sua frequência">
-<img class="access-art-image" src="/assets/hero.webp" width="1600" height="1000" alt="" loading="lazy">
-<img class="account-logo" src="/assets/wordmark.svg" width="930" height="175" alt="KYROSHIX RELEASES">
-<div class="access-art-copy"><span class="access-kicker">MÚSICA · VÍDEO · COMUNIDADE</span><p>Entre na sua<br><em>frequência.</em></p><span class="access-art-caption">Um espaço para quem vive o som.</span><div class="access-dots" aria-hidden="true"><span></span><span></span><span></span></div></div>
-</aside>
-<div class="access-content">
-<div class="access-heading"><p class="access-kicker">SEU PRÓXIMO PLAY</p><h2 id="account-title">Bom ter você de volta.</h2><p id="account-subtitle">Sua música, seu perfil, sua comunidade.</p></div>
-<p id="auth-unavailable" class="auth-notice" role="status">Carregando seu acesso…</p>
-<div id="auth-guest">
-<div id="auth-tabs" class="auth-tabs" role="group" aria-label="Acessar conta"><button type="button" data-auth-mode="login" aria-pressed="true">Entrar</button><button type="button" data-auth-mode="signup" aria-pressed="false">Criar conta</button></div>
-<form id="auth-form" novalidate>
-<div id="auth-name-field" hidden><label for="auth-name">Seu nome</label><input id="auth-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="Como você quer ser chamado"></div>
-<div><label for="auth-email">E-mail</label><input id="auth-email" name="email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required placeholder="voce@exemplo.com"></div>
-<div id="auth-password-field"><label for="auth-password">Senha</label><div class="password-wrap"><input id="auth-password" name="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="Sua senha"><button type="button" id="auth-reveal" aria-controls="auth-password" aria-pressed="false">Mostrar</button></div><p id="auth-password-hint" class="auth-hint" hidden>Pelo menos 12 caracteres. Prefira uma frase única.</p></div>
-<div id="auth-confirm-field" hidden><label for="auth-confirm">Confirme a senha</label><input id="auth-confirm" name="password-confirm" type="password" autocomplete="new-password" maxlength="128" placeholder="Digite a senha novamente"></div>
-<button type="button" id="auth-forgot" class="auth-text-button">Esqueci minha senha</button>
-<button type="submit" id="auth-submit" class="primary auth-submit" disabled aria-disabled="true">Carregando…</button>
-<button type="button" id="auth-back" class="auth-text-button" hidden>← Voltar para entrar</button>
-</form>
-<div id="auth-alternatives"><div class="auth-divider"><span>ou continue com</span></div><div id="auth-providers" class="auth-provider-grid" aria-label="Outras formas de acesso"></div><button type="button" id="auth-link-open" class="auth-text-button" hidden>Receber link de acesso por e-mail</button></div>
-<section id="auth-phone-panel" hidden><label for="auth-phone-number">Telefone com código do país</label><input id="auth-phone-number" type="tel" autocomplete="tel" placeholder="+55 11 99999-9999"><p class="auth-hint">O Google processa o número para autenticação e prevenção de abuso.</p><div id="auth-recaptcha"></div><button type="button" id="auth-phone-send" class="primary">Enviar código SMS</button><form id="auth-sms-form" hidden><label for="auth-sms-code">Código de 6 números</label><input id="auth-sms-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required placeholder="000000"><button class="primary" id="auth-sms-confirm">Confirmar SMS</button></form><button type="button" id="auth-phone-back" class="auth-text-button">← Escolher outra forma de acesso</button></section>
-<p class="auth-privacy">Sua conta reúne perfil e comentários. Você também pode ouvir e baixar sem entrar.</p>
-<button type="button" id="auth-guest-continue" class="access-guest">Continuar sem conta <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-</div>
-<section id="auth-code-panel" hidden><p class="access-kicker">VERIFICAÇÃO DE ACESSO</p><h3>Confirme que é você.</h3><p id="auth-code-destination" class="auth-hint">Receba um código no e-mail da sua conta para concluir o acesso.</p><button type="button" id="auth-code-send" class="secondary">Enviar código por e-mail</button><form id="auth-code-form"><label for="auth-code">Código de 6 números</label><input id="auth-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required placeholder="000000"><button class="primary" id="auth-code-confirm">Confirmar acesso</button></form><button type="button" id="auth-code-cancel" class="auth-text-button">Usar outra conta</button></section>
-<div id="auth-profile" hidden>
-<div class="profile-avatar" id="profile-initial" aria-hidden="true"></div><p class="profile-name" id="profile-name"></p><p class="profile-email" id="profile-email"></p>
-<div id="profile-verification" class="profile-verification" hidden><p>Confirme seu e-mail pelo link que enviamos.</p><button type="button" id="auth-resend" class="auth-text-button">Reenviar confirmação</button><button type="button" id="auth-reload" class="auth-text-button">Já confirmei meu e-mail</button></div>
-<button type="button" id="edit-my-profile" class="primary">Personalizar perfil</button><p class="uid-label">Seu ID de conta <code id="account-uid"></code></p><p id="profile-verified" class="profile-verified" hidden>E-mail confirmado</p><details id="auth-linked-methods"><summary>Conectar outra forma de acesso</summary><div id="auth-link-providers" class="auth-provider-grid"></div></details><button type="button" id="auth-signout" class="outline-download auth-signout">Sair da conta</button>
-</div>
-<p id="auth-message" class="auth-message" role="status" aria-live="polite" hidden></p>
-</div>
-</div>
-</dialog>
+  /* ===== fundo: sala escura ===== */
+  .room{
+    position:fixed;inset:0;z-index:0;background-color:#0d0b09;
+    background-image:
+      linear-gradient(180deg,rgba(10,9,8,.42),rgba(10,9,8,.68) 55%,rgba(6,5,4,.9)),
+      radial-gradient(ellipse 60% 50% at 70% 40%,rgba(214,180,140,.17),transparent 60%),
+      radial-gradient(ellipse 50% 40% at 20% 70%,rgba(120,90,60,.14),transparent 60%),
+      url('/assets/spatial-room.jpg');
+    background-repeat:no-repeat;
+    background-size:100% 100%,100% 100%,100% 100%,cover;
+    background-position:center,center,center,center;
+  }
+  .room::before{
+    content:"";position:absolute;inset:0;opacity:.55;
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.03) 0 1px,transparent 1px) 0 0/140px 100%,
+      radial-gradient(ellipse 22% 32% at 79% 28%,rgba(255,214,160,.18),transparent 72%);
+  }
+  .room::after{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(ellipse 92% 82% at 50% 44%,transparent 36%,rgba(0,0,0,.62) 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:1;opacity:.3;pointer-events:none;mix-blend-mode:overlay;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:3px 3px;
+  }
 
-<dialog id="profile-editor" class="wide-dialog" aria-labelledby="profile-editor-title"><button class="icon-button dialog-close" aria-label="Fechar"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button><p class="eyebrow">SEU PERFIL</p><h2 id="profile-editor-title">Mostre sua frequência.</h2><form id="profile-form"><div class="profile-editor-grid"><div class="form-fields"><label>Nome de exibição<input id="edit-name" required maxlength="60" autocomplete="nickname"></label><label>Pronomes <span class="optional">opcional</span><input id="edit-pronouns" maxlength="30" placeholder="Como você quer ser chamado"></label><label>Status<input id="edit-status" maxlength="80" placeholder="Na minha era nightcore 🎧"></label><label>Sobre mim<textarea id="edit-bio" maxlength="300" rows="4" placeholder="Um pouco sobre você…"></textarea></label><div class="form-pair"><label>Cor do perfil<input id="edit-accent" type="color" value="#353535"></label><label>Avatar<input type="file" id="edit-avatar" accept="image/png,image/jpeg,image/webp"><button type="button" class="text-button" id="remove-avatar">Remover avatar</button></label></div><label>Banner<input type="file" id="edit-banner" accept="image/png,image/jpeg,image/webp"><button type="button" class="text-button" id="remove-banner">Remover banner</button></label></div><div><p class="eyebrow">PRÉVIA DO PERFIL</p><div id="profile-preview"></div><p class="subtle">Seu nome, bio e imagens ficam públicos. Seu e-mail não aparece no perfil.</p></div></div><p id="profile-save-status" class="inline-message" role="status" hidden></p><div class="dialog-actions"><button type="button" class="secondary" data-close="profile-editor">Cancelar</button><button class="primary" id="save-profile">Salvar perfil</button></div></form></dialog>
-<dialog id="track-editor" class="wide-dialog" aria-labelledby="track-editor-title"><button class="icon-button dialog-close" aria-label="Fechar"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button><p class="eyebrow">ESTÚDIO</p><h2 id="track-editor-title">Adicionar música</h2><form id="track-form"><input type="hidden" id="edit-track-id"><div class="track-editor-grid"><div class="form-fields"><label>Título<input id="edit-title" required maxlength="120"></label><label>Artistas<input id="edit-artists" required maxlength="200"></label><label>Versão / remix<input id="edit-remix" maxlength="100" value="Nightcore Remix"></label><div class="form-pair"><label>Estilo<select id="edit-tags"><option value="nightcore">Nightcore</option><option value="synthwave">Synthwave</option><option value="nightcore,synthwave">Nightcore + Synthwave</option><option value="remix">Remix</option></select></label><label class="checkbox"><input type="checkbox" id="edit-featured">Em destaque</label></div><label>Descrição<textarea id="edit-description" rows="4" maxlength="5000"></textarea></label><label>Créditos da obra original<textarea id="edit-credits" rows="3" maxlength="2000" placeholder="Artistas, compositores e demais créditos"></textarea></label></div><div class="form-fields"><div id="edit-cover-preview" class="editor-cover"></div><label>Capa da música<input id="edit-cover-file" type="file" accept="image/png,image/jpeg,image/webp"></label><p class="subtle">JPG, PNG ou WebP até 30 MB. Otimizada em alta qualidade para até 8 MB.</p><label>Arquivo de áudio<input id="edit-audio-file" type="file" accept="audio/mpeg,audio/flac,audio/wav,audio/mp4,audio/ogg,.mp3,.flac,.wav,.m4a,.ogg"></label><p class="subtle" id="audio-file-hint">MP3, FLAC, WAV, M4A ou OGG. Até 50 MB por faixa.</p><p class="subtle">Ao editar, deixe os arquivos vazios para manter a capa e o áudio atuais.</p></div></div><progress id="upload-progress" max="100" value="0" hidden aria-label="Progresso do envio"></progress><p class="inline-message" id="track-save-status" role="status" hidden></p><div class="dialog-actions"><button class="secondary" type="button" data-close="track-editor">Cancelar</button><button class="primary" id="save-track">Publicar música</button></div></form></dialog>
-<dialog id="confirm-dialog" aria-labelledby="confirm-title"><h2 id="confirm-title">Excluir música?</h2><p id="confirm-text"></p><div class="dialog-actions"><button class="secondary" id="confirm-cancel">Cancelar</button><button class="danger" id="confirm-yes">Excluir</button></div></dialog>
-<div class="toast" id="toast" role="status"></div><noscript><p>Ative o JavaScript para ouvir as músicas e usar a comunidade.</p></noscript></body></html>
+  /* ===== vidro ===== */
+  .glass{
+    background:linear-gradient(135deg,rgba(255,255,255,.11),rgba(var(--grey),.18) 52%,rgba(255,255,255,.055));
+    backdrop-filter:blur(var(--blur)) saturate(1.4) brightness(1.04);
+    -webkit-backdrop-filter:blur(var(--blur)) saturate(1.4) brightness(1.04);
+    border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(255,255,255,.05);
+  }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    .glass{background:rgba(30,28,27,.94)}
+  }
+  @media(prefers-reduced-transparency:reduce){
+    .glass{background:rgba(28,26,25,.96);backdrop-filter:none;-webkit-backdrop-filter:none}
+  }
 
+  main{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:34px 22px 96px}
+
+  /* ===== topbar ===== */
+  .topbar{
+    position:sticky;top:18px;z-index:10;display:flex;align-items:center;gap:22px;
+    padding:14px 22px;margin-bottom:34px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.02em;flex-shrink:0}
+  .logo .cloud{
+    width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px rgba(255,85,0,.45);
+  }
+  .logo .cloud svg{width:20px;height:20px;fill:#fff}
+  .logo small{display:block;font-size:9px;letter-spacing:.16em;font-weight:600;color:var(--muted)}
+  .topbar nav{display:flex;gap:4px}
+  .topbar nav button{
+    color:rgba(255,255,255,.66);font-size:15px;font-weight:500;padding:9px 18px;border-radius:999px;
+    background:none;border:0;transition:.25s;white-space:nowrap;
+  }
+  .topbar nav button:hover{color:#fff;background:rgba(255,255,255,.08)}
+  .topbar nav button.active{color:#fff;background:rgba(255,255,255,.14)}
+  .search{
+    flex:1;display:flex;align-items:center;gap:10px;min-width:140px;max-width:420px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:10px 18px;
+  }
+  .search:focus-within{border-color:rgba(255,138,61,.65);box-shadow:0 0 0 3px rgba(255,138,61,.12)}
+  .search input{background:none;border:0;outline:0;color:#fff;font-size:15px;flex:1;min-width:0}
+  .search input::placeholder{color:rgba(255,255,255,.45)}
+  .search input::-webkit-search-cancel-button{display:none}
+  .search svg{width:18px;height:18px;stroke:rgba(255,255,255,.5);fill:none;stroke-width:2;flex-shrink:0}
+  .search .clear{background:none;border:0;font-size:20px;line-height:1;color:var(--muted);padding:0 4px}
+  .pro{
+    font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;padding:11px 20px;border-radius:999px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));border:0;box-shadow:0 8px 22px rgba(255,85,0,.4);
+    transition:.25s;white-space:nowrap;flex-shrink:0;
+  }
+  .pro:hover{transform:translateY(-2px)}
+  .pro span{color:rgba(255,255,255,.78);font-weight:500}
+
+  /* ===== hero ===== */
+  .hero{display:flex;gap:26px;align-items:stretch;margin-bottom:34px;flex-wrap:wrap}
+  .hero-card{flex:1.4;min-width:300px;padding:44px 40px;position:relative;overflow:hidden}
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.18em;color:rgba(255,170,120,.9);margin-bottom:14px}
+  .hero-card h1{font-size:clamp(30px,4.5vw,46px);font-weight:700;letter-spacing:-.03em;line-height:1.1}
+  .hero-card h1 em{font-style:normal;background:linear-gradient(90deg,#ff8a3d,#ff5500);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero-card p{margin-top:14px;color:var(--muted);font-size:16px;max-width:440px;line-height:1.55}
+  .hero-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+  .btn{border:0;font-size:15px;font-weight:600;padding:13px 26px;border-radius:999px;transition:.25s}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 10px 26px rgba(255,85,0,.4)}
+  .btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.16)}
+  .btn:hover{transform:translateY(-2px)}
+  .hero-card::after{
+    content:"";position:absolute;right:-70px;top:-70px;width:280px;height:280px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,120,40,.32),transparent 70%);filter:blur(10px);pointer-events:none;
+  }
+  .specs{flex:1;min-width:260px;padding:34px;display:flex;flex-direction:column;gap:18px}
+  .spec-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .spec-row .k{color:rgba(255,255,255,.55);font-size:14px}
+  .spec-row .v{font-weight:700;font-size:21px;letter-spacing:-.02em;text-align:right;overflow-wrap:anywhere}
+  .spec-title{font-size:13px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.45);text-transform:uppercase}
+  .swatches{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.1)}
+  .swatches i{width:26px;height:26px;border-radius:8px;display:block;border:1px solid rgba(255,255,255,.2)}
+  .swatches .s1{background:#fff}.swatches .s2{background:rgba(255,255,255,.96)}
+  .swatches .s3{background:rgba(var(--grey),.18)}.swatches .s4{background:rgba(255,255,255,.07)}
+  .swatches small{margin-left:auto;font-size:10px;letter-spacing:.06em;color:rgba(255,255,255,.45)}
+
+  /* ===== layout feed ===== */
+  .layout{display:grid;grid-template-columns:230px 1fr;gap:26px;align-items:start}
+  .layout>*{min-width:0}
+  .side{padding:22px;position:sticky;top:110px;min-width:0}
+  .side h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin:4px 0 14px 6px}
+  .side ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .side .nav-item{
+    width:100%;display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:14px;
+    color:rgba(255,255,255,.7);font-size:15px;font-weight:500;text-align:left;background:none;border:0;transition:.25s;
+  }
+  .side .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+  .side .nav-item.active{background:rgba(255,255,255,.14);color:#fff}
+  .side .nav-item svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0}
+  .side-divider{height:1px;background:rgba(255,255,255,.12);margin:22px 6px}
+  .status{display:flex;gap:9px;flex-wrap:wrap}
+  .status button{
+    width:40px;height:40px;border-radius:50%;border:0;padding:2px;background:var(--ring);
+    box-shadow:0 4px 12px rgba(0,0,0,.35);transition:.25s;
+  }
+  .status button:hover{transform:translateY(-3px) scale(1.06)}
+  .status button i{display:block;width:100%;height:100%;border-radius:50%;background:var(--face);border:2px solid rgba(18,16,15,.72)}
+  .side-hint{font-size:12px;line-height:1.5;color:rgba(255,255,255,.42);margin:14px 6px 0}
+
+  .feed{min-width:0}
+  .feed-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .tabs{display:flex;gap:24px}
+  .tab{
+    font-size:17px;font-weight:700;letter-spacing:-.01em;padding:8px 2px;border:0;background:none;
+    color:rgba(255,255,255,.45);position:relative;transition:.25s;
+  }
+  .tab:hover{color:rgba(255,255,255,.75)}
+  .tab.on{color:#fff}
+  .tab.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px;background:var(--accent)}
+  .feed-count{margin-left:auto;font-size:12px;letter-spacing:.04em;color:rgba(255,255,255,.45)}
+  .feed-note{font-size:13px;color:rgba(255,255,255,.5);margin:8px 0 20px;min-height:18px}
+  .track{display:flex;gap:22px;padding:22px;margin-bottom:18px;align-items:flex-start;transition:transform .3s,background .3s,box-shadow .3s;transform-style:preserve-3d}
+  .track:hover{background:linear-gradient(135deg,rgba(255,255,255,.13),rgba(var(--grey),.2));box-shadow:0 28px 70px rgba(0,0,0,.54),inset 0 1px 0 rgba(255,255,255,.22)}
+  .track.is-current{border-color:rgba(255,138,61,.5)}
+  .track.is-current .t-title{color:#ffb27a}
+
+  /* ===== capas ===== */
+  .cover,.p-art{
+    position:relative;overflow:hidden;flex-shrink:0;border-radius:18px;
+    box-shadow:0 14px 34px rgba(0,0,0,.5);border:0;padding:0;display:block;
+  }
+  .cover{width:150px;height:150px;cursor:pointer}
+  .cover .art,.p-art .art{position:absolute;inset:0}
+  .cover .art1,.p-art .art1{background:linear-gradient(135deg,#b8a6e8,#f0c9e0 55%,#8fb8e8)}
+  .cover .art2,.p-art .art2{background:linear-gradient(135deg,#39c7c7,#7de3d6)}
+  .cover .glow,.p-art .glow{position:absolute;inset:0;margin:auto;width:70%;height:70%;border-radius:50%;
+    background:radial-gradient(circle,#ffb02e,#ff7a2e 45%,transparent 72%);filter:blur(6px)}
+  .cover .ring,.p-art .ring{position:absolute;inset:14%;border:1.5px solid rgba(40,40,60,.6);border-radius:50%}
+  .cover .cross,.p-art .cross{position:absolute;left:6%;right:6%;top:50%;height:1px;background:rgba(40,40,60,.45);transform:rotate(-28deg)}
+  .cover .word,.p-art .word{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.25em;color:rgba(40,40,60,.7)}
+  .cover .tag,.p-art .tag{position:absolute;top:10px;left:10px;font-size:10px;font-weight:800;letter-spacing:.05em;color:#ff4fbf}
+  .cover .tag2,.p-art .tag2{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;letter-spacing:.05em;color:#1b5e6a}
+  .cover .art-remember,.p-art .art-remember{background:url('/assets/hero.webp') 75% center/auto 100% no-repeat}
+  .cover .art-legends,.p-art .art-legends,.cover .art-darkness,.p-art .art-darkness,.cover .art-blindfold,.p-art .art-blindfold{
+    background-image:url('/assets/covers.webp');background-size:300% 100%;background-repeat:no-repeat;
+  }
+  .cover .art-legends,.p-art .art-legends{background-position:left center}
+  .cover .art-darkness,.p-art .art-darkness{background-position:center center}
+  .cover .art-blindfold,.p-art .art-blindfold{background-position:right center}
+  .cover .art-shade,.p-art .art-shade{position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(0,0,0,.55))}
+  .cover .photo-caption,.p-art .photo-caption{position:absolute;bottom:9px;left:10px;font-size:9px;font-weight:800;letter-spacing:.16em;color:rgba(255,255,255,.85)}
+  .cover-play{
+    position:absolute;inset:0;margin:auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+    background:rgba(18,15,14,.55);border:1px solid rgba(255,255,255,.5);backdrop-filter:blur(8px);
+    opacity:0;transform:translateY(6px);transition:.25s;
+  }
+  .cover-play svg{width:18px;height:18px;fill:#fff}
+  .cover:hover .cover-play,.cover:focus-visible .cover-play,.track.is-current .cover-play{opacity:1;transform:none}
+  .track.is-current .cover-play{background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent}
+
+  .t-info{flex:1;min-width:0}
+  .frow{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+  .avatar{
+    width:40px;height:40px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+    background:var(--face,linear-gradient(135deg,#7a5cff,#ff5c87));box-shadow:0 4px 12px rgba(0,0,0,.4);
+    font-size:13px;font-weight:700;color:rgba(255,255,255,.92);text-shadow:0 1px 3px rgba(0,0,0,.5);
+  }
+  .frow .who{font-size:14.5px;color:rgba(255,255,255,.62)}
+  .frow .who b{color:#fff;font-weight:600}
+  .frow time{margin-left:auto;font-size:13px;color:rgba(255,255,255,.4);white-space:nowrap}
+  .t-artist{font-size:14px;color:rgba(255,255,255,.6)}
+  .t-title{display:block;font-size:22px;font-weight:700;letter-spacing:-.02em;margin:3px 0 14px;padding:0;border:0;background:none;text-align:left;color:inherit;transition:.2s;cursor:pointer}
+  .t-title:hover{color:var(--accent-2)}
+  .wave{display:flex;align-items:flex-end;gap:2px;height:44px;margin-bottom:14px;cursor:pointer;touch-action:none}
+  .wave i,.p-wave i{flex:1;min-width:1px;border-radius:2px 2px 0 0;background:rgba(255,255,255,.22);transition:background .18s}
+  .wave i.p,.p-wave i.p{background:var(--accent)}
+  .wave:hover i.p,.p-wave:hover i.p{background:var(--accent-2)}
+  .t-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{font-size:12px;font-weight:700;letter-spacing:.05em;padding:6px 12px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.75)}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);font-size:13.5px;color:rgba(255,255,255,.8);transition:.2s}
+  .pill:hover{background:rgba(255,255,255,.16)}
+  .pill[aria-pressed=true]{background:rgba(255,85,0,.18);border-color:rgba(255,138,61,.6);color:#fff}
+  .pill svg{width:15px;height:15px;flex-shrink:0}
+  .pill .lv{font-variant-numeric:tabular-nums}
+  .t-stats{margin-left:auto;display:flex;gap:16px;font-size:13.5px;color:rgba(255,255,255,.55);white-space:nowrap}
+  .t-stats svg{width:15px;height:15px;vertical-align:-2px;margin-right:5px}
+  .empty{padding:50px 30px;text-align:center}
+  .empty h2{font-size:22px;margin-bottom:10px}
+  .empty p{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+  /* ===== player ===== */
+  .player{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:20;
+    width:min(960px,calc(100% - 32px));display:flex;align-items:center;gap:14px;padding:13px 20px;border-radius:22px;
+  }
+  .mini{width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.09);display:grid;place-items:center;flex-shrink:0;transition:.2s}
+  .mini:hover{background:rgba(255,255,255,.2)}
+  .mini svg{width:15px;height:15px;fill:#fff}
+  .playbtn{
+    width:46px;height:46px;border-radius:50%;border:0;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;
+    box-shadow:0 8px 20px rgba(255,85,0,.5);transition:.25s;
+  }
+  .playbtn:hover{transform:scale(1.08)}
+  .playbtn svg{width:18px;height:18px;fill:#fff}
+  .p-art{width:46px;height:46px;border-radius:12px}
+  .p-art .word,.p-art .photo-caption,.p-art .tag,.p-art .tag2{display:none}
+  .p-info{min-width:0;width:180px;flex-shrink:0}
+  .p-info .n{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .p-info .a{font-size:12px;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .p-wave{flex:1;display:flex;align-items:flex-end;gap:2px;height:36px;min-width:80px;cursor:pointer;touch-action:none}
+  .p-wave i{border-radius:2px}
+  .p-time{font-size:13px;color:rgba(255,255,255,.6);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .p-vol{display:flex;align-items:center;gap:8px;flex-shrink:0}
+  .p-vol svg{width:20px;height:20px;stroke:rgba(255,255,255,.6);fill:none;stroke-width:1.8}
+  .p-vol input{width:84px;accent-color:var(--accent-2);cursor:pointer}
+  .toast{
+    position:fixed;left:50%;bottom:100px;transform:translate(-50%,10px);z-index:30;
+    padding:13px 22px;border-radius:16px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 20px;text-align:center;color:rgba(255,255,255,.38);font-size:12.5px;margin-top:44px}
+  footer a{color:rgba(255,190,140,.85)}
+  footer a:hover{color:#fff;text-decoration:underline}
+  footer small{width:100%;font-size:11.5px;color:rgba(255,255,255,.3)}
+
+  @media(max-width:1080px){
+    .topbar{flex-wrap:wrap;gap:12px}
+    .search{order:5;max-width:none;flex-basis:100%}
+    .pro{margin-left:auto}
+  }
+  @media(max-width:860px){
+    .layout{grid-template-columns:minmax(0,1fr)}
+    .side{position:static;max-width:100%}
+    .side ul{flex-direction:row;overflow-x:auto;padding-bottom:4px;max-width:100%}
+    .side .nav-item{white-space:nowrap;width:auto;flex-shrink:0}
+    .status{flex-wrap:nowrap;overflow-x:auto;max-width:100%}
+  }
+  @media(max-width:640px){
+    main{padding:16px 12px 186px}
+    .topbar{top:8px;padding:12px 14px;border-radius:20px;gap:10px}
+    .logo{order:0}
+    .pro{order:1;margin-left:auto}
+    .topbar nav{order:2;width:100%;justify-content:space-between}
+    .topbar nav button{flex:1;text-align:center;padding:9px 4px}
+    .search{order:3;flex-basis:100%}
+    .hero{gap:14px;margin-bottom:22px;flex-direction:column}
+    .hero-card,.specs{width:100%;flex:none;min-width:0}
+    .hero-card{padding:28px 24px}
+    .specs{padding:24px}
+    .track{flex-direction:column;gap:16px;padding:16px;border-radius:22px}
+    .cover{width:min(100%,210px);height:auto;aspect-ratio:1}
+    .frow time{display:none}
+    .t-title{font-size:19px}
+    .t-stats{margin-left:0;width:100%;gap:14px}
+    .player{flex-wrap:wrap;gap:10px;padding:12px 14px;bottom:10px;width:calc(100% - 20px);border-radius:20px}
+    .p-info{flex:1;width:auto}
+    .p-vol{display:none}
+    .p-wave{order:6;flex-basis:100%;height:30px}
+    .p-time{order:7;margin-left:auto}
+    .toast{bottom:150px}
+    footer{margin-top:28px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="room" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<a class="skip" href="#stream">Pular para o stream</a>
+
+<main>
+  <!-- TOPBAR -->
+  <header class="topbar glass">
+    <a class="logo" href="/" aria-label="KYROSHIX — página inicial">
+      <span class="cloud"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9.5V17H6.5A3.5 3.5 0 0 1 3 13.5 3.5 3.5 0 0 1 6.5 10c.4 0 .8.1 1.2.2V17h1V7.5a1.5 1.5 0 0 1 3 0V17h1V9a1.5 1.5 0 0 1 3 0V17h1V9.5a1 1 0 0 1 2 0V17h-1.5V9.5z"/></svg></span>
+      <span>SoundCloud<small>SPATIAL UI · KYROSHIX</small></span>
+    </a>
+    <nav aria-label="Seções">
+      <button type="button" data-view="all">Home</button>
+      <button type="button" class="active" data-view="stream">Stream</button>
+      <button type="button" data-view="library">Library</button>
+    </nav>
+    <form class="search" id="search-form" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="Buscar faixas, artistas, tags" aria-label="Buscar no stream" autocomplete="off">
+      <button class="clear" type="button" id="clear-search" aria-label="Limpar busca" hidden>×</button>
+    </form>
+    <button class="pro" id="pro" type="button">TRY <span>PRO</span></button>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-card glass">
+      <p class="eyebrow">SPATIAL UI · CONCEITO DE INTERFACE</p>
+      <h1>Sua música, <em>flutuando</em> no espaço.</h1>
+      <p>Uma experiência espacial de escuta — vidro fosco, profundidade real e o som que você ama, sempre a um gesto de distância.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="hero-play" type="button">Ouvir agora</button>
+        <button class="btn btn-ghost" id="hero-explore" type="button">Explorar stream</button>
+      </div>
+    </div>
+    <div class="specs glass">
+      <div class="spec-title">Espacial · Spatial UI</div>
+      <div class="spec-row"><span class="k">Tipografia</span><span class="v">SF Pro Display</span></div>
+      <div class="spec-row"><span class="k">Material</span><span class="v">Glass 28px</span></div>
+      <div class="spec-row"><span class="k">Faixas no stream</span><span class="v">1.284</span></div>
+      <div class="spec-row"><span class="k">Ouvintes agora</span><span class="v">87,3 mil</span></div>
+      <div class="swatches" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i><i class="s4"></i><small>#FFFFFF · #5E5E5E</small></div>
+    </div>
+  </section>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+    <aside class="side glass" aria-label="Navegação do stream">
+      <h3>Navegação</h3>
+      <ul>
+        <li><button class="nav-item" type="button" data-view="all"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Início</button></li>
+        <li><button class="nav-item active" type="button" data-view="stream"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 4l16 16M14 4l6 6"/></svg>Stream</button></li>
+        <li><button class="nav-item" type="button" data-view="likes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.9-9.7-9A5.4 5.4 0 0 1 12 6.6 5.4 5.4 0 0 1 21.7 12c-2.2 4.1-9.7 9-9.7 9z"/></svg>Curtidas</button></li>
+        <li><button class="nav-item" type="button" data-view="library"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Biblioteca</button></li>
+        <li><button class="nav-item" type="button" data-view="recent"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Recentes</button></li>
+        <li><button class="nav-item" type="button" data-view="queue"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2"/></svg>A seguir</button></li>
+      </ul>
+      <div class="side-divider"></div>
+      <h3>Ouvindo agora</h3>
+      <div class="status" id="status" aria-label="Atalhos de faixas"></div>
+      <p class="side-hint">Toque nos círculos para ouvir. Clique na forma de onda para navegar pela faixa.</p>
+    </aside>
+
+    <section class="feed" id="stream" aria-label="Stream de músicas">
+      <div class="feed-head">
+        <div class="tabs" role="tablist" aria-label="Tipo de faixa">
+          <button class="tab on" type="button" role="tab" aria-selected="true" data-tab="all">All tracks</button>
+          <button class="tab" type="button" role="tab" aria-selected="false" data-tab="releases">Releases</button>
+        </div>
+        <span class="feed-count" id="feed-count" role="status"></span>
+      </div>
+      <p class="feed-note" id="feed-note"></p>
+      <div id="track-list"></div>
+      <div class="empty glass" id="empty" hidden>
+        <h2>Nenhuma faixa por aqui</h2>
+        <p id="empty-text">Tente outro título, artista ou estilo.</p>
+        <button class="btn btn-ghost" id="reset-filters" type="button">Mostrar todas</button>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <span>© KYROSHIX · Spatial UI — conceito de interface não oficial.</span>
+    <span><a href="/sobre.html">Sobre</a> · <a href="/contato.html">Contato</a> · <a href="/privacidade.html">Privacidade</a> · <a href="/termos.html">Termos</a></span>
+    <small>As duas primeiras faixas são referências visuais e usam áudio demonstrativo do catálogo KYROSHIX.</small>
+  </footer>
+</main>
+
+<!-- PLAYER -->
+<div class="player glass" role="region" aria-label="Player de música">
+  <button class="mini" id="prev" type="button" aria-label="Faixa anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h2v14H7zM19 5v14l-10-7z"/></svg></button>
+  <button class="playbtn" id="play" type="button" aria-label="Reproduzir"><svg id="play-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg></button>
+  <button class="mini" id="next" type="button" aria-label="Próxima faixa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5h2v14h-2zM5 5v14l10-7z"/></svg></button>
+  <div class="p-art" id="p-art" aria-hidden="true"></div>
+  <div class="p-info"><div class="n" id="p-name"></div><div class="a" id="p-sub"></div></div>
+  <div class="p-wave" id="pw" role="slider" tabindex="0" aria-label="Posição da faixa" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+  <div class="p-time"><span id="cur">0:00</span> / <span id="dur">0:00</span></div>
+  <div class="p-vol">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg>
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+  </div>
+</div>
+<div class="toast glass" id="toast" role="status" aria-live="polite" hidden></div>
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+(() => {
+  'use strict';
+
+  const ICONS = {
+    play:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5l12 7-12 7z"/></svg>',
+    pause:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
+    heart:'<svg viewBox="0 0 24 24" fill="#ff5500" stroke="none" aria-hidden="true"><path d="M12 21s-7.5-4.9-9.7-9A5.4 5.4 0 0 1 12 6.6 5.4 5.4 0 0 1 21.7 12c-2.2 4.1-9.7 9-9.7 9z"/></svg>',
+    repost:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+    plays:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>',
+    comments:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-3 6l3 1-3 1a8 8 0 1 1 3-8z"/></svg>'
+  };
+
+  // As duas primeiras faixas são as referências visuais; o áudio é demonstrativo,
+  // vindo do catálogo KYROSHIX já publicado em assets/.
+  const tracks = [
+    {id:'forgive',initial:'W',group:'reference',artist:'Mt. Si',title:'Please Forgive Me',who:'Washed Out',action:'repostou uma faixa',when:'há 7 horas',
+     tag:'#CASCINE',likes:116,reposts:21,plays:'1.280',comments:42,duration:171.936,audio:'/assets/remember.mp3',cover:'radial',seed:17,
+     avatar:'linear-gradient(135deg,#7a5cff,#ff5c87)',note:'referência visual · áudio demo KYROSHIX'},
+    {id:'tampa',initial:'S',group:'reference',artist:'Small Black',title:'Tampa (FM Skyline Remix) [Extended]',who:'Small Black',action:'publicou uma faixa',when:'há 11 horas',
+     tag:'#SmallBlack',likes:89,reposts:0,plays:'2.410',comments:17,duration:200.616,audio:'/assets/darkness.mp3',cover:'teal',seed:29,
+     avatar:'linear-gradient(135deg,#223,#c33)',note:'referência visual · áudio demo KYROSHIX'},
+    {id:'remember',initial:'K',group:'release',artist:'Levianth & Axol feat. The Tech Thieves',title:'Remember',who:'KYROSHIX',action:'publicou um remix',when:'há 1 dia',
+     tag:'#Nightcore',likes:412,reposts:64,plays:'18.320',comments:128,duration:171.936,audio:'/assets/remember.mp3',cover:'art-remember',seed:41,
+     avatar:'linear-gradient(135deg,#f0a15c,#d23b5c)',note:'KYROSHIX · Nightcore Remix'},
+    {id:'legends',initial:'K',group:'release',artist:'Against The Current · League of Legends',title:'Legends Never Die',who:'KYROSHIX',action:'publicou um remix',when:'há 3 dias',
+     tag:'#Nightcore',likes:388,reposts:51,plays:'14.870',comments:96,duration:207.744,audio:'/assets/legends.mp3',cover:'art-legends',seed:53,
+     avatar:'linear-gradient(135deg,#a35bff,#ff6f91)',note:'KYROSHIX · Nightcore Remix'},
+    {id:'darkness',initial:'K',group:'release',artist:'Lost Sky × She Is Jules',title:'Darkness',who:'KYROSHIX',action:'publicou um remix',when:'há 5 dias',
+     tag:'#Synthwave',likes:301,reposts:43,plays:'11.640',comments:74,duration:200.616,audio:'/assets/darkness.mp3',cover:'art-darkness',seed:67,
+     avatar:'linear-gradient(135deg,#4f7bff,#9b5cff)',note:'KYROSHIX · Synthwave / Nightcore'},
+    {id:'blindfold',initial:'K',group:'release',artist:'Warriyo feat. Laura Brehm',title:'Blindfold',who:'KYROSHIX',action:'publicou um remix',when:'há 1 semana',
+     tag:'#Nightcore',likes:276,reposts:38,plays:'9.510',comments:61,duration:189.579,audio:'/assets/blindfold.mp3',cover:'art-blindfold',seed:83,
+     avatar:'linear-gradient(135deg,#39c7c7,#4f6bff)',note:'KYROSHIX · Nightcore Remix'}
+  ];
+
+  const statusDots = [
+    {id:'forgive',ring:'conic-gradient(#8f7bff,#ff77b5,#8f7bff)',face:'radial-gradient(circle at 35% 30%,#f4d7ff,#7a5cff)'},
+    {id:'tampa',ring:'conic-gradient(#39c7c7,#c7ff8a,#39c7c7)',face:'radial-gradient(circle at 35% 30%,#d7fffb,#2b9f9f)'},
+    {id:'remember',ring:'conic-gradient(#ff8a3d,#ffd06b,#ff8a3d)',face:'radial-gradient(circle at 35% 30%,#ffe0b6,#d2533b)'},
+    {id:'legends',ring:'conic-gradient(#a35bff,#ff6f91,#a35bff)',face:'radial-gradient(circle at 35% 30%,#f3d7ff,#7830a8)'},
+    {id:'darkness',ring:'conic-gradient(#4f7bff,#81e6ff,#4f7bff)',face:'radial-gradient(circle at 35% 30%,#d9ecff,#3054b8)'}
+  ];
+
+  const VIEWS = {
+    all:'Todas as faixas do stream, das referências aos lançamentos.',
+    stream:'O fluxo completo — toque em uma capa, título ou forma de onda para ouvir.',
+    likes:'Suas curtidas nesta sessão.',
+    library:'Lançamentos publicados no catálogo KYROSHIX.',
+    recent:'Faixas que você ouviu nesta sessão.',
+    queue:'A fila começa pela próxima faixa depois da atual.'
+  };
+
+  const $ = sel => document.querySelector(sel);
+  const audio = $('#audio');
+  const listEl = $('#track-list');
+  const emptyEl = $('#empty');
+  const emptyText = $('#empty-text');
+  const feedCount = $('#feed-count');
+  const feedNote = $('#feed-note');
+  const searchInput = $('#search');
+  const clearSearch = $('#clear-search');
+  const playerWave = $('#pw');
+  const playIcon = $('#play-icon');
+  const toastEl = $('#toast');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const state = {
+    track:tracks[0], duration:tracks[0].duration, playing:false,
+    view:'stream', tab:'all', query:'',
+    liked:new Set(), reposted:new Set(), history:[]
+  };
+
+  const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = seconds => {
+    const s = Math.max(0, Math.floor(Number(seconds) || 0));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2,'0');
+  };
+  const rand = seed => () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+
+  let toastTimer;
+  function toast(message){
+    toastEl.textContent = message;
+    toastEl.hidden = false;
+    requestAnimationFrame(() => toastEl.classList.add('show'));
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toastEl.classList.remove('show');
+      setTimeout(() => { toastEl.hidden = true; }, 260);
+    }, 2600);
+  }
+
+  function artInner(track){
+    if(track.cover === 'radial') return '<span class="art art1"></span><span class="glow"></span><span class="ring"></span><span class="cross"></span><span class="word">PLEASE&nbsp;&nbsp;FORGIVE&nbsp;&nbsp;ME</span>';
+    if(track.cover === 'teal') return '<span class="art art2"></span><span class="tag">SMALLBLACK&nbsp;&nbsp;THNX4</span><span class="tag2">TAMPA</span>';
+    return `<span class="art ${track.cover}"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
+  }
+
+  function buildWave(el, track, count){
+    const next = rand(track.seed);
+    let html = '';
+    for(let i = 0; i < count; i++){
+      const envelope = Math.sin((i / count) * Math.PI) * 0.72 + 0.28;
+      const pulse = 0.72 + 0.34 * Math.abs(Math.sin(i * 0.22 + track.seed));
+      const height = Math.min(100, 10 + (14 + next() * 76) * envelope * pulse);
+      html += `<i style="height:${height.toFixed(1)}%"></i>`;
+    }
+    el.innerHTML = html;
+  }
+
+  function paintWave(el, ratio, duration = state.duration){
+    const bars = el.children;
+    const position = Math.min(1, Math.max(0, ratio));
+    const cut = Math.round(position * bars.length);
+    for(let i = 0; i < bars.length; i++) bars[i].classList.toggle('p', i < cut);
+    el.setAttribute('aria-valuenow', String(Math.round(position * 100)));
+    el.setAttribute('aria-valuetext', fmt(position * duration) + ' de ' + fmt(duration));
+  }
+
+  function visibleTracks(){
+    let list = tracks.slice();
+    if(state.tab === 'releases') list = list.filter(t => t.group === 'release');
+    if(state.view === 'likes') list = list.filter(t => state.liked.has(t.id));
+    if(state.view === 'library') list = list.filter(t => t.group === 'release');
+    if(state.view === 'recent') list = list.filter(t => state.history.includes(t.id))
+      .sort((a,b) => state.history.lastIndexOf(b.id) - state.history.lastIndexOf(a.id));
+    if(state.view === 'queue'){
+      const index = list.findIndex(t => t.id === state.track.id);
+      if(index >= 0) list = list.slice(index + 1).concat(list.slice(0, index + 1));
+    }
+    if(state.query){
+      const q = state.query.toLowerCase();
+      list = list.filter(t => `${t.title} ${t.artist} ${t.tag} ${t.who} ${t.note}`.toLowerCase().includes(q));
+    }
+    return list;
+  }
+
+  function cardHTML(track){
+    const liked = state.liked.has(track.id);
+    const reposted = state.reposted.has(track.id);
+    const likeCount = track.likes + (liked ? 1 : 0);
+    const repostCount = track.reposts + (reposted ? 1 : 0);
+    return `<article class="track glass${track.id === state.track.id ? ' is-current' : ''}" data-id="${track.id}">
+      <button class="cover" type="button" data-action="play" aria-label="Ouvir ${esc(track.title)}">${artInner(track)}<span class="cover-play">${ICONS.play}</span></button>
+      <div class="t-info">
+        <div class="frow">
+          <span class="avatar" style="--face:${track.avatar}" aria-hidden="true">${esc(track.initial)}</span>
+          <span class="who"><b>${esc(track.who)}</b> ${esc(track.action)}</span>
+          <time>${esc(track.when)}</time>
+        </div>
+        <p class="t-artist">${esc(track.artist)}</p>
+        <button class="t-title" type="button" data-action="play">${esc(track.title)}</button>
+        <div class="wave" data-wave data-id="${track.id}" role="slider" tabindex="0" aria-label="Posição de ${esc(track.title)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+        <div class="t-meta">
+          <span class="badge">${esc(track.tag)}</span>
+          <button class="pill" type="button" data-action="like" aria-pressed="${liked}" aria-label="Curtir ${esc(track.title)}">${ICONS.heart}<span class="lv">${likeCount}</span></button>
+          ${repostCount ? `<button class="pill" type="button" data-action="repost" aria-pressed="${reposted}" aria-label="Repostar ${esc(track.title)}">${ICONS.repost}<span class="lv">${repostCount}</span></button>` : ''}
+          <div class="t-stats">
+            <span>${ICONS.plays}${esc(track.plays)}</span>
+            <span>${ICONS.comments}${track.comments}</span>
+            <span>${fmt(track.duration)}</span>
+          </div>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function renderFeed(){
+    const list = visibleTracks();
+    listEl.innerHTML = list.map(cardHTML).join('');
+    list.forEach(track => {
+      const wave = listEl.querySelector(`.wave[data-id="${track.id}"]`);
+      if(wave){
+        buildWave(wave, track, 90);
+        paintWave(wave, track.id === state.track.id ? currentRatio() : 0, track.duration);
+      }
+    });
+    emptyEl.hidden = list.length > 0;
+    if(!list.length){
+      emptyText.textContent = state.view === 'likes' && !state.query
+        ? 'Você ainda não curtiu nenhuma faixa nesta sessão.'
+        : 'Tente outro título, artista ou estilo.';
+    }
+    feedCount.textContent = `${list.length} ${list.length === 1 ? 'faixa' : 'faixas'}`;
+    feedNote.textContent = VIEWS[state.view] + (state.query ? ` Busca: “${state.query}”.` : '');
+    document.querySelectorAll('.tab').forEach(tab => {
+      const on = tab.dataset.tab === state.tab;
+      tab.classList.toggle('on', on);
+      tab.setAttribute('aria-selected', String(on));
+    });
+    document.querySelectorAll('[data-view]').forEach(button => {
+      const on = button.dataset.view === state.view;
+      button.classList.toggle('active', on);
+      if(on) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current');
+    });
+  }
+
+  function renderPlayer(){
+    const track = state.track;
+    $('#p-name').textContent = `${track.artist} — ${track.title}`;
+    $('#p-sub').textContent = track.note;
+    $('#p-art').innerHTML = artInner(track);
+    $('#dur').textContent = fmt(state.duration);
+    buildWave(playerWave, track, 110);
+    paintWave(playerWave, currentRatio());
+  }
+
+  function currentRatio(){
+    if(!state.duration) return 0;
+    return Math.min(1, Math.max(0, (audio.currentTime || 0) / state.duration));
+  }
+
+  function updateProgress(){
+    const ratio = currentRatio();
+    paintWave(playerWave, ratio);
+    const current = listEl.querySelector(`.wave[data-id="${state.track.id}"]`);
+    if(current) paintWave(current, ratio);
+    $('#cur').textContent = fmt(audio.currentTime || 0);
+  }
+
+  function updatePlayButton(){
+    playIcon.innerHTML = state.playing
+      ? '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'
+      : '<path d="M7 5l12 7-12 7z"/>';
+    $('#play').setAttribute('aria-label', state.playing ? 'Pausar' : 'Reproduzir');
+    document.body.classList.toggle('is-playing', state.playing);
+  }
+
+  function loadTrack(track, autoplay = true){
+    if(!track) return;
+    state.track = track;
+    state.duration = track.duration;
+    state.history = [track.id, ...state.history.filter(id => id !== track.id)].slice(0, 12);
+    audio.src = track.audio;
+    audio.load();
+    if(!visibleTracks().some(t => t.id === track.id)){
+      state.view = 'stream'; state.tab = 'all'; state.query = '';
+      searchInput.value = ''; clearSearch.hidden = true;
+      renderFeed();
+    }else{
+      listEl.querySelectorAll('.track').forEach(el => el.classList.toggle('is-current', el.dataset.id === track.id));
+    }
+    renderPlayer();
+    $('#cur').textContent = '0:00';
+    if(autoplay) play(); else { state.playing = false; updatePlayButton(); }
+  }
+
+  function play(){
+    const attempt = audio.play();
+    if(attempt && typeof attempt.then === 'function'){
+      attempt.then(() => { state.playing = true; updatePlayButton(); })
+        .catch(() => toast('Não foi possível iniciar o áudio. Toque em reproduzir novamente.'));
+    }
+  }
+  function pause(){ audio.pause(); state.playing = false; updatePlayButton(); }
+  function togglePlay(){ state.playing ? pause() : play(); }
+
+  function step(direction, autoplay = state.playing){
+    const list = visibleTracks();
+    if(!list.length){ loadTrack(tracks[0], autoplay); return; }
+    let index = list.findIndex(t => t.id === state.track.id);
+    if(index < 0) index = 0;
+    const next = list[(index + direction + list.length) % list.length];
+    loadTrack(next, autoplay);
+  }
+
+  function seekTo(ratio){
+    const position = Math.min(1, Math.max(0, ratio)) * state.duration;
+    try { audio.currentTime = position; } catch (_) { /* metadata ainda não carregou */ }
+    updateProgress();
+  }
+
+  function ratioFromEvent(el, event){
+    const rect = el.getBoundingClientRect();
+    return (event.clientX - rect.left) / rect.width;
+  }
+
+  function setView(view){
+    state.view = view;
+    renderFeed();
+  }
+
+  // ---- status circles ----
+  $('#status').innerHTML = statusDots.map(dot => {
+    const track = tracks.find(t => t.id === dot.id);
+    return `<button type="button" data-play="${dot.id}" style="--ring:${dot.ring};--face:${dot.face}" aria-label="Ouvir ${esc(track.title)}" title="${esc(track.artist)} — ${esc(track.title)}"><i></i></button>`;
+  }).join('');
+  $('#status').addEventListener('click', event => {
+    const button = event.target.closest('[data-play]');
+    if(button) loadTrack(tracks.find(t => t.id === button.dataset.play), true);
+  });
+
+  // ---- topbar, hero, tabs, busca ----
+  document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => setView(button.dataset.view)));
+  document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+    state.tab = tab.dataset.tab;
+    state.view = 'stream';
+    renderFeed();
+  }));
+  $('#search-form').addEventListener('submit', event => event.preventDefault());
+  searchInput.addEventListener('input', () => {
+    state.query = searchInput.value.trim();
+    clearSearch.hidden = !state.query;
+    renderFeed();
+  });
+  clearSearch.addEventListener('click', () => {
+    searchInput.value = ''; state.query = ''; clearSearch.hidden = true;
+    renderFeed(); searchInput.focus();
+  });
+  $('#reset-filters').addEventListener('click', () => {
+    state.view = 'stream'; state.tab = 'all'; state.query = '';
+    searchInput.value = ''; clearSearch.hidden = true;
+    renderFeed();
+  });
+  $('#hero-play').addEventListener('click', () => loadTrack(visibleTracks()[0] || tracks[0], true));
+  $('#hero-explore').addEventListener('click', () => {
+    $('#stream').scrollIntoView({behavior:reduceMotion.matches ? 'auto' : 'smooth', block:'start'});
+    searchInput.focus({preventScroll:true});
+  });
+  $('#pro').addEventListener('click', () => toast('Conceito de interface — nenhuma assinatura é necessária.'));
+
+  // ---- feed: play, curtir, repostar, buscar na onda ----
+  listEl.addEventListener('click', event => {
+    const card = event.target.closest('.track');
+    if(!card) return;
+    const track = tracks.find(t => t.id === card.dataset.id);
+    const action = event.target.closest('[data-action]');
+    if(!action || !track) return;
+    if(action.dataset.action === 'play'){
+      if(track.id === state.track.id) togglePlay(); else loadTrack(track, true);
+      return;
+    }
+    if(action.dataset.action === 'like'){
+      const set = state.liked;
+      set.has(track.id) ? set.delete(track.id) : set.add(track.id);
+      action.setAttribute('aria-pressed', String(set.has(track.id)));
+      action.querySelector('.lv').textContent = track.likes + (set.has(track.id) ? 1 : 0);
+      if(state.view === 'likes') renderFeed();
+      return;
+    }
+    if(action.dataset.action === 'repost'){
+      const set = state.reposted;
+      set.has(track.id) ? set.delete(track.id) : set.add(track.id);
+      action.setAttribute('aria-pressed', String(set.has(track.id)));
+      action.querySelector('.lv').textContent = track.reposts + (set.has(track.id) ? 1 : 0);
+      toast(set.has(track.id) ? 'Faixa repostada no stream.' : 'Repost removido.');
+    }
+  });
+
+  function handleWavePointer(event){
+    const wave = event.target.closest('.wave');
+    if(!wave) return;
+    event.preventDefault();
+    const track = tracks.find(t => t.id === wave.dataset.id);
+    if(!track) return;
+    const ratio = ratioFromEvent(wave, event);
+    if(track.id !== state.track.id) loadTrack(track, true);
+    seekTo(ratio);
+    try { wave.setPointerCapture(event.pointerId); wave.dataset.seeking = '1'; } catch (_) { /* sem captura */ }
+  }
+  listEl.addEventListener('pointerdown', handleWavePointer);
+  listEl.addEventListener('pointermove', event => {
+    const wave = event.target.closest('.wave');
+    if(!wave || wave.dataset.seeking !== '1' || !wave.hasPointerCapture(event.pointerId)) return;
+    if(wave.dataset.id === state.track.id) seekTo(ratioFromEvent(wave, event));
+  });
+  ['pointerup','pointercancel'].forEach(type => listEl.addEventListener(type, event => {
+    const wave = event.target.closest('.wave');
+    if(wave) delete wave.dataset.seeking;
+  }));
+  listEl.addEventListener('keydown', event => {
+    const wave = event.target.closest('.wave');
+    if(!wave || !['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const track = tracks.find(t => t.id === wave.dataset.id);
+    if(!track) return;
+    if(track.id !== state.track.id) loadTrack(track, false);
+    if(event.key === 'Home') seekTo(0);
+    else if(event.key === 'End') seekTo(0.99);
+    else seekTo(currentRatio() + (event.key === 'ArrowRight' ? 0.05 : -0.05));
+  });
+
+  // ---- tilt 3D espacial ----
+  listEl.addEventListener('pointermove', event => {
+    if(reduceMotion.matches || event.pointerType === 'touch') return;
+    const card = event.target.closest('.track');
+    if(!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - .5;
+    const y = (event.clientY - rect.top) / rect.height - .5;
+    card.style.transform = `perspective(1100px) translateY(-3px) rotateX(${(-y * 2.4).toFixed(2)}deg) rotateY(${(x * 2.4).toFixed(2)}deg)`;
+  });
+  listEl.addEventListener('pointerout', event => {
+    const card = event.target.closest('.track');
+    if(card && !card.contains(event.relatedTarget)) card.style.transform = '';
+  });
+
+  // ---- player ----
+  $('#play').addEventListener('click', togglePlay);
+  $('#prev').addEventListener('click', () => step(-1));
+  $('#next').addEventListener('click', () => step(1));
+  audio.volume = Number($('#volume').value);
+  $('#volume').addEventListener('input', event => { audio.volume = Number(event.target.value); });
+  audio.addEventListener('loadedmetadata', () => {
+    if(Number.isFinite(audio.duration) && audio.duration > 0){
+      state.duration = audio.duration;
+      $('#dur').textContent = fmt(state.duration);
+    }
+  });
+  audio.addEventListener('timeupdate', updateProgress);
+  audio.addEventListener('play', () => { state.playing = true; updatePlayButton(); });
+  audio.addEventListener('pause', () => { state.playing = false; updatePlayButton(); });
+  audio.addEventListener('ended', () => step(1, true));
+
+  function playerPointer(event){
+    event.preventDefault();
+    seekTo(ratioFromEvent(playerWave, event));
+  }
+  playerWave.addEventListener('pointerdown', event => {
+    playerWave.setPointerCapture(event.pointerId);
+    playerPointer(event);
+  });
+  playerWave.addEventListener('pointermove', event => {
+    if(playerWave.hasPointerCapture(event.pointerId)) playerPointer(event);
+  });
+  playerWave.addEventListener('keydown', event => {
+    if(event.key === 'ArrowRight'){ event.preventDefault(); seekTo(currentRatio() + 0.05); }
+    if(event.key === 'ArrowLeft'){ event.preventDefault(); seekTo(currentRatio() - 0.05); }
+    if(event.key === 'Home'){ event.preventDefault(); seekTo(0); }
+    if(event.key === 'End'){ event.preventDefault(); seekTo(0.99); }
+    if(event.key === ' ' || event.key === 'Enter'){ event.preventDefault(); togglePlay(); }
+  });
+
+  document.addEventListener('keydown', event => {
+    const tag = document.activeElement?.tagName;
+    if(tag === 'INPUT' || tag === 'TEXTAREA' || event.metaKey || event.ctrlKey || event.altKey) return;
+    if(event.target.closest('[role="slider"]')) return;
+    if(event.key === ' '){ event.preventDefault(); togglePlay(); }
+    if(event.key === 'ArrowRight' && event.shiftKey){ event.preventDefault(); step(1); }
+    if(event.key === 'ArrowLeft' && event.shiftKey){ event.preventDefault(); step(-1); }
+    if(event.key.toLowerCase() === 'm'){ audio.muted = !audio.muted; toast(audio.muted ? 'Áudio silenciado.' : 'Áudio ativado.'); }
+  });
+
+  // ---- início ----
+  renderFeed();
+  loadTrack(tracks[0], false);
+  updatePlayButton();
+})();
+</script>
+</body>
+</html>

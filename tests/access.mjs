@@ -56,7 +56,7 @@ class Element extends EventTarget {
   submit() { return this.onsubmit?.({ preventDefault() {} }); }
 }
 class DetailEvent extends Event { constructor(type, init) { super(type); this.detail = init.detail; } }
-const markup = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
+const markup = readFileSync(new URL('../dist/legacy.html', import.meta.url), 'utf8');
 function memoryStorage(initial = {}) {
   const entries = new Map(Object.entries(initial));
   return { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value), removeItem: key => entries.delete(key), entries };

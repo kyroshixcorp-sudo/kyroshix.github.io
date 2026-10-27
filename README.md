@@ -54,9 +54,11 @@ UID de dono solicitado: `8Q7S8FgBZjTrg4Mkf46ntcYvl0Q2`. A migração 03 remove a
 
 Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends Never Die, Darkness e Blindfold. Logos originais foram preservadas; o símbolo recebe branco por máscara CSS, sem redesenho. A wordmark enquadra a imagem original com SVG; o cabeçalho usa um enquadramento curto da mesma imagem. Nenhum vídeo fictício é publicado.
 
-## Conceito Spatial UI
+## Homepage Spatial UI
 
-`/spatial-ui.html` é uma página independente, sem build e sem dependências externas: mantém o CSS e o JavaScript no próprio HTML. O fundo usa `assets/spatial-room.jpg` com fallbacks em gradiente, e o player reproduz os quatro MP3 já publicados em `assets/`. As duas primeiras faixas do feed são apenas referências visuais (Mt. Si e Small Black) e usam áudio demonstrativo do catálogo KYROSHIX — isso está indicado na própria página. Busca, abas, navegação lateral, curtidas, reposts, formas de onda geradas por semente, seek, volume, tilt 3D e atalhos de teclado funcionam nesta sessão do navegador. O link para o conceito está no rodapé do site principal e no `sitemap.xml`.
+A homepage (`/`) agora é o conceito **Spatial UI**: `dist/index.html` é uma página independente, sem build e sem dependências externas, com CSS e JavaScript no próprio HTML. `/spatial-ui.html` é um alias com o mesmo conteúdo. O fundo usa `/assets/spatial-room.jpg` com fallbacks em gradiente, e o player reproduz os quatro MP3 já publicados em `/assets/`. As duas primeiras faixas do feed são apenas referências visuais (Mt. Si e Small Black) e usam áudio demonstrativo do catálogo KYROSHIX — isso está indicado na própria página. Busca, abas, navegação lateral, curtidas, reposts, formas de onda geradas por semente, seek, volume, tilt 3D e atalhos de teclado funcionam nesta sessão do navegador.
+
+O SPA anterior foi preservado em `dist/legacy.html` apenas como referência e para os testes de navegador; ele não aparece na navegação pública nem no `sitemap.xml`. `cloudflare/_redirects` é injetado no ZIP por `scripts/export-pages.py` e encaminha as rotas legáveis (`/inicio`, `/track/*`, etc.) para o novo `index.html`; `wrangler.jsonc` usa `not_found_handling: single-page-application` para o preview na Cloudflare. Ao publicar pelo módulo do Worker com `keep_assets: true`, envie também o ZIP completo (ou publique o ZIP antes) para que `assets/spatial-room.jpg` exista no armazenamento estático; sem a imagem, os gradientes de fallback mantêm a página funcional.
 
 ## Estrutura
 
@@ -64,8 +66,9 @@ Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends 
 | --- | --- |
 | `dist/app.js`, `style.css`, `modern.css`, `glass.css`, `music-player.js` | Catálogo, perfis, música e estrutura visual |
 | `dist/listening-room.js`, `experience.css`, `atelier.css` | Descoberta, histórico local, painel lateral e interface responsiva |
-| `dist/spatial-ui.html`, `dist/assets/spatial-room.jpg` | Conceito independente de SoundCloud em Spatial UI: vidro fosco sobre sala escura, feed com formas de onda e player ligado aos MP3 do catálogo |
-| `dist/router.js`, `_redirects`, `theme.js`, `themes.css` | URLs públicas, navegação sem recarregar, tema salvo e seletor animado |
+| `dist/index.html`, `dist/spatial-ui.html`, `dist/assets/spatial-room.jpg` | Homepage Spatial UI em vidro fosco sobre sala escura, feed com formas de onda e player ligado aos MP3 do catálogo |
+| `dist/legacy.html` | Cópia do SPA anterior, usada apenas por testes e rollback |
+| `cloudflare/_redirects`, `dist/router.js`, `theme.js`, `themes.css` | Rewrites de páginas no Cloudflare, URLs legadas e seletor de tema do app antigo |
 | `dist/audio-engine.js`, `sound-panel.js` | Crossfade, equalizador, efeitos, controles e preferências locais |
 | `dist/platform.js`, `video-player.js`, `drm.js` | Canais, reações, inscrições, Studio de vídeo e player |
 | `dist/auth-controller.js`, `firebase-client.js`, `access-policy.js`, `account.css` | Interface de contas, primeira visita e Firebase |

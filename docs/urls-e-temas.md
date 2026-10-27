@@ -1,9 +1,10 @@
 # URLs e temas · 4.4
 
-Publique o ZIP completo em **releases**, incluindo `_redirects`. Esta atualização
-não exige SQL, novas contas ou alteração dos provedores de login. A integração
-de contas e o catálogo carregam suas configurações pela raiz do site, inclusive
-quando uma página interna é aberta diretamente.
+Publique o ZIP completo em **releases**: `export-pages.py` injeta `_redirects`
+a partir de `cloudflare/_redirects`. A homepage (`/`) é o Spatial UI e as rotas
+abaixo continuam resolvendo para o mesmo `index.html` no Cloudflare — elas não abrem mais o SPA
+de contas/catálogo, preservado em `/legacy.html` apenas para testes. Esta
+atualização não exige SQL, novas contas ou alteração dos provedores de login.
 
 | Página | Caminho |
 | --- | --- |
@@ -36,11 +37,14 @@ o sistema. O tema é aplicado antes dos estilos para evitar uma tela clara ao
 abrir com o tema escuro selecionado. Equalizador, crossfade e reprodução são
 mantidos ao alternar.
 
-As regras de Cloudflare encaminham somente as páginas conhecidas para
-`index.html`. Não use uma regra global `/* /index.html 200`: ela pode substituir
-respostas de arquivos por HTML. O ZIP contém regras para caminhos com e sem
-barra final. Em outro servidor é necessário configurar rewrites equivalentes;
-o GitHub guarda o código e não aplica as regras `_redirects` ao hospedar Pages.
+As regras de `cloudflare/_redirects` (injetadas como `_redirects` no ZIP) encaminham somente as páginas conhecidas para
+`index.html`: rotas fixas aparecem com e sem barra final, e apenas caminhos de
+conteúdo (`/track/*`, `/watch/*`, `/canal/*`, etc.) usam splat. Não use uma
+regra global `/* /index.html 200`: ela pode substituir respostas de arquivos
+por HTML. No preview, `wrangler.jsonc` faz o mesmo com
+`not_found_handling: single-page-application`. Em outro servidor é necessário
+configurar rewrites equivalentes; o GitHub guarda o código e não aplica as
+regras `_redirects` ao hospedar Pages.
 
 Verificações executadas: `npm run test:navigation`, `npm run test:worker`,
 `npm run test:media`, sintaxe dos módulos, referências estáticas e integridade
