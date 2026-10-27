@@ -1,6 +1,7 @@
 // Preview/staging only. The worker name is deliberately NOT "releases" (production).
 // Deploying this file never touches https://releases.kyroshixcorp.workers.dev/.
-// Client-side deep links use native SPA fallback instead of _redirects rewrites.
+// "/" serves the Spatial UI homepage; unknown routes use SPA fallback to index.html.
+// dist/_redirects keeps the equivalent rewrites for the production Worker module.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "kyroshix-preview",

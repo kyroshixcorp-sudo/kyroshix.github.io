@@ -4,9 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d0b09">
-<meta name="description" content="Conceito de interface espacial em vidro fosco para um stream de músicas — SoundCloud Spatial UI, por KYROSHIX.">
-<title>SoundCloud — Spatial UI | KYROSHIX</title>
-<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta name="description" content="KYROSHIX em Spatial UI: uma experiência de escuta em vidro fosco, com formas de onda interativas e os lançamentos do catálogo.">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="KYROSHIX — Spatial UI">
+<meta property="og:description" content="Vidro fosco, luz quente e música flutuando no espaço.">
+<meta property="og:image" content="https://releases.kyroshixcorp.workers.dev/assets/spatial-room.jpg">
+<meta property="og:url" content="https://releases.kyroshixcorp.workers.dev/">
+<link rel="canonical" href="https://releases.kyroshixcorp.workers.dev/">
+<title>KYROSHIX — Spatial UI</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <style>
   :root{
     --white:#fff;
@@ -42,7 +49,7 @@
       linear-gradient(180deg,rgba(10,9,8,.42),rgba(10,9,8,.68) 55%,rgba(6,5,4,.9)),
       radial-gradient(ellipse 60% 50% at 70% 40%,rgba(214,180,140,.17),transparent 60%),
       radial-gradient(ellipse 50% 40% at 20% 70%,rgba(120,90,60,.14),transparent 60%),
-      url('assets/spatial-room.jpg');
+      url('/assets/spatial-room.jpg');
     background-repeat:no-repeat;
     background-size:100% 100%,100% 100%,100% 100%,cover;
     background-position:center,center,center,center;
@@ -199,9 +206,9 @@
   .cover .word,.p-art .word{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:8px;letter-spacing:.25em;color:rgba(40,40,60,.7)}
   .cover .tag,.p-art .tag{position:absolute;top:10px;left:10px;font-size:10px;font-weight:800;letter-spacing:.05em;color:#ff4fbf}
   .cover .tag2,.p-art .tag2{position:absolute;top:10px;right:10px;font-size:10px;font-weight:800;letter-spacing:.05em;color:#1b5e6a}
-  .cover .art-remember,.p-art .art-remember{background:url('assets/hero.webp') 75% center/auto 100% no-repeat}
+  .cover .art-remember,.p-art .art-remember{background:url('/assets/hero.webp') 75% center/auto 100% no-repeat}
   .cover .art-legends,.p-art .art-legends,.cover .art-darkness,.p-art .art-darkness,.cover .art-blindfold,.p-art .art-blindfold{
-    background-image:url('assets/covers.webp');background-size:300% 100%;background-repeat:no-repeat;
+    background-image:url('/assets/covers.webp');background-size:300% 100%;background-repeat:no-repeat;
   }
   .cover .art-legends,.p-art .art-legends{background-position:left center}
   .cover .art-darkness,.p-art .art-darkness{background-position:center center}
@@ -336,7 +343,7 @@
 <main>
   <!-- TOPBAR -->
   <header class="topbar glass">
-    <a class="logo" href="/inicio" aria-label="Voltar para o site KYROSHIX">
+    <a class="logo" href="/" aria-label="KYROSHIX — página inicial">
       <span class="cloud"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9.5V17H6.5A3.5 3.5 0 0 1 3 13.5 3.5 3.5 0 0 1 6.5 10c.4 0 .8.1 1.2.2V17h1V7.5a1.5 1.5 0 0 1 3 0V17h1V9a1.5 1.5 0 0 1 3 0V17h1V9.5a1 1 0 0 1 2 0V17h-1.5V9.5z"/></svg></span>
       <span>SoundCloud<small>SPATIAL UI · KYROSHIX</small></span>
     </a>
@@ -411,8 +418,8 @@
   </div>
 
   <footer>
-    <span>© SoundCloud · Conceito Spatial UI não oficial — vidro, luz e profundidade.</span>
-    <span><a href="/inicio">← Voltar ao site KYROSHIX</a> · <a href="/musicas">Catálogo</a></span>
+    <span>© KYROSHIX · Spatial UI — conceito de interface não oficial.</span>
+    <span><a href="/sobre.html">Sobre</a> · <a href="/contato.html">Contato</a> · <a href="/privacidade.html">Privacidade</a> · <a href="/termos.html">Termos</a></span>
     <small>As duas primeiras faixas são referências visuais e usam áudio demonstrativo do catálogo KYROSHIX.</small>
   </footer>
 </main>
@@ -451,22 +458,22 @@
   // vindo do catálogo KYROSHIX já publicado em assets/.
   const tracks = [
     {id:'forgive',initial:'W',group:'reference',artist:'Mt. Si',title:'Please Forgive Me',who:'Washed Out',action:'repostou uma faixa',when:'há 7 horas',
-     tag:'#CASCINE',likes:116,reposts:21,plays:'1.280',comments:42,duration:171.936,audio:'assets/remember.mp3',cover:'radial',seed:17,
+     tag:'#CASCINE',likes:116,reposts:21,plays:'1.280',comments:42,duration:171.936,audio:'/assets/remember.mp3',cover:'radial',seed:17,
      avatar:'linear-gradient(135deg,#7a5cff,#ff5c87)',note:'referência visual · áudio demo KYROSHIX'},
     {id:'tampa',initial:'S',group:'reference',artist:'Small Black',title:'Tampa (FM Skyline Remix) [Extended]',who:'Small Black',action:'publicou uma faixa',when:'há 11 horas',
-     tag:'#SmallBlack',likes:89,reposts:0,plays:'2.410',comments:17,duration:200.616,audio:'assets/darkness.mp3',cover:'teal',seed:29,
+     tag:'#SmallBlack',likes:89,reposts:0,plays:'2.410',comments:17,duration:200.616,audio:'/assets/darkness.mp3',cover:'teal',seed:29,
      avatar:'linear-gradient(135deg,#223,#c33)',note:'referência visual · áudio demo KYROSHIX'},
     {id:'remember',initial:'K',group:'release',artist:'Levianth & Axol feat. The Tech Thieves',title:'Remember',who:'KYROSHIX',action:'publicou um remix',when:'há 1 dia',
-     tag:'#Nightcore',likes:412,reposts:64,plays:'18.320',comments:128,duration:171.936,audio:'assets/remember.mp3',cover:'art-remember',seed:41,
+     tag:'#Nightcore',likes:412,reposts:64,plays:'18.320',comments:128,duration:171.936,audio:'/assets/remember.mp3',cover:'art-remember',seed:41,
      avatar:'linear-gradient(135deg,#f0a15c,#d23b5c)',note:'KYROSHIX · Nightcore Remix'},
     {id:'legends',initial:'K',group:'release',artist:'Against The Current · League of Legends',title:'Legends Never Die',who:'KYROSHIX',action:'publicou um remix',when:'há 3 dias',
-     tag:'#Nightcore',likes:388,reposts:51,plays:'14.870',comments:96,duration:207.744,audio:'assets/legends.mp3',cover:'art-legends',seed:53,
+     tag:'#Nightcore',likes:388,reposts:51,plays:'14.870',comments:96,duration:207.744,audio:'/assets/legends.mp3',cover:'art-legends',seed:53,
      avatar:'linear-gradient(135deg,#a35bff,#ff6f91)',note:'KYROSHIX · Nightcore Remix'},
     {id:'darkness',initial:'K',group:'release',artist:'Lost Sky × She Is Jules',title:'Darkness',who:'KYROSHIX',action:'publicou um remix',when:'há 5 dias',
-     tag:'#Synthwave',likes:301,reposts:43,plays:'11.640',comments:74,duration:200.616,audio:'assets/darkness.mp3',cover:'art-darkness',seed:67,
+     tag:'#Synthwave',likes:301,reposts:43,plays:'11.640',comments:74,duration:200.616,audio:'/assets/darkness.mp3',cover:'art-darkness',seed:67,
      avatar:'linear-gradient(135deg,#4f7bff,#9b5cff)',note:'KYROSHIX · Synthwave / Nightcore'},
     {id:'blindfold',initial:'K',group:'release',artist:'Warriyo feat. Laura Brehm',title:'Blindfold',who:'KYROSHIX',action:'publicou um remix',when:'há 1 semana',
-     tag:'#Nightcore',likes:276,reposts:38,plays:'9.510',comments:61,duration:189.579,audio:'assets/blindfold.mp3',cover:'art-blindfold',seed:83,
+     tag:'#Nightcore',likes:276,reposts:38,plays:'9.510',comments:61,duration:189.579,audio:'/assets/blindfold.mp3',cover:'art-blindfold',seed:83,
      avatar:'linear-gradient(135deg,#39c7c7,#4f6bff)',note:'KYROSHIX · Nightcore Remix'}
   ];
 

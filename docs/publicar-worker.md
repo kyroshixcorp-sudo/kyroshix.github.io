@@ -1,13 +1,22 @@
 # Publicar a atualização no Worker releases
 
-A versão 4.5 também pode ser publicada como um módulo do Worker, preservando
-os assets estáticos existentes. O módulo entrega os arquivos públicos de interface
-e encaminha caminhos como `/inicio` e `/track/remember` para a página principal.
+A homepage Spatial UI também pode ser publicada como um módulo do Worker,
+preservando os assets estáticos existentes. O módulo entrega os arquivos públicos
+de interface (incluindo `index.html`, `spatial-ui.html` e `legacy.html`) e
+encaminha caminhos como `/inicio` e `/track/remember` para a página principal.
+As regras vêm de `dist/_redirects`, que agora faz parte do ZIP.
 Imagens, MP3 e configurações JSON de conta continuam no armazenamento estático.
 Os caminhos listados em `metadata.json` passam pelo Worker e contam como
 invocações no plano da Cloudflare. As mídias continuam sendo servidas diretamente
 pelo serviço de assets. As rotas de páginas são geradas do `_redirects` do ZIP,
 sem substituir requisições de mídia ou configuração.
+
+**Atenção ao novo asset:** `/assets/spatial-room.jpg` foi adicionado ao `dist/`.
+O upload somente do módulo (`metadata.json` + `worker.mjs` + `patches.mjs`) usa
+`keep_assets: true` e **não adiciona arquivos binários novos**. Publique o ZIP
+completo gerado por `export-pages.py` antes (ou em vez disso) para enviar a
+imagem. Se ela faltar, a homepage continua funcionando com os gradientes de
+fallback definidos no CSS.
 
 ```sh
 python3 scripts/export-pages.py ../exports/KYROSHIX-Cloudflare-Pages.zip --origin https://releases.kyroshixcorp.workers.dev

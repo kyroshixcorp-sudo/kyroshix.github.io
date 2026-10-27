@@ -15,11 +15,13 @@ try {
   assert(!metadata.assets.config.run_worker_first.includes('/*'));
   let delegated;
   const env = {ASSETS:{fetch:request=>{delegated=request;return new Response('static asset',{status:206,headers:{'Content-Type':'audio/mpeg'}});}}};
-  for(const path of ['/','/inicio','/musicas','/perfil/owner','/track/remember','/watch/video--id','/canal/creator','/favoritas/','/track/remember?shared=1']) {
+  for(const path of ['/','/inicio','/musicas','/perfil/owner','/track/remember','/watch/video--id','/canal/creator','/favoritas/','/track/remember?shared=1','/spatial-ui.html']) {
     const response = await worker.fetch(new Request('https://site.test'+path),env);
     assert.equal(response.status,200,path); assert.match(response.headers.get('Content-Type'),/^text\/html/);
-    assert((await response.text()).includes('/theme.js')); assert.equal(response.headers.get('Cache-Control'),'no-cache');
+    assert((await response.text()).includes('spatial-room.jpg'),path); assert.equal(response.headers.get('Cache-Control'),'no-cache');
   }
+  const legacy = await worker.fetch(new Request('https://site.test/legacy.html'),env);
+  assert.equal(legacy.status,200); assert((await legacy.text()).includes('/theme.js'));
   const script = await worker.fetch(new Request('https://site.test/router.js'),env);
   for(const path of ['/account.css','/access-policy.js','/auth-controller.js','/firebase-client.js']) {
     const response = await worker.fetch(new Request('https://site.test'+path),env);

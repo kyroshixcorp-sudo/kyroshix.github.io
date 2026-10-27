@@ -60,7 +60,10 @@ with ZipFile(args.output, 'w', compression=ZIP_DEFLATED, compresslevel=6) as arc
 /video-config.json
   Cache-Control: no-store
 ''')
-    archive.writestr('robots.txt', 'User-agent: *\nAllow: /\n')
+    # dist/robots.txt já é versionado e contém a linha Sitemap; só cria um
+    # fallback quando o arquivo não existir, evitando nomes duplicados no ZIP.
+    if 'robots.txt' not in archive.namelist():
+        archive.writestr('robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://releases.kyroshixcorp.workers.dev/sitemap.xml\n')
 with ZipFile(args.output) as archive:
     assert archive.testzip() is None, 'ZIP integrity failed'
     assert 'index.html' in archive.namelist()

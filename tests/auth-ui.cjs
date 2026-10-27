@@ -31,7 +31,7 @@ const fakeAuth=`export async function createFirebaseClient(_config,options={}){
   await context.route('**/firebase-client.js',route=>route.fulfill({contentType:'text/javascript',body:fakeAuth}));
   await context.route('**/community-config.json',route=>route.fulfill({json:{enabled:false,supabaseUrl:'',publishableKey:''}}));
   const page=await context.newPage();page.on('pageerror',error=>errors.push(error.message));
-  await page.goto('http://127.0.0.1:8765/');
+  await page.goto('http://127.0.0.1:8765/legacy.html');
   await page.locator('.release-card').nth(3).waitFor();
   return{context,page};
  }
