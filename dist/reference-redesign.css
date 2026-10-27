@@ -198,3 +198,146 @@ progress::-webkit-progress-value { background: var(--kx-red); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+/* Keep the existing theme switch functional with the new visual layer. */
+html[data-theme="dark"] {
+  --bg: #0c0c0e;
+  --panel: #151517;
+  --surface: #202023;
+  --text: #f5f5f6;
+  --muted: #a0a0a8;
+  --line: #ffffff12;
+  --red: #ff3328;
+  color-scheme: dark;
+}
+html[data-theme="dark"] body {
+  color: #f5f5f6;
+  background:
+    radial-gradient(ellipse at 78% 0%, rgb(225 6 0 / 10%), transparent 35%),
+    linear-gradient(180deg, #101012 0%, #0b0b0d 58%, #09090a 100%);
+}
+html[data-theme="dark"] .topbar,
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .main,
+html[data-theme="dark"] .home-route .main,
+html[data-theme="dark"] .player {
+  background-color: #0c0c0ef5;
+  color: #f5f5f6;
+  border-color: #ffffff16;
+}
+html[data-theme="dark"] .release-card,
+html[data-theme="dark"] .video-card,
+html[data-theme="dark"] .track-card,
+html[data-theme="dark"] .playlist-card,
+html[data-theme="dark"] .artist-card {
+  background: linear-gradient(155deg, #1b1b1e, #121214);
+  border-color: #ffffff0e;
+}
+html[data-theme="dark"] .primary,
+html[data-theme="dark"] .header-listen,
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .button-primary {
+  background: #e10600;
+  color: #fff;
+  border-color: transparent;
+}
+html[data-theme="dark"] .player-play,
+html[data-theme="dark"] .now-play {
+  background: #f5f5f6;
+  color: #101012;
+}
+html[data-theme="light"] {
+  --bg: #f0f0f2;
+  --panel: #ffffff;
+  --surface: #e8e8eb;
+  --text: #171719;
+  --muted: #62626b;
+  --line: #dedee3;
+  --red: #c80500;
+  color-scheme: light;
+}
+html[data-theme="light"] body {
+  color: #171719;
+  background:
+    radial-gradient(ellipse at 78% 0%, rgb(225 6 0 / 7%), transparent 35%),
+    linear-gradient(180deg, #fafafd 0%, #f0f0f2 58%, #e8e8eb 100%);
+}
+html[data-theme="light"] .topbar {
+  background: rgb(255 255 255 / 94%);
+  color: #171719;
+  border-color: #dedee3;
+  box-shadow: 0 12px 40px #0000000c;
+}
+html[data-theme="light"] .header-links a,
+html[data-theme="light"] .search input { color: #29292f; }
+html[data-theme="light"] .header-links a:hover { color: #000; }
+html[data-theme="light"] .account-trigger { background: #151517; color: #fff; }
+html[data-theme="light"] .sidebar {
+  background: linear-gradient(180deg, #fff, #f7f7f9);
+  color: #242429;
+  border-color: #dedee3;
+  box-shadow: 0 16px 42px #00000008;
+}
+html[data-theme="light"] .library-heading,
+html[data-theme="light"] .track-heading h3 { color: #171719; }
+html[data-theme="light"] .sidebar-label { color: #73737c; }
+html[data-theme="light"] .nav-item { color: #55555e; }
+html[data-theme="light"] .nav-item:hover { background: #00000007; color: #171719; }
+html[data-theme="light"] .nav-item.active,
+html[data-theme="light"] .sidebar .nav-item.active {
+  color: #171719;
+  background: linear-gradient(90deg, #e1060016, #e1060004);
+  box-shadow: inset 3px 0 0 #e10600;
+}
+html[data-theme="light"] .panel,
+html[data-theme="light"] .card,
+html[data-theme="light"] .modal,
+html[data-theme="light"] .dialog,
+html[data-theme="light"] .popover,
+html[data-theme="light"] .dropdown {
+  background-color: #fff;
+  color: #171719;
+  border-color: #dedee3;
+  box-shadow: 0 18px 50px #0000000b;
+}
+html[data-theme="light"] .release-card,
+html[data-theme="light"] .video-card,
+html[data-theme="light"] .track-card,
+html[data-theme="light"] .playlist-card,
+html[data-theme="light"] .artist-card {
+  background: linear-gradient(155deg, #fff, #f6f6f8);
+  border-color: #dedee3;
+  box-shadow: 0 10px 30px #0000000a;
+}
+html[data-theme="light"] .release-card:hover,
+html[data-theme="light"] .video-card:hover,
+html[data-theme="light"] .track-card:hover,
+html[data-theme="light"] .playlist-card:hover,
+html[data-theme="light"] .artist-card:hover { border-color: #e1060060; }
+html[data-theme="light"] :where(input,select,textarea) {
+  background: #fff;
+  color: #171719;
+  border-color: #d5d5dc;
+}
+html[data-theme="light"] :where(input,select,textarea)::placeholder { color: #777780; }
+html[data-theme="light"] .secondary,
+html[data-theme="light"] .outline-download {
+  background: #ffffff;
+  border-color: #d5d5dc;
+  color: #29292f;
+}
+html[data-theme="light"] .player {
+  background: rgb(255 255 255 / 96%);
+  color: #171719;
+  border-color: #dcdce2;
+  box-shadow: 0 -12px 44px #00000012;
+}
+html[data-theme="light"] .player .icon-button { color: #44444d; }
+html[data-theme="light"] .player .icon-button:hover { background: #0000000a; color: #111; }
+html[data-theme="light"] .player-play,
+html[data-theme="light"] .now-play { background: #171719; color: #fff; }
+html[data-theme="light"] .subtle,
+html[data-theme="light"] .muted,
+html[data-theme="light"] .track-meta,
+html[data-theme="light"] .track-information .artist { color: #62626b; }
+html[data-theme="light"] .toast { background: #fff; color: #171719; border-color: #dedee3; }
