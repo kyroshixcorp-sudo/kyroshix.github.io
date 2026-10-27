@@ -4,7 +4,9 @@ A homepage Spatial UI também pode ser publicada como um módulo do Worker,
 preservando os assets estáticos existentes. O módulo entrega os arquivos públicos
 de interface (incluindo `index.html`, `spatial-ui.html` e `legacy.html`) e
 encaminha caminhos como `/inicio` e `/track/remember` para a página principal.
-As regras vêm de `dist/_redirects`, que agora faz parte do ZIP.
+As regras vêm de `cloudflare/_redirects`, que `export-pages.py` injeta no ZIP
+(como `_redirects`) para gerar `APP_ROUTES`. Assim o arquivo não fica em `dist/`
+e não interfere no preview do Wrangler.
 Imagens, MP3 e configurações JSON de conta continuam no armazenamento estático.
 Os caminhos listados em `metadata.json` passam pelo Worker e contam como
 invocações no plano da Cloudflare. As mídias continuam sendo servidas diretamente

@@ -1,8 +1,8 @@
 # URLs e temas · 4.4
 
-Publique o ZIP completo em **releases**, incluindo `_redirects`, que agora está
-em `dist/_redirects`. A homepage (`/`) é o Spatial UI e as rotas abaixo continuam
-resolvendo para o mesmo `index.html` no Cloudflare — elas não abrem mais o SPA
+Publique o ZIP completo em **releases**: `export-pages.py` injeta `_redirects`
+a partir de `cloudflare/_redirects`. A homepage (`/`) é o Spatial UI e as rotas
+abaixo continuam resolvendo para o mesmo `index.html` no Cloudflare — elas não abrem mais o SPA
 de contas/catálogo, preservado em `/legacy.html` apenas para testes. Esta
 atualização não exige SQL, novas contas ou alteração dos provedores de login.
 
@@ -37,7 +37,7 @@ o sistema. O tema é aplicado antes dos estilos para evitar uma tela clara ao
 abrir com o tema escuro selecionado. Equalizador, crossfade e reprodução são
 mantidos ao alternar.
 
-As regras de `dist/_redirects` encaminham somente as páginas conhecidas para
+As regras de `cloudflare/_redirects` (injetadas como `_redirects` no ZIP) encaminham somente as páginas conhecidas para
 `index.html`: rotas fixas aparecem com e sem barra final, e apenas caminhos de
 conteúdo (`/track/*`, `/watch/*`, `/canal/*`, etc.) usam splat. Não use uma
 regra global `/* /index.html 200`: ela pode substituir respostas de arquivos

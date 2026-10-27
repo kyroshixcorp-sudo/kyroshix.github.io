@@ -17,7 +17,7 @@ if origin:
     if url.scheme != 'https' or not url.netloc or url.path or url.query or url.fragment or url.username:
         parser.error('--origin must be an HTTPS origin without a path or credentials')
 files = sorted(p for p in root.rglob('*') if p.is_file())
-assert len(files) + 2 <= 1000, 'Direct Upload file limit exceeded'
+assert len(files) + 3 <= 1000, 'Direct Upload file limit exceeded'
 args.output.parent.mkdir(parents=True, exist_ok=True)
 with ZipFile(args.output, 'w', compression=ZIP_DEFLATED, compresslevel=6) as archive:
     for file in files:
@@ -64,8 +64,15 @@ with ZipFile(args.output, 'w', compression=ZIP_DEFLATED, compresslevel=6) as arc
     # fallback quando o arquivo não existir, evitando nomes duplicados no ZIP.
     if 'robots.txt' not in archive.namelist():
         archive.writestr('robots.txt', 'User-agent: *\nAllow: /\nSitemap: https://releases.kyroshixcorp.workers.dev/sitemap.xml\n')
+    # _redirects fica fora de dist/ para não afetar o preview do Wrangler, mas
+    # precisa estar no ZIP usado por export-worker.py para gerar APP_ROUTES.
+    redirects_template = Path(__file__).resolve().parents[1] / 'cloudflare' / '_redirects'
+    if '_redirects' not in archive.namelist() and redirects_template.exists():
+        archive.writestr('_redirects', redirects_template.read_text(encoding='utf-8'))
 with ZipFile(args.output) as archive:
+    names = archive.namelist()
     assert archive.testzip() is None, 'ZIP integrity failed'
-    assert 'index.html' in archive.namelist()
-    assert all(not n.startswith(('.git/', '.openai/')) for n in archive.namelist())
-print(f'{args.output}: {args.output.stat().st_size} bytes; {len(files) + 2} files; verify Firebase providers and authorized domain before announcing live login.')
+    assert 'index.html' in names
+    assert '_redirects' in names
+    assert all(not n.startswith(('.git/', '.openai/')) for n in names)
+print(f'{args.output}: {args.output.stat().st_size} bytes; {len(names)} files; verify Firebase providers and authorized domain before announcing live login.')

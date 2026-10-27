@@ -4,7 +4,7 @@ O arquivo `wrangler.jsonc` publica `dist/` como assets estáticos em um Worker
 separado, `kyroshix-preview`. O Worker de produção `releases` não é alterado.
 A raiz `/` entrega a homepage Spatial UI (`dist/index.html`); as rotas legíveis
 (`/inicio`, `/track/...`) caem no `not_found_handling: single-page-application`
-e recebem a mesma página. `dist/_redirects` documenta os rewrites equivalentes
+e recebem a mesma página. `cloudflare/_redirects` documenta os rewrites equivalentes
 para o Worker de produção.
 
 ## Opção A — Workers Builds (recomendada, gratuita)
