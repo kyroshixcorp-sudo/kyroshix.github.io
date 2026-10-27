@@ -159,4 +159,24 @@ grant execute on function public.krs_start_direct_chat(text) to anon, authentica
 revoke insert, delete, update on public.krs_conversations from anon, authenticated;
 revoke insert, delete on public.krs_conversation_members from anon, authenticated;
 
+-- Keep conversation ordering current after a successful message insert.
+create or replace function public.krs_chat_touch_conversation()
+returns trigger
+language plpgsql security definer
+set search_path = ''
+as $
+begin
+  update public.krs_conversations
+  set last_message_at = new.created_at
+  where id = new.conversation_id;
+  return new;
+end;
+$;
+revoke all on function public.krs_chat_touch_conversation() from public;
+
+drop trigger if exists krs_chat_message_touch_conversation on public.krs_messages;
+create trigger krs_chat_message_touch_conversation
+after insert on public.krs_messages
+for each row execute function public.krs_chat_touch_conversation();
+
 commit;
