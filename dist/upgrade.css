@@ -1,0 +1,87 @@
+/* KYROSHIX RELEASES — responsive glass design layer.
+   Deliberately additive: preserves existing component behavior and markup. */
+:root {
+  --kyro-red: #ff334f;
+  --kyro-red-soft: #ff6478;
+  --kyro-glass: rgb(23 23 28 / 78%);
+  --kyro-glass-border: rgb(255 255 255 / 11%);
+  --kyro-shadow: 0 18px 60px rgb(0 0 0 / 22%);
+  --kyro-radius: 20px;
+  --focus-ring: 0 0 0 3px rgb(255 51 79 / 28%);
+  accent-color: var(--kyro-red);
+}
+:root { scroll-behavior: smooth; }
+body { -webkit-text-size-adjust: 100%; text-rendering: optimizeLegibility; }
+::selection { background: rgb(255 51 79 / 35%); color: #fff; }
+:where(button, a, input, select, textarea):focus-visible {
+  outline: 2px solid var(--kyro-red-soft);
+  outline-offset: 3px;
+}
+:where(.panel, .card, .modal, .dialog, .popover, .dropdown, .player, .sidebar, .topbar) {
+  border-color: var(--kyro-glass-border);
+}
+:where(.panel, .card, .modal, .dialog, .popover, .dropdown) {
+  box-shadow: var(--kyro-shadow);
+}
+:where(.primary, .btn-primary, .button-primary, [data-variant="primary"]) {
+  background-color: var(--kyro-red);
+  border-color: transparent;
+}
+:where(.primary, .btn-primary, .button-primary, [data-variant="primary"]):not(:disabled):hover {
+  filter: brightness(1.08);
+}
+img, video, audio, canvas, iframe { max-width: 100%; }
+input, select, textarea { min-width: 0; max-width: 100%; }
+button, a { -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) and (pointer: fine) {
+  :where(.card, .track-card, .video-card, .playlist-card, .artist-card) {
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+  :where(.card, .track-card, .video-card, .playlist-card, .artist-card):hover {
+    border-color: rgb(255 255 255 / 18%);
+  }
+}
+@media (max-width: 760px) {
+  :root { --header: 62px; --player: 82px; }
+  html { scroll-padding-top: 76px; }
+  body { overflow-wrap: anywhere; }
+  h1 { font-size: clamp(1.65rem, 7vw, 2.15rem); }
+  h2 { font-size: clamp(1.2rem, 5vw, 1.55rem); }
+  :where(.topbar, header.topbar) {
+    inset-inline: 8px;
+    top: max(6px, env(safe-area-inset-top));
+    width: auto;
+    max-width: none;
+    border-radius: 16px;
+  }
+  :where(.main, main, #main-content, .content, .page-content) {
+    min-width: 0;
+    max-width: 100%;
+  }
+  :where(.grid, .track-grid, .video-grid, .card-grid, .artist-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :where(.track-row, .track-item, .video-row) { min-width: 0; }
+  :where(.track-row, .track-item, .video-row) > * { min-width: 0; }
+  :where(.track-title, .track-name, .video-title, .artist-name) {
+    overflow-wrap: anywhere;
+  }
+  :where(.player, .music-player, .bottom-player) {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  :where(input, select, textarea, button) { scroll-margin-bottom: 100px; }
+}
+@media (max-width: 390px) {
+  :where(.grid, .track-grid, .video-grid, .card-grid, .artist-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  :where(.topbar .brand img, .brand img) { max-width: 136px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
