@@ -341,6 +341,7 @@ function drmConfig(env) {
   return { licenseServers, enabled: Object.keys(licenseServers).length > 0 };
 }
 function handleHealth(env) {
+  if (env.KX_PREVIEW_READ_ONLY === 'true') env = { ASSETS: env.ASSETS };
   // Só booleanos: nunca devolve segredos, chaves ou valores de config.
   return json({ ok: true, worker: true, stripe: !!env.STRIPE_SECRET_KEY && !!env.STRIPE_PRICE_PRO,
     email: !!env.RESEND_API_KEY && !!env.EMAIL_FROM, kv: !!env.KX_DATA,
@@ -397,25 +398,31 @@ async function fetchYoutubeVideos(fetcher = fetch) {
 }
 
 const FEED_CACHE_MS = 10 * 60 * 1000;
+let ephemeralFeed = null, ephemeralFetch = null, ephemeralFailureAt = 0;
 async function handleVideoSync(request, env) {
   if (request.method !== 'GET' && request.method !== 'POST') return json({ ok: false, reason: 'Method not allowed' }, 405);
   const kv = env.KX_DATA;
-  if (!kv) return notConfigured('Vincule o namespace KV KX_DATA para guardar a sincronização do YouTube.');
   const url = new URL(request.url);
   const force = url.searchParams.get('force') === '1';
-  const cached = await readJson(kv, VIDEOS_KEY, {});
+  const cached = kv ? await readJson(kv, VIDEOS_KEY, {}) : (ephemeralFeed || {});
   const age = Date.now() - (Number(cached?.updatedAt) || 0);
-  if (!force && Array.isArray(cached?.videos) && cached.videos.length && age < FEED_CACHE_MS) {
+  if ((!force || !kv) && Array.isArray(cached?.videos) && cached.videos.length && age < FEED_CACHE_MS) {
     return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
       source: cached.source || 'youtube-feed', cached: true });
   }
   try {
-    const videos = await fetchYoutubeVideos();
+    if (!kv && Date.now() - ephemeralFailureAt < 60000) throw Error('Feed temporariamente indisponível. Tente novamente em um minuto.');
+    if (!kv && !ephemeralFetch) ephemeralFetch = fetchYoutubeVideos().finally(() => { ephemeralFetch = null; });
+    const videos = await (kv ? fetchYoutubeVideos() : ephemeralFetch);
     const updatedAt = Date.now();
-    await kv.put(VIDEOS_KEY, JSON.stringify({ videos, updatedAt, source: 'youtube-feed' }));
-    return json({ ok: true, videos, updatedAt, source: 'youtube-feed', cached: false });
+    // Sem KV (preview) a sincronização ainda é real: lê o feed público e
+    // devolve a lista, só não persiste entre dispositivos.
+    if (kv) await kv.put(VIDEOS_KEY, JSON.stringify({ videos, updatedAt, source: 'youtube-feed' }));
+    else ephemeralFeed = { videos, updatedAt, source: 'youtube-feed' };
+    return json({ ok: true, videos, updatedAt, source: 'youtube-feed', cached: false,
+      ephemeral: !kv, persisted: !!kv });
   } catch (error) {
-    // Mantém o último catálogo válido em vez de apagar tudo.
+    if (!kv) ephemeralFailureAt = Date.now();
     if (Array.isArray(cached?.videos) && cached.videos.length) {
       return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
         source: cached.source || 'cache', cached: true,
@@ -437,6 +444,13 @@ function handleDrmStatus(env) {
 export default {
   async fetch(request, env) {
     const pathname = new URL(request.url).pathname;
+    // Preview isolado: não habilitar pagamentos, autenticação ou escrita com
+    // credenciais reais até existir autenticação e controle de tentativas seguros.
+    if (env.KX_PREVIEW_READ_ONLY === 'true') {
+      const privateApi = pathname.startsWith('/api/auth/') || pathname.startsWith('/api/admin/') || pathname.startsWith('/api/billing/');
+      const writeApi = pathname.startsWith('/api/') && request.method !== 'GET' && request.method !== 'HEAD';
+      if (privateApi || writeApi) return notConfigured('Prévia somente leitura: autenticação, pagamentos e gravações não estão habilitados neste Worker.');
+    }
     if (pathname === '/api/health') return handleHealth(env);
     if (pathname === '/api/videos/sync') return handleVideoSync(request, env);
     if (pathname === '/api/drm/status') return handleDrmStatus(env);

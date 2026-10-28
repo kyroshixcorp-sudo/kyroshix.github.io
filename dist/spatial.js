@@ -311,19 +311,12 @@
     const s = session();
     return s ? accounts().find(a => a.id === s.id) || null : null;
   }
-  const plan = () => currentAccount()?.plan || 'free';
+  // Um e-mail digitado ou um valor no localStorage não prova a identidade do dono.
+  // O privilégio só existe nesta sessão após confirmação no servidor.
+  const isOwner = () => !!currentAccount() && currentAccount().email === OWNER_EMAIL && state.ownerVerified === true && !!state.ownerToken;
+  const plan = () => isOwner() ? 'owner' : (currentAccount()?.plan === 'owner' ? 'free' : currentAccount()?.plan || 'free');
   const can = key => (BENEFITS[key] || []).includes(plan());
-  const isOwner = () => !!currentAccount() && currentAccount().email === OWNER_EMAIL && currentAccount().plan === 'owner';
-  // O dono tem Premium vitalício. Isso é um benefício LOCAL (navegador); publicar
-  // no servidor continua exigindo o token verificado por e-mail.
-  function grantOwnerPlan() {
-    const list = accounts(), account = list.find(a => a.email === OWNER_EMAIL);
-    if (!account || account.plan === 'owner') return false;
-    account.plan = 'owner'; account.planSince = account.planSince || Date.now();
-    saveAccounts(list);
-    return true;
-  }
-  function ownerIsVerified() { return !!state.ownerToken; }
+  function ownerIsVerified() { return isOwner(); }
   const profile = () => read('kx.profile.v2', { name: '', bio: '', avatar: '', accent: '#ff8a3d', theme: 'dark' });
   const saveProfile = data => write('kx.profile.v2', { ...profile(), ...data });
 
@@ -348,8 +341,7 @@
     const hash = await derive(password, salt);
     const mail = email.trim().toLowerCase();
     const account = { id: uid(), name: name.trim(), email: mail, salt, hash,
-      plan: mail === OWNER_EMAIL ? 'owner' : 'free',
-      planSince: mail === OWNER_EMAIL ? Date.now() : null, createdAt: Date.now() };
+      plan: 'free', planSince: null, createdAt: Date.now() };
     const list = accounts(); list.push(account); saveAccounts(list);
     write(SESSION_KEY, { id: account.id, at: Date.now() });
     return account;
@@ -359,15 +351,13 @@
     if (!account) return null;
     const hash = await derive(password, account.salt);
     if (hash !== account.hash) return null;
-    if (account.email === OWNER_EMAIL && account.plan !== 'owner') {
-      const list = accounts(), target = list.find(a => a.id === account.id);
-      if (target) { target.plan = 'owner'; target.planSince = Date.now(); saveAccounts(list); }
-    }
     write(SESSION_KEY, { id: account.id, at: Date.now() });
     return account;
   }
   function logout() {
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('kx.owner.token');
+    state.ownerToken = null; state.ownerVerified = false;
     state.authMode = 'login'; state.pendingAction = null;
     renderAll(); renderAuth();
     toast('Você saiu da conta.');
@@ -395,7 +385,7 @@
     liked: asSet(read('kx.liked.v2', [])), reposted: asSet(read('kx.reposted.v2', [])),
     history: asArray(read('kx.history.v2', [])), shuffled: false, repeating: false,
     selectedPlan: 'pro', authMode: 'login', eq: { bass: 0, mid: 0, treble: 0 }, pendingAction: null,
-    codeVerified: false, codePending: null, ownerToken: read('kx.owner.token', null),
+    codeVerified: false, codePending: null, ownerToken: null, ownerVerified: false,
     chatMessages: [], videos: [], videosSource: 'config', videosUpdatedAt: 0,
     catalogUpdatedAt: 0, billingNotice: '', adsReady: false,
     backend: { status: 'checking', worker: false, stripe: false, email: false, kv: false, detail: '' },
@@ -860,8 +850,8 @@
     const account = currentAccount();
     $('#account-btn').textContent = account ? account.name : 'Entrar';
     $('#account-btn').classList.toggle('is-owner', isOwner());
-    $('#plan-btn').textContent = isOwner() ? 'PREMIUM ✦' : (account && account.plan !== 'free' ? planName(account.plan).toUpperCase() + ' ✦' : 'VER PLANOS');
-    $('#plan-btn').classList.toggle('is-pro', !!account && account.plan !== 'free');
+    $('#plan-btn').textContent = isOwner() ? 'PREMIUM ✦' : (account && plan() !== 'free' ? planName(plan()).toUpperCase() + ' ✦' : 'VER PLANOS');
+    $('#plan-btn').classList.toggle('is-pro', !!account && plan() !== 'free');
   }
   function renderNow() {
     const dlg = $('#player-dialog'); if (!dlg.open) return;
@@ -1002,7 +992,7 @@
       <div class="planos-head">
         <p class="eyebrow">KYROSHIX RECORDS · ASSINATURAS</p>
         <h1>Som sem limites, <em>do seu jeito</em>.</h1>
-        <p>Pagamento processado pelo Stripe em página segura. Cancele quando quiser; sem fidelidade.</p>
+        <p>A cobrança depende de configuração e validação do servidor. Verifique o estado dos serviços abaixo.</p>
       </div>
       <div class="backend-status ${state.backend.worker ? 'ok' : 'warn'}">
         <span class="backend-dot"></span>
@@ -1012,7 +1002,7 @@
       ${backendChecklist()}
       ${currentAccount() ? `<div class="account-box"><span class="avatar" style="--face:linear-gradient(135deg,#ff8a3d,#b06bff)">${esc(currentAccount().name.charAt(0).toUpperCase())}</span>
         <div><b>${esc(currentAccount().name)}</b><span>${esc(currentAccount().email)}</span></div>
-        <span class="plan-tag">${esc(planName(currentAccount().plan))}</span></div>` : '<div class="notice info">Entre na sua conta para assinar. O dono já possui Premium vitalício.</div>'}
+        <span class="plan-tag">${esc(planName(plan()))}</span></div>` : '<div class="notice info">Entre na sua conta para assinar. O dono já possui Premium vitalício.</div>'}
       ${notice}
       <div class="plan-grid">${PLANS.map(p => `
         <article class="plan-tile ${p.badge ? 'featured' : ''} ${current === p.id ? 'current' : ''}">
@@ -1030,7 +1020,7 @@
         <div class="dlg-actions" style="margin-bottom:14px"><button class="btn btn-ghost" type="button" data-action="set-view" data-view="admin">${icon('shield')} Abrir painel do dono</button></div>` : ''}
       ${currentAccount() && currentAccount().email === OWNER_EMAIL && !isOwner()
         ? `<div class="notice warn">${icon('crown')} Esta é a conta do dono, mas o Premium ainda não foi aplicado.
-            <button class="btn btn-primary btn-sm" type="button" data-action="activate-owner">Ativar Premium de dono</button></div>` : ''}
+            <button class="btn btn-primary btn-sm" type="button" data-action="activate-owner">Verificar identidade</button></div>` : ''}
       <div class="planos-foot">
         <div>${icon('shield')}<b>Pagamento seguro</b><span>Cartão processado pelo Stripe. Nenhum dado de cartão passa por este site.</span></div>
         <div>${icon('refresh')}<b>Ativação imediata</b><span>O webhook confirma o pagamento e libera o plano na hora.</span></div>
@@ -1059,7 +1049,7 @@
     const health = state.backend.worker ? await api('/api/videos/sync' + (force ? '?force=1' : '')) : null;
     if (health?.ok && Array.isArray(health.videos) && health.videos.length) {
       state.videos = health.videos.filter(v => safeYoutubeId(v?.id || v?.videoId));
-      state.videosSource = 'server'; state.videosUpdatedAt = health.updatedAt || Date.now();
+      state.videosSource = health.ephemeral ? 'feed' : 'server'; state.videosUpdatedAt = health.updatedAt || Date.now();
       if (state.view === 'videos') renderStage();
       if (!quiet) toast('Vídeos sincronizados do canal oficial (' + state.videos.length + ').');
       return state.videosSource;
@@ -1074,7 +1064,7 @@
       state.videosSource = 'config';
     }
     if (state.view === 'videos') renderStage();
-    if (!quiet) toast(state.videosSource === 'server'
+    if (!quiet) toast(state.videosSource === 'server' || state.videosSource === 'feed'
       ? 'Vídeos sincronizados com o servidor (' + state.videos.length + ').'
       : 'Catálogo oficial de vídeos carregado. ' + backendLabel(result));
     return state.videosSource;
@@ -1086,7 +1076,7 @@
         <p>Reprodução via YouTube com consentimento explícito — nada é carregado antes do seu clique.</p></div></div>
       <div class="backend-status ${state.videosSource === 'server' ? 'ok' : 'info'}">
         <span class="backend-dot"></span>
-        <div><b>${list.length} vídeos do canal oficial</b><span>Origem: ${state.videosSource === 'server' ? 'sincronizado do servidor (KV)' : 'catálogo oficial publicado'} ·
+        <div><b>${list.length} vídeos do canal oficial</b><span>Origem: ${state.videosSource === 'server' ? 'sincronizado do servidor (KV)' : state.videosSource === 'feed' ? 'feed do YouTube (sem persistência)' : 'catálogo oficial publicado'} ·
           ${appConfig.youtube?.channel ? `<a href="${esc(appConfig.youtube.channel)}" target="_blank" rel="noopener noreferrer">@KYROSHIXCORP ↗</a>` : ''}</span></div>
         <button class="btn btn-ghost btn-sm" type="button" data-action="sync-videos">${icon('refresh')} Sincronizar</button>
       </div>
@@ -1164,7 +1154,7 @@
     return `<section class="panel glass profile-page">
       <div class="panel-head"><div><p class="eyebrow">MINHA CONTA</p><h1>Seu perfil.</h1><p>Personalize como você aparece no catálogo e nas conversas.</p></div></div>
       ${account ? `<div class="account-box"><span class="avatar" style="--face:${esc(pr.avatar ? `url('${pr.avatar}')` : 'linear-gradient(135deg,#ff8a3d,#b06bff)')}">${pr.avatar ? '' : esc(account.name.charAt(0).toUpperCase())}</span>
-        <div><b>${esc(account.name)}</b><span>${esc(account.email)} · plano ${esc(planName(account.plan))}</span></div><span class="plan-tag">${esc(planName(account.plan))}</span></div>` : '<div class="notice warn">Entre na sua conta para salvar seu perfil.</div>'}
+        <div><b>${esc(account.name)}</b><span>${esc(account.email)} · plano ${esc(planName(plan()))}</span></div><span class="plan-tag">${esc(planName(plan()))}</span></div>` : '<div class="notice warn">Entre na sua conta para salvar seu perfil.</div>'}
       <form class="form-grid" id="profile-form">
         <div class="field"><label for="pf-name">Nome de exibição</label><input id="pf-name" maxlength="40" value="${esc(pr.name || account?.name || '')}" placeholder="Como quer ser chamado"></div>
         <div class="field"><label for="pf-bio">Bio</label><textarea id="pf-bio" rows="3" maxlength="240" placeholder="Conte um pouco sobre você">${esc(pr.bio || '')}</textarea></div>
@@ -1262,22 +1252,22 @@
       $('#auth-subtitle').textContent = 'Gerencie plano, perfil e segurança.';
       logged.innerHTML = `<div class="account-box"><span class="avatar" style="--face:linear-gradient(135deg,#ff8a3d,#b06bff)">${esc(account.name.charAt(0).toUpperCase())}</span>
         <div><b>${esc(account.name)}</b><span>${esc(account.email)} · desde ${new Date(account.createdAt).toLocaleDateString('pt-BR')}</span></div>
-        <span class="plan-tag ${isOwner() ? 'owner' : ''}">${isOwner() ? 'DONO · PREMIUM' : esc(planName(account.plan))}</span></div>
+        <span class="plan-tag ${isOwner() ? 'owner' : ''}">${isOwner() ? 'DONO · PREMIUM' : esc(planName(plan()))}</span></div>
         <div class="form-grid">
           <div class="ins-card" style="margin:0"><h3>${icon('crown')} Plano atual</h3>
-            <p>${account.plan === 'free' ? 'Free — recursos Pro/Studio bloqueados.' : `${esc(planName(account.plan))} ativo${account.planSince ? ' desde ' + new Date(account.planSince).toLocaleDateString('pt-BR') : ''}.`}</p></div>
+            <p>${plan() === 'free' ? 'Free — recursos Pro/Studio bloqueados.' : `${esc(planName(plan()))} ativo${account.planSince ? ' desde ' + new Date(account.planSince).toLocaleDateString('pt-BR') : ''}.`}</p></div>
           <div class="dlg-actions" style="margin-top:4px">
             <button class="btn btn-primary" type="button" data-action="open-plans">Gerenciar plano</button>
             <button class="btn btn-ghost" type="button" data-action="set-view" data-view="perfil">Meu perfil</button>
             ${isOwner() ? '<button class="btn btn-ghost" type="button" data-action="set-view" data-view="admin">Painel do dono</button>' : ''}
-            ${account.plan !== 'free' && account.plan !== 'owner' ? '<button class="btn btn-ghost" type="button" data-action="cancel-plan">Cancelar assinatura</button>' : ''}
+            ${plan() !== 'free' && plan() !== 'owner' ? '<button class="btn btn-ghost" type="button" data-action="cancel-plan">Cancelar assinatura</button>' : ''}
             <button class="btn btn-dark" type="button" data-action="logout">${icon('logout')} Sair</button>
           </div>
         </div>`;
     } else {
       guest.hidden = false; logged.hidden = true;
       $('#auth-title').textContent = 'Entre na KYROSHIX Records.';
-      $('#auth-subtitle').textContent = 'Conta real com verificação por e-mail.';
+      $('#auth-subtitle').textContent = 'Conta local neste navegador. A verificação por e-mail depende do servidor.';
       $$('#auth-seg button').forEach(b => b.classList.toggle('active', b.dataset.mode === state.authMode));
       const signup = state.authMode === 'signup';
       $('#auth-name-field').hidden = !signup; $('#auth-confirm-field').hidden = !signup;
@@ -1425,10 +1415,7 @@
       case 'refresh-backend': refreshBackendStatus().then(() => { renderStage(); toast(backendSummary()); }); break;
       case 'sync-videos': syncVideos(false, true); break;
       case 'play-track-id': { const t = byId(btn.dataset.id); if (t) { loadTrack(t, true); toast('Tocando ' + t.title + '.'); } break; }
-      case 'activate-owner': {
-        grantOwnerPlan(); renderAll(); setView('planos');
-        toast('Premium vitalício ativado para a conta do dono.'); break;
-      }
+      case 'activate-owner': beginOwnerVerification(); break;
       case 'play-video': {
         const id = safeYoutubeId(btn.dataset.id);
         const card = btn.closest('.video-card');
@@ -1601,16 +1588,13 @@
       }
       write(SESSION_KEY, { id: account.id, at: Date.now() });
     }
-    state.codePending = null; state.codeVerified = true;
-    const justGranted = pending.email === OWNER_EMAIL && grantOwnerPlan();
+    state.codePending = null; state.codeVerified = !pending.localOnly && appConfig.auth?.emailCode === true;
     $('#auth-form').reset();
     closeDialog($('#auth-dialog'));
     renderAll(); renderAuth();
     const after = state.pendingAction; state.pendingAction = null;
     if (typeof after === 'function') after(); else renderAll();
-    toast(pending.email === OWNER_EMAIL
-      ? (justGranted ? 'Modo dono ativado: Premium vitalício e todos os benefícios liberados.' : 'Bem-vindo de volta, dono. Premium ativo.')
-      : (pending.mode === 'signup' ? 'Conta criada. Bem-vindo à KYROSHIX Records.' : 'Acesso confirmado.'));
+    toast(pending.email === OWNER_EMAIL ? 'Conta aberta. Para acessar o painel, confirme sua identidade.' : (pending.mode === 'signup' ? 'Conta criada neste navegador.' : 'Conta aberta neste navegador.'));
   }
 
   async function beginAccess(pending) {
@@ -1631,7 +1615,8 @@
       : 'Verificação por e-mail indisponível: configure <b>RESEND_API_KEY</b> e <b>EMAIL_FROM</b> no Worker. ' +
         'Até lá, o acesso fica restrito a este navegador.';
     err.hidden = false;
-    await finalizeAccess(pending);
+    await finalizeAccess({ ...pending, localOnly: true });
+    toast('Acesso local somente neste navegador. Código por e-mail não disponível.');
   }
 
   async function verifyAccessCode(code) {
@@ -1642,9 +1627,7 @@
       if (!result?.ok || !result.token) {
         const e = $('#auth-code-error'); e.textContent = result?.detail || result?.reason || 'Código inválido ou expirado.'; e.hidden = false; return;
       }
-      state.ownerToken = result.token; write('kx.owner.token', result.token);
-      const list = accounts(); const account = list.find(a => a.email === pending.email);
-      if (account) { account.plan = 'owner'; account.planSince = Date.now(); saveAccounts(list); }
+      state.ownerToken = result.token; state.ownerVerified = true;
       state.codePending = null; $('#auth-code').value = '';
       closeDialog($('#auth-dialog')); renderAll(); setView('admin');
       toast('Acesso de dono confirmado. Premium ativado.');
@@ -1723,15 +1706,7 @@
       renderAuth(); openDialog($('#auth-dialog')); return;
     }
     const result = await api('/api/admin/code', { email: OWNER_EMAIL });
-    if (backendMissing(result)) {
-      // Sem backend, libera edição LOCAL. Escritas no servidor continuam exigindo
-      // token verificado, então isso não afeta outros visitantes.
-      grantOwnerPlan();
-      state.ownerToken = null; write('kx.owner.token', null);
-      renderAll(); setView('admin');
-      toast('Modo dono local ativado — Premium liberado. ' + backendLabel(result));
-      return;
-    }
+    if (backendMissing(result)) { toast('Não foi possível verificar o dono. ' + backendLabel(result)); return; }
     if (!result?.ok) { toast('Não foi possível enviar o código: ' + backendLabel(result)); return; }
     state.codePending = { mode: 'owner', email: OWNER_EMAIL };
     renderAuth(); openDialog($('#auth-dialog')); $('#auth-code')?.focus();
@@ -1960,8 +1935,8 @@
   // Início
   async function boot() {
     await loadAppConfig();
-    // Conta do dono criada antes desta versão também recebe o Premium vitalício.
-    if (currentAccount()?.email === OWNER_EMAIL) grantOwnerPlan();
+    // Não restaurar privilégio de dono a partir de localStorage.
+    localStorage.removeItem('kx.owner.token');
     await Promise.all([refreshBackendStatus(), loadDrmStatus()]);
     await syncVideos(true);
     applyProfile();

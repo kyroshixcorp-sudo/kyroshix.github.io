@@ -1,3 +1,5 @@
+> **Correção de segurança:** a versão anterior concedia modo dono ao digitar o e-mail no navegador. Isso não verifica identidade. Esse atalho foi removido: é necessária verificação pelo servidor. O preview é somente leitura; cobrança, envio de código, publicação compartilhada e DRM comercial não estão ativos ou validados. As seções históricas abaixo podem descrever implementações anteriores e não devem ser tratadas como confirmação de operação em produção.
+
 # KYROSHIX RELEASES — versão 4.5 · Contas
 
 A versão 4.5 refaz o acesso com um cartão de duas colunas, arte KYROSHIX e formulário que acompanha o tema claro/escuro. Na primeira visita anônima deste navegador, o cadastro abre depois da restauração da sessão. Há opções de Google, Facebook, GitHub, telefone/SMS, Instagram e X, com disponibilidade explícita. Google e e-mail continuam configurados; os outros métodos dependem das etapas de ativação em [docs/acesso-4.5.md](docs/acesso-4.5.md). Continuar sem conta mantém a escuta pública.

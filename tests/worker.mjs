@@ -71,6 +71,14 @@ try {
   const store = new Map();
   const kv = {get:async k=>store.get(k)??null,put:async(k,v)=>store.set(k,v),delete:async k=>store.delete(k)};
   const envFull = {...env,KX_DATA:kv,STRIPE_WEBHOOK_SECRET:'whsec_test',ADMIN_EMAIL:'kyroshixcorp@gmail.com'};
+  // Preview não pode habilitar escrita ou pagamentos mesmo com bindings presentes.
+  const preview = {...envFull, KX_PREVIEW_READ_ONLY:'true', STRIPE_SECRET_KEY:'sk_test_private', STRIPE_PRICE_PRO:'price_test'};
+  for (const route of ['/api/auth/code','/api/admin/verify','/api/billing/checkout','/api/catalog']) {
+    const response = await worker.fetch(new Request('https://site.test'+route,{method:'POST',body:'{}'}),preview);
+    assert.equal((await response.json()).reason,'not_configured', route);
+  }
+  const previewHealth = await (await worker.fetch(new Request('https://site.test/api/health'),preview)).json();
+  assert.equal(previewHealth.stripe,false); assert.equal(previewHealth.kv,false);
   // /api/health: só booleanos, nunca segredos.
   const health = await worker.fetch(new Request('https://site.test/api/health'),envFull);
   const healthData = await health.json();
@@ -104,13 +112,12 @@ try {
   assert.equal(parsed[0].source,'youtube-feed');
   assert.equal(parseYoutubeFeed('').length,0);
   assert.equal(parseYoutubeFeed('<feed><entry><yt:videoId>curto</yt:videoId></entry></feed>').length,0);
-  // /api/videos/sync sem KV responde not_configured.
-  const syncNoKv = await worker.fetch(new Request('https://site.test/api/videos/sync'),env);
-  assert.equal((await syncNoKv.json()).reason,'not_configured');
   // Com KV, sincroniza o feed público e persiste a lista.
   const realFetch = globalThis.fetch;
   globalThis.fetch = async () => ({ ok:true, status:200, text:async()=>feedXml });
   try {
+    const syncNoKv = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),env)).json();
+    assert.equal(syncNoKv.ok,true); assert.equal(syncNoKv.ephemeral,true);
     const synced = await worker.fetch(new Request('https://site.test/api/videos/sync'),envFull);
     const syncData = await synced.json();
     assert.equal(syncData.ok,true);

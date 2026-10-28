@@ -1,3 +1,5 @@
+> **Correção de segurança:** a versão anterior concedia modo dono ao digitar o e-mail no navegador. Isso não verifica identidade. Esse atalho foi removido: é necessária verificação pelo servidor. O preview é somente leitura; cobrança, envio de código, publicação compartilhada e DRM comercial não estão ativos ou validados. As seções históricas abaixo podem descrever implementações anteriores e não devem ser tratadas como confirmação de operação em produção.
+
 # Autorizar o domínio de preview no Firebase
 
 **Solicitação:** autorizar `https://arena-6a25f84d-kyroshix-github-io-kyroshix-preview.kyroshixcorp.workers.dev/` no Firebase.

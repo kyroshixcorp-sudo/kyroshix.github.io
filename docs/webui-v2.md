@@ -1,6 +1,14 @@
+> **Correção de segurança:** a versão anterior concedia modo dono ao digitar o e-mail no navegador. Isso não verifica identidade. Esse atalho foi removido: é necessária verificação pelo servidor. O preview é somente leitura; cobrança, envio de código, publicação compartilhada e DRM comercial não estão ativos ou validados. As seções históricas abaixo podem descrever implementações anteriores e não devem ser tratadas como confirmação de operação em produção.
+
 # Spatial WebUI v2 — configuração real
 
 Guia da versão 2 da homepage. **Nada aqui é simulado:** cada serviço que depende de infraestrutura externa responde `not_configured` até você configurar as credenciais. O que funciona sem credenciais (player, catálogo local, perfil local, layout, métricas locais) funciona de verdade.
+
+## Segurança: não habilitar cobrança ou administração em produção ainda
+
+O checkout e a gestão de assinaturas deste módulo **não estão prontos para produção**: o status usa e-mail fornecido pelo cliente e a confirmação não vincula o pagamento a uma identidade autenticada. O código administrativo baseado em KV não implementa limite de tentativas atômico adequado para códigos curtos. Antes de ativar segredos ou bindings, implemente autenticação validada no servidor, limite de tentativas resistente à concorrência, associação da assinatura ao UID verificado e tratamento correto dos eventos e estados do Stripe. Não exponha os endpoints atuais como um sistema de pagamentos ou administração confiável.
+
+No preview, `KX_PREVIEW_READ_ONLY=true` bloqueia autenticação por código, cobrança e toda gravação. O modo dono não pode ser concedido apenas por e-mail/localStorage. O catálogo do canal tem uma cópia publicada e pode consultar o feed quando a rede permite; sem KV isso não garante sincronização entre dispositivos.
 
 ## 1. O que mudou em relação à v1
 
