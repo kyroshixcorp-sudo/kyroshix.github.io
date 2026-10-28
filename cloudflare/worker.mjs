@@ -204,7 +204,7 @@ async function handleBilling(request, env, pathname) {
       'metadata[email]': email
     };
     const created = await stripeRequest(env, 'checkout/sessions', params);
-    if (!created.ok || !created.data?.url) return fail(created.data?.error?.message || 'O Stripe recusou a criação do checkout.', 502);
+    if (!created.ok || !created.data?.url) return fail(publicError(created.data?.error?.message) || 'O Stripe recusou a criação do checkout.', 502);
     return json({ ok: true, url: created.data.url, id: created.data.id });
   }
   if (pathname === '/api/billing/confirm') {
@@ -348,10 +348,25 @@ function handleHealth(env) {
     ownerEmail: env.ADMIN_EMAIL || 'kyroshixcorp@gmail.com' });
 }
 
-const decodeXml = value => String(value || '')
-  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-  .replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&')
-  .replace(/<[^>]*>/g, '').trim();
+// Nunca reconstrói marcação HTML: entidades de < > viram texto seguro e
+// qualquer tag restante é removida em loop (evita bypass tipo <<script>script>).
+function decodeXml(value) {
+  let text = String(value || '')
+    .replace(/&lt;|&#60;|&#x3c;/gi, '\u2039')
+    .replace(/&gt;|&#62;|&#x3e;/gi, '\u203a')
+    .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&');
+  let previous;
+  do { previous = text; text = text.replace(/<[^>]*>/g, ''); } while (text !== previous);
+  return text.replace(/[<>\u0000-\u001f]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// Mensagens de erro públicas: sem stack trace, caminhos de arquivo ou URLs internas.
+function publicError(value) {
+  return String(value || '')
+    .replace(/(?:\bat\s+[^\n]*|\S+\.(?:mjs|js|ts|cjs):\d+:\d+|node:internal[^\s]*)/g, '')
+    .replace(/\s+/g, ' ').trim().slice(0, 160);
+}
 
 /** Lê o feed Atom público do canal — sem chave de API e sem dados inventados. */
 export function parseYoutubeFeed(xml) {
@@ -404,9 +419,10 @@ async function handleVideoSync(request, env) {
     if (Array.isArray(cached?.videos) && cached.videos.length) {
       return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
         source: cached.source || 'cache', cached: true,
-        warning: String(error?.message || error).slice(0, 160) });
+        warning: publicError(error?.message) || 'Usando último catálogo válido.' });
     }
-    return json({ ok: false, reason: 'feed_error', detail: String(error?.message || error).slice(0, 200) }, 502);
+    return json({ ok: false, reason: 'feed_error',
+      detail: publicError(error?.message) || 'Não foi possível ler o feed do YouTube.' }, 502);
   }
 }
 

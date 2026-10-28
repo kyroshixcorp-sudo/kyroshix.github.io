@@ -96,6 +96,11 @@ try {
   assert.match(parsed[0].title,/Snakes & Ladders/);
   assert.match(parsed[0].description,/Remix/);
   assert.equal(parsed[0].description.includes('<'),false,'descrição não pode conter marcação');
+  // Bypass clássico de sanitização de tag não pode sobreviver.
+  const evil = parseYoutubeFeed('<feed><entry><yt:videoId>6hbfr21jgWU</yt:videoId>' +
+    '<title>&lt;&lt;script&gt;script&gt;alert(1)</title></entry></feed>');
+  assert.equal(/[<>]/.test(evil[0].title),false,'título não pode conter marcação HTML');
+  assert.ok(evil[0].title.includes('‹'),'entidades devem virar texto seguro');
   assert.equal(parsed[0].source,'youtube-feed');
   assert.equal(parseYoutubeFeed('').length,0);
   assert.equal(parseYoutubeFeed('<feed><entry><yt:videoId>curto</yt:videoId></entry></feed>').length,0);
