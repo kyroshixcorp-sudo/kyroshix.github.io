@@ -30,8 +30,11 @@ medidos no próprio navegador. Consulte [spatial-webui.md](spatial-webui.md).
 
 ```sh
 python3 scripts/export-pages.py ../exports/KYROSHIX-Cloudflare-Pages.zip --origin https://releases.kyroshixcorp.workers.dev
-python3 scripts/export-worker.py ../exports/KYROSHIX-Cloudflare-Pages.zip ../exports/worker-release
+python3 scripts/export-worker.py ../exports/KYROSHIX-Cloudflare-Pages.zip ../exports/worker-release \
+  --kv-data-id <ID_KX_DATA> --kv-metrics-id <ID_KX_METRICS>
 ```
+
+Os IDs vêm de `npx wrangler kv namespace create KX_DATA` e `KX_METRICS`. Sem eles, as rotas `/api/*` respondem `not_configured`; a página continua funcionando com dados locais. As rotas `/api/*` já entram em `run_worker_first` no `metadata.json` gerado. Configure também os segredos `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_STUDIO`, `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM` e `ADMIN_EMAIL` — detalhes em [webui-v2.md](webui-v2.md).
 
 Envie `metadata.json`, `worker.mjs` e `patches.mjs` como multipart/form-data ao
 endpoint de upload do Worker `releases`. O metadado `keep_assets: true` preserva

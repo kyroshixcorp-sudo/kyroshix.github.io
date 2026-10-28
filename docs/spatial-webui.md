@@ -40,7 +40,7 @@ Tudo é local ao navegador, em `localStorage`:
 
 A senha passa por PBKDF2-SHA256 com 120 mil iterações e salt aleatório (Web Crypto). Se o navegador não oferecer `crypto.subtle`, há um fallback determinístico — nesse caso a proteção é apenas ofuscante, não criptográfica. Não há servidor de autenticação: qualquer pessoa com acesso ao navegador pode ler e alterar esses dados.
 
-O checkout **não cobra nada**. Ele valida nome, 16 dígitos, validade `MM/AA` e CVC, e grava o plano escolhido. Os dados do cartão não são enviados, não são salvos e não devem ser reais. Para billing de produção é necessário: provedor de pagamento, chaves como secrets do Worker, criação de sessão/checkout no servidor, verificação de assinatura de webhooks e persistência da assinatura em banco/KV autoritativo. Nunca confie no plano vindo do `localStorage` para liberar conteúdo protegido.
+Na v1 o checkout **não cobrava nada**; na v2 ele redireciona para o Stripe (veja `webui-v2.md`). Ele valida nome, 16 dígitos, validade `MM/AA` e CVC, e grava o plano escolhido. Os dados do cartão não são enviados, não são salvos e não devem ser reais. Para billing de produção é necessário: provedor de pagamento, chaves como secrets do Worker, criação de sessão/checkout no servidor, verificação de assinatura de webhooks e persistência da assinatura em banco/KV autoritativo. Nunca confie no plano vindo do `localStorage` para liberar conteúdo protegido.
 
 Comentários de exemplo são marcados com **EXEMPLO**. Publicar, responder, curtir e excluir (somente o autor) exigem conta e persistem no navegador.
 
@@ -79,7 +79,7 @@ O `wrangler.jsonc` deste repositório é **apenas de preview/staging** (`kyroshi
 3. Publique **primeiro o ZIP** (assets) e depois o módulo com `keep_assets: true`, ou então publique somente o ZIP completo. Um upload de módulo com `keep_assets: true` **não cria arquivos novos**: `spatial.css` e `spatial.js` precisam entrar pelo ZIP.
 4. Confira no navegador: `GET /spatial.css` e `GET /spatial.js` devem responder `200` com os content types corretos.
 
-`npm run test:worker` valida as rotas de documento, os dois novos arquivos, HEAD/ETag e as respostas dos endpoints de métricas sem KV. As duas baterias Chromium em `.test-artifacts/` somam **140 verificações**: layout/interação em 11 larguras de 1920 px a 360 px (`spatial-webui.cjs`, 90) e gating de planos, comentários avançados, conta, controles do player, bastidores, filtros e scrim (`spatial-webui-interactions.cjs`, 50).
+`npm run test:worker` valida as rotas de documento, os dois novos arquivos, HEAD/ETag e as respostas dos endpoints de métricas sem KV. A bateria Chromium atual em `.test-artifacts/spatial-v2.cjs` roda **103 verificações** em 12 larguras (1920 a 360 px), incluindo as novas seções, Stripe, Google/código, perfil, chat, vídeos e painel do dono. Veja [webui-v2.md](webui-v2.md) para a configuração dos serviços reais.
 
 O preview local (`.test-artifacts/preview.py`) implementa `Range` em `bytes` para os MP3. Sem suporte a `Range` no servidor, o Chromium aceita a atribuição de `currentTime` mas descarta o seek quando termina o carregamento. O `spatial.js` guarda a posição pedida e a reaplica em `loadedmetadata`/`loadeddata`/`canplay` (até três tentativas) para sobreviver a redes lentas; os assets da Cloudflare já servem `Range` nativamente.
 

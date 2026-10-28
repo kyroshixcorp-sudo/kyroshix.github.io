@@ -54,17 +54,21 @@ UID de dono solicitado: `8Q7S8FgBZjTrg4Mkf46ntcYvl0Q2`. A migração 03 remove a
 
 Os quatro MP3 fornecidos pelo usuário permanecem nos assets: Remember, Legends Never Die, Darkness e Blindfold. Logos originais foram preservadas; o símbolo recebe branco por máscara CSS, sem redesenho. A wordmark enquadra a imagem original com SVG; o cabeçalho usa um enquadramento curto da mesma imagem. Nenhum vídeo fictício é publicado.
 
-## Homepage KYROSHIX Records — Spatial WebUI
+## Homepage KYROSHIX Records — Spatial WebUI v2
 
-A homepage (`/`) é a **Spatial WebUI**, uma página independente, sem build, sem framework e sem dependências externas: `dist/index.html` carrega `dist/spatial.css` e `dist/spatial.js` (módulo ES). `/spatial-ui.html` é um alias idêntico. O fundo usa `/assets/spatial-room.jpg` com fallbacks em gradiente e o player reproduz os quatro MP3 já publicados em `/assets/`. As duas primeiras faixas do feed são apenas referências visuais (Mt. Si e Small Black) e usam áudio demonstrativo do catálogo KYROSHIX — isso está indicado na própria página.
+A homepage (`/`) é uma **Spatial WebUI** independente, sem build e sem framework: `dist/index.html` + `dist/spatial.css` + `dist/spatial.js` (módulo ES). `/spatial-ui.html` é um alias idêntico. O layout usa três colunas alinhadas no desktop, painel de inteligência lateral abaixo de 1280 px, navegação inferior de 5 seções no celular e ícones compactos/centralizados (16 px). A varredura Chromium de 360 a 1920 px não apresenta overflow.
 
-A interface tem três colunas alinhadas no desktop (navegação, palco, inteligência), painel de inteligência lateral abaixo de 1280 px, navegação inferior no celular, mini player fixo e player expandido com abas **Fila / Comentários / Bastidores / Som**. Home, Descobrir, Stream e Biblioteca trazem retomada de audição, histórias verticais "Behind the track", playlists, álbuns, artistas seguidos, stations, busca, filtros, waveform com seek, fila, shuffle/repeat, EQ de três bandas, velocidade e volume. O painel de inteligência mostra grafo do catálogo, KPIs, Sentiment Rate, RI Analysis e um campo "Pergunte sobre sua audiência" sempre visível.
+**Catálogo:** apenas as quatro faixas oficiais com cover art publicada — as duas referências visuais com capas geradas em CSS foram removidas. Não há mais comentários de exemplo: o painel começa vazio e só recebe mensagens reais de contas autenticadas.
 
-**Contas e planos.** Cadastro/login locais com senha derivada por PBKDF2-SHA256 (120 mil iterações) — nenhuma senha em texto puro é gravada. Os planos Free, Pro e Studio desbloqueiam downloads, EQ, alta qualidade, presets e velocidade; o checkout valida os campos do cartão localmente e **não processa nenhum pagamento**. Contas, sessão, plano, curtidas, histórico, comentários e métricas ficam em `localStorage`. Isto é uma demonstração funcional de fluxo de inscrição, não billing real: para cobrança de verdade é preciso escolher um provedor (Stripe/Mercado Pago), configurar segredos no Worker, verificar webhooks e persistir assinaturas no servidor.
+**Conta real:** e-mail/senha com PBKDF2, login com Google via Firebase e código de 6 dígitos enviado por e-mail a cada acesso. O dono (`kyroshixcorp@gmail.com`) recebe Premium vitalício e um painel para editar título, artista, descrição e capa das músicas, adicionar/remover faixas e publicar vídeos — com escrita autorizada por token verificado no Worker.
 
-**Números reais.** Não há contadores inventados. Cada evento `play` do elemento de áudio gera uma reprodução; presença é medida por heartbeat de cada sessão aberta (janela de 30 s). O front envia para `/api/metrics/play` e `/api/metrics/presence` e lê `/api/metrics`. Se o Worker tiver o namespace KV `KX_METRICS` vinculado, os números são agregados entre dispositivos; sem o binding, a API responde `ok:false` e a página usa apenas os contadores reais medidos neste navegador. Comentários têm exemplos marcados **EXEMPLO** e aceitam publicação, respostas, curtidas e exclusão pelo autor. Guia completo: [docs/spatial-webui.md](docs/spatial-webui.md).
+**Assinatura real:** página `/planos` com checkout do **Stripe** no servidor, webhook com verificação de assinatura e confirmação de sessão. O formulário de cartão de demonstração foi removido; nenhum dado de cartão passa pelo site. Sem as chaves, a página mostra claramente o que falta configurar — não simula pagamento.
 
-O SPA anterior foi preservado em `dist/legacy.html` apenas como referência e para os testes de navegador; ele não aparece na navegação pública nem no `sitemap.xml`. `cloudflare/_redirects` é injetado no ZIP por `scripts/export-pages.py` e encaminha as rotas legíveis (`/inicio`, `/track/*`, etc.) para o novo `index.html`; `wrangler.jsonc` usa `not_found_handling: single-page-application` para o preview na Cloudflare. Ao publicar pelo módulo do Worker com `keep_assets: true`, envie também o ZIP completo (ou publique o ZIP antes) para que `assets/spatial-room.jpg` e os novos `spatial.css`/`spatial.js` existam no armazenamento estático; sem a imagem, os gradientes de fallback mantêm a página funcional.
+**Outros sistemas:** chat em salas estilo Telegram/WhatsApp (mensagens no KV), página de vídeos do YouTube com embed sob consentimento (e aviso de que DRM não se aplica a embed de terceiros), perfil personalizável (nome, bio, avatar, cor, tema), slots do Google AdSense condicionados a publisher ID aprovado e métricas de audiência medidas por eventos reais de `play` e heartbeat.
+
+Toda a configuração de segredos, KV, Stripe, Resend, Firebase, AdSense e DRM está em [docs/webui-v2.md](docs/webui-v2.md). Configuração pública (sem segredos): `dist/app-config.json`.
+
+O SPA anterior foi preservado em `dist/legacy.html` apenas para rollback/testes. `cloudflare/_redirects` é injetado no ZIP por `scripts/export-pages.py`; `wrangler.jsonc` usa `not_found_handling: single-page-application` no preview. Ao publicar pelo módulo com `keep_assets: true`, envie **primeiro o ZIP completo** para criar `spatial.css`, `spatial.js`, `app-config.json` e `ads.js` nos assets, e vincule os namespaces KV `KX_DATA` e `KX_METRICS`.
 
 ## Estrutura
 
@@ -72,7 +76,7 @@ O SPA anterior foi preservado em `dist/legacy.html` apenas como referência e pa
 | --- | --- |
 | `dist/app.js`, `style.css`, `modern.css`, `glass.css`, `music-player.js` | Catálogo, perfis, música e estrutura visual |
 | `dist/listening-room.js`, `experience.css`, `atelier.css` | Descoberta, histórico local, painel lateral e interface responsiva |
-| `dist/index.html`, `dist/spatial-ui.html`, `dist/spatial.css`, `dist/spatial.js` | Homepage Spatial WebUI em vidro fosco, player completo, contas/planos, comentários e métricas reais |
+| `dist/index.html`, `dist/spatial-ui.html`, `dist/spatial.css`, `dist/spatial.js`, `dist/app-config.json` | Spatial WebUI v2: player, contas/Stripe, chat, vídeos, perfil, painel do dono e métricas reais |
 | `dist/legacy.html` | Cópia do SPA anterior, usada apenas por testes e rollback |
 | `cloudflare/_redirects`, `dist/router.js`, `theme.js`, `themes.css` | Rewrites de páginas no Cloudflare, URLs legadas e seletor de tema do app antigo |
 | `dist/audio-engine.js`, `sound-panel.js` | Crossfade, equalizador, efeitos, controles e preferências locais |

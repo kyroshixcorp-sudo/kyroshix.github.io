@@ -54,10 +54,42 @@ try {
   }
   const postPlay = await worker.fetch(new Request('https://site.test/api/metrics/play',{method:'POST',headers:{'Content-Type':'application/json'},body:'{"track":"remember"}'}),env);
   assert.equal(postPlay.status,200); assert.equal((await postPlay.json()).ok,false);
+  // Rotas /api/* precisam passar pelo Worker (run_worker_first).
+  for(const path of ['/api/auth/code','/api/auth/verify','/api/admin/verify','/api/billing/checkout',
+                     '/api/billing/webhook','/api/catalog','/api/chat','/api/profile','/api/videos']) {
+    assert(metadata.assets.config.run_worker_first.includes(path),path);
+  }
+  // Sem segredos: os serviços reais respondem "not_configured", nunca simulam sucesso.
+  for(const path of ['/api/auth/code','/api/admin/code','/api/billing/checkout','/api/billing/confirm','/api/billing/status']) {
+    const response = await worker.fetch(new Request('https://site.test'+path,
+      {method:path.includes('status')?'GET':'POST',headers:{'Content-Type':'application/json'},body:path.includes('status')?undefined:'{"email":"dono@kyroshix.local","plan":"pro"}'}),env);
+    const data = await response.json();
+    assert.equal(data.ok,false,path);
+    assert.equal(data.reason,'not_configured',path+' => '+JSON.stringify(data));
+  }
+  // Webhook do Stripe: assinatura ausente é recusada (quando configurado).
+  const store = new Map();
+  const kv = {get:async k=>store.get(k)??null,put:async(k,v)=>store.set(k,v),delete:async k=>store.delete(k)};
+  const envFull = {...env,KX_DATA:kv,STRIPE_WEBHOOK_SECRET:'whsec_test',ADMIN_EMAIL:'kyroshixcorp@gmail.com'};
+  const badHook = await worker.fetch(new Request('https://site.test/api/billing/webhook',{method:'POST',body:'{}'}),envFull);
+  assert.equal((await badHook.json()).ok,false);
+  // Catálogo: escrita sem token de dono é recusada; leitura pública funciona.
+  const rejected = await worker.fetch(new Request('https://site.test/api/catalog',{method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({tracks:[{id:'x',title:'x',image:'https://a.test/c.jpg',audio:'https://a.test/a.mp3'}]})}),envFull);
+  assert.equal((await rejected.json()).ok,false);
+  const emptyCatalog = await worker.fetch(new Request('https://site.test/api/catalog'),envFull);
+  assert.equal((await emptyCatalog.json()).tracks,null);
+  // Chat: mensagens reais persistem no KV.
+  const chatPost = await worker.fetch(new Request('https://site.test/api/chat',{method:'POST',
+    headers:{'Content-Type':'application/json'},body:'{"author":"Dono","text":"Oi","room":"geral"}'}),envFull);
+  const chatData = await chatPost.json();
+  assert.equal(chatData.ok,true); assert.equal(chatData.messages.length,1); assert.equal(chatData.messages[0].text,'Oi');
+  const chatGet = await worker.fetch(new Request('https://site.test/api/chat'),envFull);
+  assert.equal((await chatGet.json()).messages.length,1);
   for(const path of ['/assets/remember.mp3','/auth-config.json','/assets/missing.js','/unrecognized']) {
     const request = new Request('https://site.test'+path,{headers:{Range:'bytes=20-99'}});
     const response = await worker.fetch(request,env);
     assert.equal(delegated,request); assert.equal(delegated.headers.get('Range'),'bytes=20-99'); assert.equal(response.status,206);
   }
-  console.log('PASS: generated Cloudflare document routes, root scripts, HEAD/ETag/405 responses and untouched static/range requests.');
+  console.log('PASS: generated Cloudflare document routes, root scripts, HEAD/ETag/405, real API endpoints (Stripe/auth/KV/chat) and untouched static/range requests.');
 } finally {rmSync(output,{recursive:true,force:true});}
