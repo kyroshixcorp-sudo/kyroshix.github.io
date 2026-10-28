@@ -22,6 +22,13 @@ try {
   }
   const legacy = await worker.fetch(new Request('https://site.test/legacy.html'),env);
   assert.equal(legacy.status,200); assert((await legacy.text()).includes('/theme.js'));
+  for(const path of ['/spatial.css','/spatial.js']) {
+    const response = await worker.fetch(new Request('https://site.test'+path),env);
+    assert.equal(response.status,200,path);
+    assert.match(response.headers.get('Content-Type'),path.endsWith('.css') ? /^text\/css/ : /^application\/javascript/);
+    assert((await response.text()).length>100,path);
+    assert(metadata.assets.config.run_worker_first.includes(path));
+  }
   const script = await worker.fetch(new Request('https://site.test/router.js'),env);
   for(const path of ['/account.css','/access-policy.js','/auth-controller.js','/firebase-client.js']) {
     const response = await worker.fetch(new Request('https://site.test'+path),env);
@@ -37,6 +44,16 @@ try {
   const head = await worker.fetch(new Request('https://site.test/track/remember',{method:'HEAD'}),env);
   assert.equal(head.status,200); assert(Number(head.headers.get('Content-Length'))>0); assert.equal(await head.text(),'');
   assert.equal((await worker.fetch(new Request('https://site.test/inicio',{method:'POST'}),env)).status,405);
+  // Métricas reais: sem KV o endpoint responde de forma explícita e não quebra a página.
+  for(const path of ['/api/metrics','/api/metrics/play','/api/metrics/presence']) {
+    const response = await worker.fetch(new Request('https://site.test'+path),env);
+    assert.equal(response.status,200,path);
+    assert.match(response.headers.get('Content-Type'),/^application\/json/);
+    const data = await response.json();
+    assert.equal(data.ok,false,path); assert.match(data.reason,/KX_METRICS/);
+  }
+  const postPlay = await worker.fetch(new Request('https://site.test/api/metrics/play',{method:'POST',headers:{'Content-Type':'application/json'},body:'{"track":"remember"}'}),env);
+  assert.equal(postPlay.status,200); assert.equal((await postPlay.json()).ok,false);
   for(const path of ['/assets/remember.mp3','/auth-config.json','/assets/missing.js','/unrecognized']) {
     const request = new Request('https://site.test'+path,{headers:{Range:'bytes=20-99'}});
     const response = await worker.fetch(request,env);

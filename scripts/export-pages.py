@@ -30,7 +30,7 @@ with ZipFile(args.output, 'w', compression=ZIP_DEFLATED, compresslevel=6) as arc
             html = html.replace('<meta name="robots" content="noindex,nofollow">', '<meta name="robots" content="index,follow">')
             html = re.sub(r'<meta property="og:(?:image|url)"[^>]*>', '', html)
             if origin:
-                html = html.replace('</head>', f'<meta property="og:url" content="{origin}/"><meta property="og:image" content="{origin}/assets/hero.webp"></head>')
+                html = html.replace('</head>', f'<meta property="og:url" content="{origin}/"><meta property="og:image" content="{origin}/assets/spatial-room.jpg"></head>')
             data = html.encode('utf-8')
             assert b'chatgpt.site' not in data
         archive.writestr(name, data)
