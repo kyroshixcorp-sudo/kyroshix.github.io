@@ -56,6 +56,26 @@ autorizado; previews por branch precisam do hostname exato. Consulte
 [firebase-preview-domain.md](firebase-preview-domain.md) e o script
 `npm run authorize:firebase`.
 
+## Quando o Workers Builds falha sem logs
+
+O check `Workers Builds: kyroshix-preview` é executado pela Cloudflare e o log
+completo fica no dashboard (exige login na conta). O `gh` só devolve o Build ID.
+Para separar problema de código de falha de infraestrutura:
+
+```sh
+npx wrangler deploy --dry-run          # valida wrangler.jsonc + 72 assets
+npx wrangler versions upload --dry-run
+python3 scripts/export-pages.py /tmp/site.zip
+python3 scripts/export-worker.py /tmp/site.zip /tmp/worker
+npm run test:worker
+```
+
+Se os comandos locais passam e o commit não alterou `dist/`, o bundle enviado é
+idêntico ao build anterior — a falha é transitória. Reexecute o build no dashboard
+(**Workers & Pages → kyroshix-preview → Deployments → Retry**) ou faça um novo
+push no branch. Não é necessário alterar `wrangler.jsonc` nem `cloudflare/worker.mjs`:
+o preview publica somente `assets.directory`, e o módulo Worker roda em `releases`.
+
 ## Rollback
 
 O preview é independente: apagar o Worker `kyroshix-preview` ou voltar o branch
