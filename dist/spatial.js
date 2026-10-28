@@ -227,7 +227,9 @@
     if (!item) return false;
     const account = currentAccount();
     if (item.demo || !account || item.owner !== account.id) return false;
-    comments[trackId] = list.filter(c => c.id !== commentId);
+    // Remove também as respostas diretas: caso contrário ficam invisíveis no painel,
+    // mas continuam inflando o contador real de comentários.
+    comments[trackId] = list.filter(c => c.id !== commentId && c.replyTo !== commentId);
     saveComments();
     renderInsights();
     return true;
@@ -278,7 +280,12 @@
     write(SESSION_KEY, { id: account.id, at: Date.now() });
     return account;
   }
-  function logout() { localStorage.removeItem(SESSION_KEY); renderAll(); toast('Você saiu da conta.'); }
+  function logout() {
+    localStorage.removeItem(SESSION_KEY);
+    state.authMode = 'login'; state.pendingAction = null;
+    renderAll(); renderAuth();
+    toast('Você saiu da conta.');
+  }
   function setPlan(id) {
     const account = currentAccount();
     if (!account) return false;
@@ -373,9 +380,13 @@
     const nc = $('#now-cur'); if (nc) nc.textContent = fmt(audio.currentTime || 0);
     const nd = $('#now-dur'); if (nd) nd.textContent = fmt(state.duration);
   }
+  let pendingSeek = null, seekAttempts = 0;
   function seekTo(ratio) {
     const position = Math.min(1, Math.max(0, ratio)) * state.duration;
-    try { audio.currentTime = position; } catch { /* metadata pendente */ }
+    // Guarda sempre: durante um load() o Chromium aceita a atribuição mas
+    // descarta o seek quando os metadados chegam. Só limpamos no evento seeked.
+    pendingSeek = position; seekAttempts = 0;
+    try { audio.currentTime = position; } catch { /* aplica no loadedmetadata */ }
     updateProgress();
   }
   const ratioFromEvent = (el, event) => (event.clientX - el.getBoundingClientRect().left) / el.getBoundingClientRect().width;
@@ -400,6 +411,7 @@
   }
   function loadTrack(track, autoplay = true) {
     if (!track) return;
+    pendingSeek = null; seekAttempts = 0; // um seek da faixa anterior não deve vazar para esta
     state.track = track; state.duration = track.duration; state.countedPlay = false;
     state.history = [track.id, ...state.history.filter(id => id !== track.id)].slice(0, 12);
     persistSets();
@@ -1009,6 +1021,11 @@
       if (e.target === dlg) dlg.close();
       if (e.target.closest('[data-close]')) dlg.close();
     });
+    // Fechar a tela de conta sem entrar cancela a ação que a abriu; assim ela
+    // não dispara depois, quando o usuário fizer login por outro caminho.
+    if (dlg.id === 'auth-dialog') dlg.addEventListener('close', () => {
+      if (!currentAccount()) state.pendingAction = null;
+    });
   });
   $('#insights-toggle').addEventListener('click', () => {
     const panel = $('#insights'), open = panel.classList.toggle('open');
@@ -1148,9 +1165,16 @@
       const t = getTrack();
       if (t && t.id !== state.track.id) loadTrack(t, true);
       seekTo(ratioFromEvent(el, e));
+      el.dataset.seeking = '1';
       try { el.setPointerCapture(e.pointerId); } catch { /* sem captura */ }
     });
-    el.addEventListener('pointermove', e => { if (el.hasPointerCapture(e.pointerId)) seekTo(ratioFromEvent(el, e)); });
+    el.addEventListener('pointermove', e => {
+      // Só arrasta com o botão pressionado. Sem isso, um movimento de ponteiro
+      // depois de um clique simples zerava a posição recém-escolhida.
+      if (!(e.buttons & 1) || el.dataset.seeking !== '1' || !el.hasPointerCapture(e.pointerId)) return;
+      seekTo(ratioFromEvent(el, e));
+    });
+    ['pointerup', 'pointercancel'].forEach(type => el.addEventListener(type, () => { delete el.dataset.seeking; }));
     el.addEventListener('keydown', e => {
       if (e.key === 'ArrowRight') { e.preventDefault(); seekTo(currentRatio() + .05); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); seekTo(currentRatio() - .05); }
@@ -1171,6 +1195,7 @@
     try { wave.setPointerCapture(e.pointerId); wave.dataset.seeking = '1'; } catch { /* ignore */ }
   });
   document.addEventListener('pointermove', e => {
+    if (!(e.buttons & 1)) return;
     const wave = e.target.closest('.wave[data-wave]');
     if (wave && wave.dataset.seeking === '1' && wave.hasPointerCapture(e.pointerId) && wave.dataset.id === state.track.id) seekTo(ratioFromEvent(wave, e));
   });
@@ -1192,8 +1217,27 @@
   });
 
   // Áudio
+  function applyPendingSeek() {
+    if (pendingSeek == null) return;
+    const target = Math.min(pendingSeek, state.duration || pendingSeek);
+    if (Math.abs(audio.currentTime - target) < 1) { pendingSeek = null; seekAttempts = 0; return; }
+    // Alguns servidores sem suporte a Range cancelam o seek durante o load.
+    // Tenta de novo quando houver dados suficientes, com limite para não loopar.
+    if (seekAttempts >= 3) { pendingSeek = null; seekAttempts = 0; return; }
+    seekAttempts += 1;
+    try { audio.currentTime = target; } catch { /* ignore */ }
+  }
   audio.addEventListener('loadedmetadata', () => {
     if (Number.isFinite(audio.duration) && audio.duration > 0) { state.duration = audio.duration; $('#dur').textContent = fmt(state.duration); }
+    applyPendingSeek();
+    updateProgress();
+  });
+  ['loadeddata', 'canplay'].forEach(type => audio.addEventListener(type, applyPendingSeek));
+  audio.addEventListener('seeked', () => {
+    // Confirma que o seek realmente chegou ao destino antes de esquecê-lo.
+    if (pendingSeek == null) return;
+    if (Math.abs(audio.currentTime - pendingSeek) < 1) { pendingSeek = null; seekAttempts = 0; }
+    else if (audio.readyState >= 3) window.setTimeout(applyPendingSeek, 0);
   });
   audio.addEventListener('timeupdate', updateProgress);
   audio.addEventListener('play', () => {

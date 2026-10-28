@@ -79,7 +79,9 @@ O `wrangler.jsonc` deste repositório é **apenas de preview/staging** (`kyroshi
 3. Publique **primeiro o ZIP** (assets) e depois o módulo com `keep_assets: true`, ou então publique somente o ZIP completo. Um upload de módulo com `keep_assets: true` **não cria arquivos novos**: `spatial.css` e `spatial.js` precisam entrar pelo ZIP.
 4. Confira no navegador: `GET /spatial.css` e `GET /spatial.js` devem responder `200` com os content types corretos.
 
-`npm run test:worker` valida as rotas de documento, os dois novos arquivos, HEAD/ETag e as respostas dos endpoints de métricas sem KV. O teste visual de layout e interação (11 larguras de 1920 px a 360 px, conta, planos, comentários, player e insights) roda com Chromium em `.test-artifacts/spatial-webui.cjs`.
+`npm run test:worker` valida as rotas de documento, os dois novos arquivos, HEAD/ETag e as respostas dos endpoints de métricas sem KV. As duas baterias Chromium em `.test-artifacts/` somam **140 verificações**: layout/interação em 11 larguras de 1920 px a 360 px (`spatial-webui.cjs`, 90) e gating de planos, comentários avançados, conta, controles do player, bastidores, filtros e scrim (`spatial-webui-interactions.cjs`, 50).
+
+O preview local (`.test-artifacts/preview.py`) implementa `Range` em `bytes` para os MP3. Sem suporte a `Range` no servidor, o Chromium aceita a atribuição de `currentTime` mas descarta o seek quando termina o carregamento. O `spatial.js` guarda a posição pedida e a reaplica em `loadedmetadata`/`loadeddata`/`canplay` (até três tentativas) para sobreviver a redes lentas; os assets da Cloudflare já servem `Range` nativamente.
 
 ## Limites conhecidos
 
