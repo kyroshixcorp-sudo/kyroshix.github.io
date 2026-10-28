@@ -14,6 +14,8 @@ const PRESENCE_WINDOW_MS = 30000;
 const CODE_TTL_MS = 10 * 60 * 1000;
 const TOKEN_TTL_MS = 8 * 60 * 60 * 1000;
 const PLAN_BY_PRICE = { pro: 'pro', studio: 'studio' };
+const YOUTUBE_CHANNEL_ID = 'UCGzRDl1ps7nPbgQybBv2J4Q';
+const YOUTUBE_FEED = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + YOUTUBE_CHANNEL_ID;
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status,
@@ -280,7 +282,8 @@ async function handleData(request, env, pathname) {
   }
   if (pathname === '/api/videos' && request.method === 'GET') {
     const stored = await readJson(kv, VIDEOS_KEY, { videos: [] });
-    return json({ ok: true, videos: stored.videos || [] });
+    return json({ ok: true, videos: stored.videos || [], updatedAt: stored.updatedAt || 0,
+      source: stored.source || 'kv' });
   }
   if (pathname === '/api/admin/videos' && request.method === 'POST') {
     let body; try { body = await request.json(); } catch { return fail('JSON inválido.'); }
@@ -327,10 +330,100 @@ async function handleData(request, env, pathname) {
   }
   return json({ ok: false, reason: 'not found' }, 404);
 }
+/* --------------------------------------------- saúde e sincronização */
+function drmConfig(env) {
+  const systems = { widevine: 'com.widevine.alpha', playready: 'com.microsoft.playready', fairplay: 'com.apple.fps' };
+  const licenseServers = {};
+  for (const [name, key] of Object.entries(systems)) {
+    const url = env['DRM_LICENSE_' + name.toUpperCase()];
+    if (typeof url === 'string' && validHttps(url)) licenseServers[key] = url;
+  }
+  return { licenseServers, enabled: Object.keys(licenseServers).length > 0 };
+}
+function handleHealth(env) {
+  // Só booleanos: nunca devolve segredos, chaves ou valores de config.
+  return json({ ok: true, worker: true, stripe: !!env.STRIPE_SECRET_KEY && !!env.STRIPE_PRICE_PRO,
+    email: !!env.RESEND_API_KEY && !!env.EMAIL_FROM, kv: !!env.KX_DATA,
+    metrics: !!env.KX_METRICS, drm: drmConfig(env).enabled, youtubeChannelId: YOUTUBE_CHANNEL_ID,
+    ownerEmail: env.ADMIN_EMAIL || 'kyroshixcorp@gmail.com' });
+}
+
+const decodeXml = value => String(value || '')
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+  .replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&')
+  .replace(/<[^>]*>/g, '').trim();
+
+/** Lê o feed Atom público do canal — sem chave de API e sem dados inventados. */
+export function parseYoutubeFeed(xml) {
+  const videos = [];
+  if (typeof xml !== 'string' || !xml.includes('<entry')) return videos;
+  for (const entry of xml.split(/<entry[\s>]/).slice(1)) {
+    const id = /<yt:videoId>([A-Za-z0-9_-]{11})<\/yt:videoId>/.exec(entry)?.[1];
+    if (!id) continue;
+    const title = decodeXml(/<title>([\s\S]*?)<\/title>/.exec(entry)?.[1] || '');
+    const published = /<published>([^<]+)<\/published>/.exec(entry)?.[1] || '';
+    const description = decodeXml(/<media:description>([\s\S]*?)<\/media:description>/.exec(entry)?.[1] || '').slice(0, 240);
+    videos.push({ id, title: title.slice(0, 160), description,
+      publishedAt: published, duration: '', source: 'youtube-feed' });
+    if (videos.length >= 30) break;
+  }
+  return videos;
+}
+
+async function fetchYoutubeVideos(fetcher = fetch) {
+  const response = await fetcher(YOUTUBE_FEED, {
+    headers: { 'User-Agent': 'KYROSHIX-Records/1.0 (+https://releases.kyroshixcorp.workers.dev/)' },
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!response.ok) throw Error('O YouTube recusou o feed (HTTP ' + response.status + ').');
+  const videos = parseYoutubeFeed(await response.text());
+  if (!videos.length) throw Error('O feed do YouTube não trouxe vídeos publicados.');
+  return videos;
+}
+
+const FEED_CACHE_MS = 10 * 60 * 1000;
+async function handleVideoSync(request, env) {
+  if (request.method !== 'GET' && request.method !== 'POST') return json({ ok: false, reason: 'Method not allowed' }, 405);
+  const kv = env.KX_DATA;
+  if (!kv) return notConfigured('Vincule o namespace KV KX_DATA para guardar a sincronização do YouTube.');
+  const url = new URL(request.url);
+  const force = url.searchParams.get('force') === '1';
+  const cached = await readJson(kv, VIDEOS_KEY, {});
+  const age = Date.now() - (Number(cached?.updatedAt) || 0);
+  if (!force && Array.isArray(cached?.videos) && cached.videos.length && age < FEED_CACHE_MS) {
+    return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
+      source: cached.source || 'youtube-feed', cached: true });
+  }
+  try {
+    const videos = await fetchYoutubeVideos();
+    const updatedAt = Date.now();
+    await kv.put(VIDEOS_KEY, JSON.stringify({ videos, updatedAt, source: 'youtube-feed' }));
+    return json({ ok: true, videos, updatedAt, source: 'youtube-feed', cached: false });
+  } catch (error) {
+    // Mantém o último catálogo válido em vez de apagar tudo.
+    if (Array.isArray(cached?.videos) && cached.videos.length) {
+      return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
+        source: cached.source || 'cache', cached: true,
+        warning: String(error?.message || error).slice(0, 160) });
+    }
+    return json({ ok: false, reason: 'feed_error', detail: String(error?.message || error).slice(0, 200) }, 502);
+  }
+}
+
+function handleDrmStatus(env) {
+  const { licenseServers, enabled } = drmConfig(env);
+  return json({ ok: true, enabled, drmEnabled: enabled, licenseAuth: env.DRM_LICENSE_AUTH || 'none',
+    licenseServers, fairplayCertificateUrl: validHttps(env.DRM_FAIRPLAY_CERT || '') ? env.DRM_FAIRPLAY_CERT : '',
+    note: 'Embeds do YouTube usam o player do YouTube e não podem receber DRM; a proteção vale apenas para HLS/DASH próprio.' });
+}
+
 /* ------------------------------------------------------------------ fetch */
 export default {
   async fetch(request, env) {
     const pathname = new URL(request.url).pathname;
+    if (pathname === '/api/health') return handleHealth(env);
+    if (pathname === '/api/videos/sync') return handleVideoSync(request, env);
+    if (pathname === '/api/drm/status') return handleDrmStatus(env);
     if (pathname === '/api/metrics' || pathname === '/api/metrics/play' || pathname === '/api/metrics/presence')
       return handleMetrics(request, env, pathname);
     if (pathname.startsWith('/api/auth/') || (pathname.startsWith('/api/admin/') && pathname !== '/api/admin/videos'))

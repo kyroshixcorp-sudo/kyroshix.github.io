@@ -42,6 +42,10 @@ Sem essa proteção, trate a URL de preview como pública.
 Workers Free: 100.000 requisições/dia; requisições a assets estáticos não
 contam como invocação quando não há script. Nada aqui exige plano pago.
 
+## Rotas /api/* no preview
+
+O `wrangler.jsonc` publica **somente assets**; o módulo `cloudflare/worker.mjs` roda no Worker `releases` (produção), não no `kyroshix-preview`. Por isso, no preview, uma chamada a `/api/health` ou `/api/billing/checkout` cai no `not_found_handling: single-page-application` e devolve `index.html` com status 200. A WebUI detecta esse HTML e mostra "Worker de APIs não publicado neste endereço" — contas, player e os 16 vídeos do catálogo oficial continuam funcionando localmente. Para exercitar Stripe, código por e-mail e sincronização, publique o Worker script em `releases` com `KX_DATA`/`KX_METRICS` e as rotas `/api/*` em `run_worker_first` (o `export-worker.py` já as inclui).
+
 ## Firebase
 
 Para login Google no preview, adicione o domínio do preview em Firebase

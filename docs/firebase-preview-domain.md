@@ -113,6 +113,12 @@ npm run check:auth -- https://arena-6a25f84d-kyroshix-github-io-kyroshix-preview
 
 Depois, abra o preview em janela anônima, clique em **Entrar → Continuar com Google** e confirme o popup. Se ainda falhar, a interface da WebUI v2 agora mostra o hostname exato a autorizar na mensagem de erro.
 
+## Conta do dono e benefícios (independe do domínio autorizado)
+
+O login por **e-mail/senha** da WebUI é local (PBKDF2) e não consulta o Firebase. Ao entrar ou se cadastrar com `kyroshixcorp@gmail.com`, a conta recebe **Premium vitalício** e o painel do dono é liberado no próprio navegador, mesmo neste preview sem Worker. O código por e-mail e a publicação em tempo real para todos os visitantes continuam exigindo o Worker e `RESEND_API_KEY`; sem eles, o painel fica em **modo local** com aviso visível.
+
+O login **com Google** é o único que depende de `authorizedDomains`. Se ele falhar com `auth/unauthorized-domain`, a interface mostra o hostname exato a autorizar. Enquanto isso, use o login por senha para acessar o painel.
+
 ## Notas de segurança
 
 - `auth-config.json` contém apenas identificadores públicos de cliente; eles **não** concedem acesso administrativo.

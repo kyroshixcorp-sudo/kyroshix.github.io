@@ -70,6 +70,10 @@ Toda a configuração de segredos, KV, Stripe, Resend, Firebase, AdSense e DRM e
 
 O SPA anterior foi preservado em `dist/legacy.html` apenas para rollback/testes. `cloudflare/_redirects` é injetado no ZIP por `scripts/export-pages.py`; `wrangler.jsonc` usa `not_found_handling: single-page-application` no preview. Ao publicar pelo módulo com `keep_assets: true`, envie **primeiro o ZIP completo** para criar `spatial.css`, `spatial.js`, `app-config.json` e `ads.js` nos assets, e vincule os namespaces KV `KX_DATA` e `KX_METRICS`.
 
+### Correções de serviço (branch atual)
+
+O `api()` agora detecta o **SPA fallback** do preview (`/api/*` devolvendo HTML 200) e classifica como `worker_missing`, em vez de falhar silenciosamente. A conta `kyroshixcorp@gmail.com` recebe **Premium vitalício no login** (com painel do dono em modo local quando não há Worker); a página de planos mostra um **diagnóstico** vindo de `/api/health` com o checklist do que falta; e a página de vídeos carrega os **16 vídeos reais** do canal `@KYROSHIXCORP`, sincronizados pelo feed Atom público via `/api/videos/sync`. Detalhes em [docs/webui-v2.md](docs/webui-v2.md#11-diagnóstico-por-que-o-donoassinaturavídeos-falhavam-corrigido).
+
 ## Estrutura
 
 | Caminho | Responsabilidade |

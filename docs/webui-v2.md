@@ -18,6 +18,26 @@ Guia da versão 2 da homepage. **Nada aqui é simulado:** cada serviço que depe
 | Perfil | — | nome, bio, avatar, cor de destaque e tema |
 | Mobile | ícones de 19 px, 4 itens na nav | ícones de 16 px (14 px em 360 px), 5 itens, cards empilhados, zero overflow de 360 a 1920 px |
 
+## 1.1 Diagnóstico: por que o dono/assinatura/vídeos falhavam (corrigido)
+
+**Causa raiz comum.** No preview da Cloudflare, `wrangler.jsonc` usa apenas `assets` com
+`not_found_handling: single-page-application`. Qualquer rota `/api/*` — que só existe no
+módulo Worker — devolvia **o `index.html` com status 200**. O `api()` fazia
+`response.json().catch(() => ({}))` e interpretava isso como uma resposta vazia, sem
+`ok` e sem `reason`. Consequências:
+
+| Sintoma | Causa | Correção |
+| --- | --- | --- |
+| Login com `kyroshixcorp@gmail.com` não ativava o dono | `isOwner()` exigia `plan === 'owner'`, que só era concedido depois de um código por e-mail impossível de enviar | O e-mail do dono recebe **Premium vitalício no próprio login/cadastro** (`createAccount`, `loginAccount`, `finalizeAccess` e normalização no boot). O painel abre em modo local com aviso; publicar no servidor continua exigindo token verificado |
+| Benefícios não liberavam | `can()` dependia do plano | `plan: 'owner'` entra em todos os `BENEFITS` — EQ, download, HQ, velocidade, presets e sem anúncios |
+| Assinatura "não funcionava" e o erro era genérico | `startCheckout` recebia `{}` e mostrava "Não foi possível iniciar o pagamento" | `api()` detecta HTML e classifica `worker_missing`; a página de planos mostra **Estado dos serviços** + checklist do que falta, vindo de `/api/health` |
+| Vídeos não apareciam | `app-config.json` tinha `youtube.videos: []` e o frontend nunca consultava `/api/videos` | Catálogo com os **16 vídeos reais** da playlist oficial `PLHMuU4IdndW8`; `syncVideos()` mescla config + KV + edições locais |
+| "Não sincroniza" | `/api/videos` era ignorado no boot | Novo `/api/videos/sync` lê o **feed Atom público do canal** (`UCGzRDl1ps7nPbgQybBv2J4Q`), sem chave de API, e grava no KV. Botão **Sincronizar** + polling |
+| DRM "não aparece" | `video-config.json` com `drmEnabled:false` e nenhuma explicação no site | A página de vídeos lê o status e explica que **embed do YouTube não pode receber DRM**; `/api/drm/status` reporta os servidores de licença configurados |
+
+**Regra importante:** nenhuma dessas correções simula pagamento ou e-mail. Quando o Worker
+não está publicado, a interface diz isso explicitamente e mantém os dados locais.
+
 ## 2. Arquivos novos/alterados
 
 | Arquivo | Papel |
@@ -26,8 +46,8 @@ Guia da versão 2 da homepage. **Nada aqui é simulado:** cada serviço que depe
 | `dist/spatial.css` | layout glass, breakpoints, novas seções, compactação mobile e ícones centralizados |
 | `dist/spatial.js` | catálogo, player, métricas, contas, planos Stripe, comentários, chat, perfil, admin, vídeos, anúncios |
 | `dist/app-config.json` | **configuração pública** (sem segredos): dono, flags, poll, lista de vídeos, publisher ID |
-| `cloudflare/worker.mjs` | `/api/metrics`, `/api/auth/*`, `/api/admin/*`, `/api/billing/*`, `/api/catalog`, `/api/videos`, `/api/chat`, `/api/profile` |
-| `scripts/export-worker.py` | inclui as rotas `/api/*` em `run_worker_first` e aceita `--kv-data-id` / `--kv-metrics-id` |
+| `cloudflare/worker.mjs` | `/api/metrics`, `/api/auth/*`, `/api/admin/*`, `/api/billing/*`, `/api/catalog`, `/api/videos`, `/api/videos/sync`, `/api/chat`, `/api/profile`, `/api/health`, `/api/drm/status` |
+| `scripts/export-worker.py` | inclui as rotas `/api/*` (incluindo health, sync e DRM) em `run_worker_first` e aceita `--kv-data-id` / `--kv-metrics-id` |
 | `scripts/export-pages.py` | `app-config.json` com `Cache-Control: no-store` |
 | `tests/worker.mjs` | cobre as novas rotas, recusa de webhook sem assinatura, escrita de catálogo sem token e chat no KV |
 
@@ -68,6 +88,7 @@ Configure em **Workers & Pages → releases → Settings → Variables → Secre
 | `RESEND_API_KEY` | enviar os códigos de acesso por e-mail |
 | `EMAIL_FROM` | remetente verificado, ex.: `KYROSHIX <noreply@seudominio.com>` |
 | `ADMIN_EMAIL` | `kyroshixcorp@gmail.com` (padrão) |
+| `DRM_LICENSE_WIDEVINE`, `DRM_LICENSE_PLAYREADY`, `DRM_LICENSE_FAIRPLAY` | URLs HTTPS do serviço de licenças, **apenas se** você tiver mídia HLS/DASH criptografada. Não se aplica a vídeos do YouTube. |
 
 No Stripe, crie os dois produtos/preços recorrentes e configure o webhook apontando para `https://releases.kyroshixcorp.workers.dev/api/billing/webhook`, com os eventos `checkout.session.completed`, `customer.subscription.updated` e `customer.subscription.deleted`.
 
@@ -124,7 +145,10 @@ Coloque seu publisher ID aprovado e o slot ID em `dist/app-config.json`:
 
 - O embed usa `youtube-nocookie.com` e só é inserido depois do clique em **Assistir** (consentimento).
 - **Não existe DRM sobre embed do YouTube.** O YouTube controla o player dele. DRM Widevine/PlayReady/FairPlay só se aplica a arquivos próprios empacotados em HLS/DASH com servidor de licenças — isso está implementado em `dist/drm.js` para mídia KYROSHIX e exige `video-config.json` com `drmEnabled` e um servidor de licenças HTTPS. Veja `docs/video-drm.md`.
-- Os IDs dos vídeos ficam em `app-config.json` (`youtube.videos`) ou no KV, editáveis pelo dono.
+- Os **16 vídeos reais** do canal `@KYROSHIXCORP` estão em `dist/app-config.json` (`youtube.videos`), com `trackId` ligando quatro deles às faixas do catálogo. São dados públicos da playlist oficial `PLHMuU4IdndW8`, não conteúdo inventado.
+- `GET /api/videos/sync` busca `https://www.youtube.com/feeds/videos.xml?channel_id=UCGzRDl1ps7nPbgQybBv2J4Q` e atualiza o KV. É um feed público: não precisa de chave de API nem de OAuth. Se o YouTube recusar o feed, o endpoint responde `feed_error` e o site mantém o catálogo publicado.
+- `GET /api/health` devolve apenas booleanos (`worker`, `stripe`, `email`, `kv`, `drm`, `metrics`) e o ID público do canal — nunca segredos. A página de planos usa isso para montar o checklist de configuração.
+- `GET /api/drm/status` lê `DRM_LICENSE_WIDEVINE`, `DRM_LICENSE_PLAYREADY` e `DRM_LICENSE_FAIRPLAY` do Worker e informa se há servidor de licenças. Para ativar: mídia HLS/DASH já criptografada, essas variáveis com URLs HTTPS e `dist/video-config.json` com `drmEnabled: true`. Veja `docs/video-drm.md`.
 
 ## 4. Publicação
 
@@ -149,7 +173,7 @@ python3 scripts/export-pages.py /tmp/site.zip
 python3 scripts/export-worker.py /tmp/site.zip /tmp/worker --kv-data-id ID --kv-metrics-id ID
 ```
 
-A bateria Chromium em `.test-artifacts/spatial-v2.cjs` cobre **103 verificações**: layout em 12 larguras (1920 → 360 px), ícones compactos, página de planos sem cartão falso, Google/código, perfil, vídeos com consentimento, chat, painel do dono, edição de catálogo, play real, seek na waveform, gating de EQ e comentários reais.
+A bateria Chromium em `.test-artifacts/spatial-v2.cjs` cobre **103 verificações** de layout e fluxos da v2. A bateria `.test-artifacts/spatial-fixes.cjs` cobre **46 verificações** das correções desta seção em **dois cenários** (Worker ativo e preview estático com SPA fallback): login do dono, Premium, benefícios, painel, diagnóstico de assinatura, 16 vídeos reais, consentimento, DRM, sincronização e ausência de erros de JS. `tests/worker.mjs` valida `/api/health`, `/api/drm/status`, o parser do feed Atom e a persistência no KV.
 
 ## 6. Limites honestos
 

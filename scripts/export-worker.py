@@ -67,7 +67,8 @@ API_ROUTES = [
     '/api/metrics', '/api/metrics/play', '/api/metrics/presence',
     '/api/auth/code', '/api/auth/verify', '/api/admin/code', '/api/admin/verify',
     '/api/billing/checkout', '/api/billing/confirm', '/api/billing/status', '/api/billing/webhook',
-    '/api/catalog', '/api/videos', '/api/admin/videos', '/api/profile', '/api/chat',
+    '/api/catalog', '/api/videos', '/api/videos/sync', '/api/admin/videos',
+    '/api/profile', '/api/chat', '/api/health', '/api/drm/status',
 ]
 routes = sorted(set(files) | set(app_routes) | set(API_ROUTES) | {'/'})
 bindings = [{'name': 'ASSETS', 'type': 'assets'}]
