@@ -16,8 +16,11 @@
     "test:worker": "node tests/worker.mjs",
     "test:auth-ui": "node tests/auth-ui.cjs",
     "test:studio-apps": "node tests/studio-apps.cjs",
-    "test:auth": "node tests/auth-regressions.mjs && node tests/auth-deployment.mjs && node tests/access.mjs",
-    "check:auth": "node scripts/check-auth.mjs"
+    "test:auth": "node tests/auth-regressions.mjs && node tests/auth-deployment.mjs && node tests/access.mjs && node tests/authorize-firebase-domain.mjs",
+    "check:auth": "node scripts/check-auth.mjs",
+    "authorize:firebase": "node scripts/authorize-firebase-domain.mjs",
+    "check:firebase-domain": "node scripts/authorize-firebase-domain.mjs --check",
+    "test:firebase-domain": "node tests/authorize-firebase-domain.mjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.3.14",

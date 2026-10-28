@@ -1493,8 +1493,15 @@
       if (!email) throw new Error('O Google não retornou um e-mail.');
       await beginAccess({ mode: 'google', email: email.toLowerCase(), name: cred.user.displayName || email.split('@')[0] });
     } catch (e) {
-      err.textContent = 'Não foi possível entrar com o Google: ' + (e?.code || e?.message || 'erro desconhecido') +
-        '. Confirme o provedor no Firebase e o domínio autorizado.';
+      const code = e?.code || '';
+      if (code === 'auth/unauthorized-domain' || code === 'auth/unauthorized-continue-uri') {
+        err.innerHTML = 'Login bloqueado: este endereço ainda não foi autorizado no Firebase. ' +
+          'Adicione exatamente <b>' + esc(location.hostname) + '</b> em Authentication → Settings → ' +
+          'Authorized domains (sem https:// e sem barra) e tente novamente.';
+      } else {
+        err.textContent = 'Não foi possível entrar com o Google: ' + (code || e?.message || 'erro desconhecido') +
+          '. Confirme que o provedor Google está ativado no Firebase.';
+      }
       err.hidden = false;
     }
   }

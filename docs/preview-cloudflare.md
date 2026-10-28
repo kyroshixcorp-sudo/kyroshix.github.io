@@ -47,6 +47,10 @@ contam como invocação quando não há script. Nada aqui exige plano pago.
 Para login Google no preview, adicione o domínio do preview em Firebase
 Authentication → Settings → Authorized domains. Sem isso, a escuta pública
 funciona e o login Google falha com `auth/unauthorized-domain`.
+O hostname estável `kyroshix-preview.kyroshixcorp.workers.dev` já está
+autorizado; previews por branch precisam do hostname exato. Consulte
+[firebase-preview-domain.md](firebase-preview-domain.md) e o script
+`npm run authorize:firebase`.
 
 ## Rollback
 

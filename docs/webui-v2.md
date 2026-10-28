@@ -85,10 +85,10 @@ Depois de configurar, mude `dist/app-config.json`:
 O projeto já tem `dist/auth-config.json` com `apiKey`, `authDomain`, `projectId` e `appId` (são valores públicos). Falta apenas:
 
 1. Firebase Console → **Authentication → Sign-in method → Google → Enable**.
-2. **Settings → Authorized domains**: adicione `releases.kyroshixcorp.workers.dev` e o domínio de preview.
+2. **Settings → Authorized domains**: `releases.kyroshixcorp.workers.dev` e `kyroshix-preview.kyroshixcorp.workers.dev` já estão autorizados. Autorize também o hostname exato de cada preview por branch, por exemplo `arena-6a25f84d-kyroshix-github-io-kyroshix-preview.kyroshixcorp.workers.dev` — veja [firebase-preview-domain.md](firebase-preview-domain.md).
 3. `app-config.json` → `"auth": { "google": true }`.
 
-O botão "Continuar com Google" usa `signInWithPopup`. Se o provedor ou o domínio não estiverem autorizados, a mensagem de erro do Firebase aparece no diálogo — não há fallback falso.
+O botão "Continuar com Google" usa `signInWithPopup`. Se o domínio não estiver autorizado, a WebUI mostra o hostname exato que precisa ser adicionado no Firebase — não há fallback falso. Para aplicar a mudança sem entrar no Console, use `npm run authorize:firebase -- --apply` com seu `GOOGLE_OAUTH_TOKEN` (detalhes no guia).
 
 ### 3.4 Código de acesso por e-mail a cada login
 
