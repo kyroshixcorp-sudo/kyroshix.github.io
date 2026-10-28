@@ -8,8 +8,8 @@ from pathlib import Path
 from zipfile import ZipFile
 
 DEFAULT_FILES = [
-    # Homepage Spatial UI e o alias /spatial-ui.html.
-    'index.html', 'spatial-ui.html', 'legacy.html',
+    # Homepage Spatial WebUI, alias /spatial-ui.html e assets do módulo.
+    'index.html', 'spatial-ui.html', 'spatial.css', 'spatial.js', 'legacy.html',
     # Páginas estáticas continuam acessíveis pelos links do rodapé.
     'sobre.html', 'contato.html', 'privacidade.html', 'termos.html', 'direitos-autorais.html',
     # Módulos mantidos para o app legado e para os testes existentes.

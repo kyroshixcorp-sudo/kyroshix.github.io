@@ -7,6 +7,12 @@ A raiz `/` entrega a homepage Spatial UI (`dist/index.html`); as rotas legíveis
 e recebem a mesma página. `cloudflare/_redirects` documenta os rewrites equivalentes
 para o Worker de produção.
 
+Este preview publica **somente assets estáticos** (`wrangler.jsonc` não define
+`main`). Portanto `/api/metrics` não existe aqui e a Spatial WebUI usa os
+contadores reais medidos no navegador. Para agregação entre dispositivos, vincule
+o KV `KX_METRICS` ao Worker de produção; veja
+[spatial-webui.md](spatial-webui.md).
+
 ## Opção A — Workers Builds (recomendada, gratuita)
 
 1. Cloudflare → Workers & Pages → Create → Import a repository →
