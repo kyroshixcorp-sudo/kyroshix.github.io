@@ -97,7 +97,11 @@ async function sendEmail(env, to, subject, html) {
 }
 async function issueCode(env, kv, email, scope) {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) return notConfigured('Defina RESEND_API_KEY e EMAIL_FROM (domínio verificado) no Worker.');
-  const code = String(crypto.getRandomValues(new Uint32Array(1))[0] % 1000000).padStart(6, '0');
+  // Amostragem por rejeição: evita o viés do módulo sobre 2^32.
+  const range = 1000000, limit = Math.floor(4294967296 / range) * range;
+  let value;
+  do { value = crypto.getRandomValues(new Uint32Array(1))[0]; } while (value >= limit);
+  const code = String(value % range).padStart(6, '0');
   const key = 'code:' + scope + ':' + await hashText(email);
   await kv.put(key, JSON.stringify({ code: await hashText(code + scope), at: Date.now() }), { expirationTtl: 600 });
   const sent = await sendEmail(env, email, 'Seu código de acesso KYROSHIX Records',

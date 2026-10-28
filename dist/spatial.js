@@ -39,6 +39,28 @@
   function openDialog(dlg) { if (dlg && !dlg.open) dlg.showModal(); }
   function closeDialog(dlg) { if (dlg && dlg.open) dlg.close(); }
 
+  /* ------------------------------------------------------- URLs seguras */
+  // Nunca deixe um valor vindo de localStorage/KV virar esquema javascript:,
+  // data:text/html ou quebrar a declaração CSS url().
+  const cssSafe = u => String(u || '').replace(/["'()\\\s<>]/g, '');
+  function safeMediaUrl(value) {
+    const raw = String(value || '');
+    if (/^\/assets\/[A-Za-z0-9._-]+$/.test(raw)) return raw;
+    try {
+      const u = new URL(raw, location.href);
+      return u.protocol === 'https:' && !u.username && !u.password ? u.href : '';
+    } catch { return ''; }
+  }
+  function safeImageUrl(value) {
+    const raw = String(value || '');
+    if (/^\/assets\/[A-Za-z0-9._-]+$/.test(raw)) return raw;
+    if (/^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(raw)) return raw;
+    try {
+      const u = new URL(raw, location.href);
+      return u.protocol === 'https:' && !u.username && !u.password ? u.href : '';
+    } catch { return ''; }
+  }
+
   /* -------------------------------------------------- configuração pública */
   const OWNER_EMAIL = 'kyroshixcorp@gmail.com';
   const DEFAULT_CONFIG = {
@@ -448,7 +470,7 @@
     state.track = track; state.duration = track.duration; state.countedPlay = false;
     state.history = [track.id, ...state.history.filter(id => id !== track.id)].slice(0, 12);
     persistSets();
-    audio.src = track.audio; audio.load();
+    audio.src = safeMediaUrl(track.audio) || '/assets/remember.mp3'; audio.load();
     renderAll();
     if (autoplay) play(); else { state.playing = false; updatePlayButton(); }
   }
@@ -493,15 +515,17 @@
   }
   function downloadTrack(track) {
     if (!can('download')) { openPlans(); toast('Downloads disponíveis nos planos Pro e Studio.'); return; }
-    const a = document.createElement('a'); a.href = track.audio; a.download = track.title.replace(/[^\w\s-]/g, '') + '.mp3';
+    const href = safeMediaUrl(track.audio);
+    if (!href) { toast('Endereço de áudio inválido.'); return; }
+    const a = document.createElement('a'); a.href = href; a.download = track.title.replace(/[^\w\s-]/g, '') + '.mp3';
     document.body.appendChild(a); a.click(); a.remove();
     toast('Download iniciado.');
   }
 
   /* ------------------------------------------------------------- capas */
   function artInner(track) {
-    const custom = track.image || (/^https?:|^data:image\//.test(track.cover || '') ? track.cover : '');
-    if (custom) return `<span class="art art-custom" style="background-image:url('${esc(custom)}')"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
+    const custom = safeImageUrl(track.image || (/^https?:|^data:image\//.test(track.cover || '') ? track.cover : ''));
+    if (custom) return `<span class="art art-custom" style="background-image:url(&quot;${esc(cssSafe(custom))}&quot;)"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
     return `<span class="art ${esc(track.cover || 'art-remember')}"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
   }
   function avatarHTML(track, extra = '') {
@@ -641,8 +665,8 @@
     </section>` + tilesHTML(tracks.slice(2), 'Lançamentos para descobrir');
   }
   function storyBackground(t) {
-    const custom = t.image || (/^https?:|^data:image\//.test(t.cover || '') ? t.cover : '');
-    if (custom) return `url('${esc(custom)}')`;
+    const custom = safeImageUrl(t.image || (/^https?:|^data:image\//.test(t.cover || '') ? t.cover : ''));
+    if (custom) return `url(&quot;${esc(cssSafe(custom))}&quot;)`;
     return t.cover === 'art-remember' ? "url('/assets/hero.webp')" : "url('/assets/covers.webp')";
   }
   function libraryHTML() {
