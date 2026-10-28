@@ -1,0 +1,9 @@
+{
+  "ownerEmail": "kyroshixcorp@gmail.com",
+  "billing": { "provider": "stripe", "enabled": false, "publishableKey": "" },
+  "auth": { "google": true, "emailCode": true },
+  "ads": { "enabled": false, "publisherId": "", "slotId": "" },
+  "chat": { "enabled": true },
+  "realtime": { "enabled": true, "pollMs": 4000 },
+  "youtube": { "videos": [] }
+}

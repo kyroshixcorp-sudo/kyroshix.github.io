@@ -27,6 +27,8 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('archive', type=Path, help='Public ZIP from export-pages.py')
 parser.add_argument('output', type=Path, help='Generated deployment directory')
 parser.add_argument('--files', nargs='+', default=DEFAULT_FILES)
+parser.add_argument('--kv-data-id', default='', help='ID do namespace KV KX_DATA (catálogo, códigos, chat, assinaturas)')
+parser.add_argument('--kv-metrics-id', default='', help='ID do namespace KV KX_METRICS (plays e ouvintes)')
 args = parser.parse_args()
 files = {}
 with ZipFile(args.archive) as archive:
@@ -59,12 +61,24 @@ shutil.copyfile(Path(__file__).resolve().parents[1] / 'cloudflare/worker.mjs',
     'export const FILES = ' + json.dumps(files, ensure_ascii=True) + ';\n'
     + 'export const APP_ROUTES = ' + json.dumps(app_routes) + ';\n',
     encoding='utf-8')
-routes = sorted(set(files) | set(app_routes) | {'/'})
+# As rotas /api/* precisam passar pelo Worker (run_worker_first), senão os
+# assets estáticos responderiam 404 antes do script ser executado.
+API_ROUTES = [
+    '/api/metrics', '/api/metrics/play', '/api/metrics/presence',
+    '/api/auth/code', '/api/auth/verify', '/api/admin/code', '/api/admin/verify',
+    '/api/billing/checkout', '/api/billing/confirm', '/api/billing/status', '/api/billing/webhook',
+    '/api/catalog', '/api/videos', '/api/admin/videos', '/api/profile', '/api/chat',
+]
+routes = sorted(set(files) | set(app_routes) | set(API_ROUTES) | {'/'})
+bindings = [{'name': 'ASSETS', 'type': 'assets'}]
+for binding, kv_id in (('KX_DATA', args.kv_data_id), ('KX_METRICS', args.kv_metrics_id)):
+    if kv_id:
+        bindings.append({'name': binding, 'type': 'kv_namespace', 'namespace_id': kv_id})
 metadata = {
     'main_module': 'worker.mjs', 'compatibility_date': '2026-10-07',
     'keep_assets': True,
     'assets': {'config': {'run_worker_first': routes}},
-    'bindings': [{'name': 'ASSETS', 'type': 'assets'}],
+    'bindings': bindings,
     'annotations': {
         'workers/message': 'KYROSHIX Spatial UI: glass homepage on Cloudflare',
         'workers/tag': 'kyroshix-spatial-home',

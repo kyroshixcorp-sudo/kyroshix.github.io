@@ -39,47 +39,95 @@
   function openDialog(dlg) { if (dlg && !dlg.open) dlg.showModal(); }
   function closeDialog(dlg) { if (dlg && dlg.open) dlg.close(); }
 
+  /* -------------------------------------------------- configuração pública */
+  const OWNER_EMAIL = 'kyroshixcorp@gmail.com';
+  const DEFAULT_CONFIG = {
+    ownerEmail: OWNER_EMAIL,
+    billing: { provider: 'stripe', enabled: false, publishableKey: '' },
+    auth: { google: false, emailCode: false },
+    ads: { enabled: false, publisherId: '' },
+    chat: { enabled: false },
+    youtube: { videos: [] },
+    realtime: { enabled: false, pollMs: 4000 }
+  };
+  let appConfig = DEFAULT_CONFIG;
+  async function loadAppConfig() {
+    try {
+      const response = await fetch('/app-config.json', { cache: 'no-store' });
+      if (response.ok) {
+        const data = await response.json();
+        appConfig = { ...DEFAULT_CONFIG, ...data,
+          billing: { ...DEFAULT_CONFIG.billing, ...(data.billing || {}) },
+          auth: { ...DEFAULT_CONFIG.auth, ...(data.auth || {}) },
+          ads: { ...DEFAULT_CONFIG.ads, ...(data.ads || {}) },
+          youtube: { ...DEFAULT_CONFIG.youtube, ...(data.youtube || {}) } };
+      }
+    } catch { /* usa os padrões seguros */ }
+    window.KYROSHIX_ADS_CONFIG = appConfig.ads;
+    try { await import('/ads.js'); } catch { /* AdSense é opcional */ }
+    return appConfig;
+  }
+  async function api(path, payload, method) {
+    const options = { method: method || (payload === undefined ? 'GET' : 'POST'), cache: 'no-store', credentials: 'same-origin' };
+    if (payload !== undefined) {
+      options.headers = { 'Content-Type': 'application/json' };
+      options.body = JSON.stringify(payload);
+    }
+    try {
+      const response = await fetch(path, options);
+      const data = await response.json().catch(() => ({}));
+      return { ...data, status: response.status };
+    } catch {
+      return { ok: false, reason: 'offline', detail: 'Não foi possível contactar o servidor.' };
+    }
+  }
+  const configured = (result, feature) => result?.ok !== false || result?.reason !== 'not_configured'
+    ? true : (toast(feature + ': configure os segredos no Worker.'), false);
+
   /* ---------------------------------------------------------------- dados */
-  const tracks = [
-    { id: 'forgive', initial: 'W', group: 'reference', artist: 'Mt. Si', title: 'Please Forgive Me', who: 'Washed Out', action: 'repostou uma faixa', when: 'há 7 horas',
-      tag: '#CASCINE', likes: 116, reposts: 21, duration: 171.936, audio: '/assets/remember.mp3', cover: 'radial', seed: 17,
-      avatar: 'linear-gradient(135deg,#7a5cff,#ff5c87)', note: 'referência visual · áudio demo KYROSHIX', color: '#9a7bff',
-      credits: 'Referência visual de capa radial. Obra original: Mt. Si. Áudio demonstrativo: catálogo KYROSHIX.',
-      story: 'Um círculo de luz que atravessa a faixa. A capa virou símbolo do movimento espacial do som.' },
-    { id: 'tampa', initial: 'S', group: 'reference', artist: 'Small Black', title: 'Tampa (FM Skyline Remix) [Extended]', who: 'Small Black', action: 'publicou uma faixa', when: 'há 11 horas',
-      tag: '#SmallBlack', likes: 89, reposts: 0, duration: 200.616, audio: '/assets/darkness.mp3', cover: 'teal', seed: 29,
-      avatar: 'linear-gradient(135deg,#223,#c33)', note: 'referência visual · áudio demo KYROSHIX', color: '#57d6c4',
-      credits: 'Referência visual em turquesa. Obra original: Small Black. Áudio demonstrativo: catálogo KYROSHIX.',
-      story: 'Turquesa, estática e uma extensão que não quer terminar. O remix ganhou nova vida no stream.' },
+  /* Só entram no catálogo faixas com cover art publicada. As duas referências
+     visuais antigas (capas geradas em CSS) foram removidas a pedido do dono. */
+  const DEFAULT_TRACKS = [
     { id: 'remember', initial: 'K', group: 'release', artist: 'Levianth & Axol feat. The Tech Thieves', title: 'Remember', who: 'KYROSHIX', action: 'publicou um remix', when: 'há 1 dia',
-      tag: '#Nightcore', likes: 412, reposts: 64, duration: 171.936, audio: '/assets/remember.mp3', cover: 'art-remember', seed: 41,
+      tag: '#Nightcore', likes: 412, reposts: 64, duration: 171.936, audio: '/assets/remember.mp3', cover: 'art-remember', image: '/assets/hero.webp', seed: 41,
       avatar: 'linear-gradient(135deg,#f0a15c,#d23b5c)', note: 'KYROSHIX · Nightcore Remix', color: '#ff8a3d',
+      description: 'O som que fica. Nightcore acelerado, vocais em evidência e a energia que abriu o catálogo.',
       credits: 'Obra original: Remember — Levianth & Axol feat. The Tech Thieves. Remix: KYROSHIX.',
       story: 'O som que fica. Nightcore acelerado, vocais em evidência e a energia que abriu o catálogo.' },
     { id: 'legends', initial: 'K', group: 'release', artist: 'Against The Current · League of Legends', title: 'Legends Never Die', who: 'KYROSHIX', action: 'publicou um remix', when: 'há 3 dias',
-      tag: '#Nightcore', likes: 388, reposts: 51, duration: 207.744, audio: '/assets/legends.mp3', cover: 'art-legends', seed: 53,
+      tag: '#Nightcore', likes: 388, reposts: 51, duration: 207.744, audio: '/assets/legends.mp3', cover: 'art-legends', image: '/assets/covers.webp', seed: 53,
       avatar: 'linear-gradient(135deg,#a35bff,#ff6f91)', note: 'KYROSHIX · Nightcore Remix', color: '#ff6f91',
+      description: 'A energia de Worlds em nova velocidade. Um hino que continua de pé depois do último refrão.',
       credits: 'Obra original: Legends Never Die — Worlds 2017, League of Legends feat. Against The Current. Remix: KYROSHIX.',
       story: 'A energia de Worlds em nova velocidade. Um hino que continua de pé depois do último refrão.' },
     { id: 'darkness', initial: 'K', group: 'release', artist: 'Lost Sky × She Is Jules', title: 'Darkness', who: 'KYROSHIX', action: 'publicou um remix', when: 'há 5 dias',
-      tag: '#Synthwave', likes: 301, reposts: 43, duration: 200.616, audio: '/assets/darkness.mp3', cover: 'art-darkness', seed: 67,
+      tag: '#Synthwave', likes: 301, reposts: 43, duration: 200.616, audio: '/assets/darkness.mp3', cover: 'art-darkness', image: '/assets/covers.webp', seed: 67,
       avatar: 'linear-gradient(135deg,#4f7bff,#9b5cff)', note: 'KYROSHIX · Synthwave / Nightcore', color: '#6f8bff',
+      description: 'Entre luzes de neon e noites de synthwave. A faixa que puxa o catálogo para o lado mais escuro.',
       credits: 'Obra original: Darkness — Lost Sky & She Is Jules. Remix: KYROSHIX.',
       story: 'Entre luzes de neon e noites de synthwave. A faixa que puxa o catálogo para o lado mais escuro.' },
     { id: 'blindfold', initial: 'K', group: 'release', artist: 'Warriyo feat. Laura Brehm', title: 'Blindfold', who: 'KYROSHIX', action: 'publicou um remix', when: 'há 1 semana',
-      tag: '#Nightcore', likes: 276, reposts: 38, duration: 189.579, audio: '/assets/blindfold.mp3', cover: 'art-blindfold', seed: 83,
+      tag: '#Nightcore', likes: 276, reposts: 38, duration: 189.579, audio: '/assets/blindfold.mp3', cover: 'art-blindfold', image: '/assets/covers.webp', seed: 83,
       avatar: 'linear-gradient(135deg,#39c7c7,#4f6bff)', note: 'KYROSHIX · Nightcore Remix', color: '#57d6c4',
+      description: 'Feche os olhos. Entre na frequência. Uma viagem noturna em forma de remix.',
       credits: 'Obra original: Blindfold — Warriyo feat. Laura Brehm. Remix: KYROSHIX.',
       story: 'Feche os olhos. Entre na frequência. Uma viagem noturna em forma de remix.' }
   ];
+  const hasCover = t => t && typeof t === 'object' &&
+    (/^art-/.test(t.cover || '') || /^https?:\/\/\S+/.test(t.cover || '') || /^https?:\/\/\S+/.test(t.image || '') || /^data:image\//.test(t.image || ''));
+  let tracks = (() => {
+    const saved = read('kx.catalog.v2', null);
+    const list = Array.isArray(saved) ? saved.filter(hasCover) : DEFAULT_TRACKS.map(t => ({ ...t }));
+    return list.length ? list : DEFAULT_TRACKS.map(t => ({ ...t }));
+  })();
   const byId = id => tracks.find(t => t.id === id) || tracks[0];
+  const saveCatalog = () => write('kx.catalog.v2', tracks);
 
   const statusDots = [
-    { id: 'forgive', ring: 'conic-gradient(#8f7bff,#ff77b5,#8f7bff)', face: 'radial-gradient(circle at 35% 30%,#f4d7ff,#7a5cff)' },
-    { id: 'tampa', ring: 'conic-gradient(#39c7c7,#c7ff8a,#39c7c7)', face: 'radial-gradient(circle at 35% 30%,#d7fffb,#2b9f9f)' },
     { id: 'remember', ring: 'conic-gradient(#ff8a3d,#ffd06b,#ff8a3d)', face: 'radial-gradient(circle at 35% 30%,#ffe0b6,#d2533b)' },
     { id: 'legends', ring: 'conic-gradient(#a35bff,#ff6f91,#a35bff)', face: 'radial-gradient(circle at 35% 30%,#f3d7ff,#7830a8)' },
-    { id: 'darkness', ring: 'conic-gradient(#4f7bff,#81e6ff,#4f7bff)', face: 'radial-gradient(circle at 35% 30%,#d9ecff,#3054b8)' }
+    { id: 'darkness', ring: 'conic-gradient(#4f7bff,#81e6ff,#4f7bff)', face: 'radial-gradient(circle at 35% 30%,#d9ecff,#3054b8)' },
+    { id: 'blindfold', ring: 'conic-gradient(#39c7c7,#81e6ff,#39c7c7)', face: 'radial-gradient(circle at 35% 30%,#d7fffb,#2b9f9f)' }
   ];
 
   const PLANS = [
@@ -87,9 +135,13 @@
     { id: 'pro', name: 'Pro', price: 'R$ 14,90', period: '/mês', badge: 'POPULAR', features: ['Tudo do Free', 'Download em MP3', 'Equalizador de 3 bandas', 'Alta qualidade', 'Sem anúncios'] },
     { id: 'studio', name: 'Studio', price: 'R$ 39,90', period: '/mês', badge: 'COMPLETO', features: ['Tudo do Pro', 'Presets de som', 'Velocidade de reprodução', 'Bastidores ilimitados', 'Selo de apoiador'] }
   ];
+  const OWNER_PLAN = { id: 'owner', name: 'Owner', price: 'Premium', period: ' vitalício', badge: 'DONO' };
+  const planById = id => PLANS.find(p => p.id === id) || (id === 'owner' ? OWNER_PLAN : PLANS[0]);
+  const planName = id => planById(id).name;
   const BENEFITS = {
-    download: ['pro', 'studio'], eq: ['pro', 'studio'], hq: ['pro', 'studio'], noads: ['pro', 'studio'],
-    presets: ['studio'], speed: ['pro', 'studio'], supporter: ['studio']
+    download: ['pro', 'studio', 'owner'], eq: ['pro', 'studio', 'owner'], hq: ['pro', 'studio', 'owner'],
+    noads: ['pro', 'studio', 'owner'], presets: ['studio', 'owner'], speed: ['pro', 'studio', 'owner'],
+    supporter: ['studio', 'owner'], admin: ['owner']
   };
 
   const VIEWS = {
@@ -97,11 +149,16 @@
     discover: { title: 'Descobrir', note: 'Histórias verticais, bastidores de cada faixa e curadoria por estilo.' },
     stream: { title: 'Stream', note: 'O fluxo completo do catálogo — toque em uma capa, título ou forma de onda para ouvir.' },
     library: { title: 'Sua biblioteca', note: 'Curtidas, playlists, álbuns, artistas seguidos e estações em um só lugar.' },
+    planos: { title: 'Assinaturas', note: 'Escolha seu plano e pague com segurança pelo Stripe.' },
+    videos: { title: 'Vídeos', note: 'Clipes oficiais via YouTube, reproduzidos sob consentimento.' },
+    chat: { title: 'Conversas', note: 'Mensagens em tempo real entre ouvintes.' },
+    perfil: { title: 'Meu perfil', note: 'Personalize nome, avatar, bio e aparência.' },
+    admin: { title: 'Painel do dono', note: 'Edite o catálogo, as capas e as descrições em tempo real.' },
     likes: { title: 'Curtidas', note: 'Faixas que você marcou com coração.' },
     recent: { title: 'Recentes', note: 'Faixas que você ouviu nesta sessão.' },
     queue: { title: 'A seguir', note: 'A fila começa pela próxima faixa depois da atual.' },
     playlists: { title: 'Playlists', note: 'Coleções montadas a partir dos estilos do catálogo.' },
-    albums: { title: 'Álbuns e lançamentos', note: 'Os quatro lançamentos oficiais KYROSHIX Records.' },
+    albums: { title: 'Álbuns e lançamentos', note: 'Os lançamentos oficiais KYROSHIX Records.' },
     following: { title: 'Seguindo', note: 'Artistas e canais que você acompanha.' },
     stations: { title: 'Stations', note: 'Rádios contínuas a partir de uma faixa.' }
   };
@@ -161,40 +218,11 @@
 
   /* ------------------------------------------------------------- comentários */
   const COMMENTS_KEY = 'kx.comments.v2';
-  const seedComments = () => ({
-    forgive: [
-      { author: 'Washed Out', initial: 'W', text: 'Essa capa radial é hipnótica. Voltei várias vezes só para ver a luz girar.', at: Date.now() - 7200000 },
-      { author: 'Marina R.', initial: 'M', text: 'O refrão gruda na cabeça. Alguém sabe o nome do remix?', at: Date.now() - 3600000 }
-    ],
-    tampa: [
-      { author: 'Small Black', initial: 'S', text: 'Versão estendida, direto do arquivo original. Obrigado por ouvirem.', at: Date.now() - 10800000 }
-    ],
-    remember: [
-      { author: 'KYROSHIX', initial: 'K', text: 'O som que fica. Essa abriu o catálogo — deixem seu comentário sobre a versão nightcore.', at: Date.now() - 86400000 },
-      { author: 'Lukas', initial: 'L', text: 'A ponte em 1:42 é absurda. Volume alto, por favor.', at: Date.now() - 43200000 },
-      { author: 'Duda', initial: 'D', text: 'Já entrou na playlist da academia 🎧', at: Date.now() - 7200000 }
-    ],
-    legends: [
-      { author: 'KYROSHIX', initial: 'K', text: 'A energia de Worlds em nova velocidade. Qual parte vocês mais gostam?', at: Date.now() - 172800000 },
-      { author: 'Rafa', initial: 'R', text: 'O drop final ficou enorme no fone.', at: Date.now() - 86400000 }
-    ],
-    darkness: [
-      { author: 'KYROSHIX', initial: 'K', text: 'Synthwave + nightcore. Essa é para dirigir de madrugada.', at: Date.now() - 259200000 }
-    ],
-    blindfold: [
-      { author: 'KYROSHIX', initial: 'K', text: 'Feche os olhos. Entre na frequência.', at: Date.now() - 345600000 },
-      { author: 'Nina', initial: 'N', text: 'A voz da Laura Brehm com essa velocidade ficou perfeita.', at: Date.now() - 90000000 }
-    ]
-  });
+  // Sem exemplos inventados: os comentários começam vazios e só crescem com
+  // mensagens reais de contas autenticadas.
   let comments = read(COMMENTS_KEY, null);
-  if (!comments || typeof comments !== 'object') {
-    const seeded = seedComments();
-    comments = {};
-    for (const [trackId, list] of Object.entries(seeded)) {
-      comments[trackId] = list.map(c => ({ id: uid(), ...c, replyTo: null, demo: true, likes: Math.floor(Math.random() * 4), likedBy: [] }));
-    }
-    write(COMMENTS_KEY, comments);
-  }
+  if (!comments || typeof comments !== 'object' || Array.isArray(comments)) comments = {};
+  for (const key of Object.keys(comments)) if (comments[key]?.demo) delete comments[key];
   const getComments = trackId => comments[trackId] || [];
   function commentCount() { return Object.values(comments).reduce((a, list) => a + (Array.isArray(list) ? list.length : 0), 0); }
   function saveComments() { write(COMMENTS_KEY, comments); metrics.commentsPosted = commentCount(); write(METRICS_KEY, metrics); }
@@ -247,6 +275,9 @@
   }
   const plan = () => currentAccount()?.plan || 'free';
   const can = key => (BENEFITS[key] || []).includes(plan());
+  const isOwner = () => !!currentAccount() && currentAccount().email === OWNER_EMAIL && currentAccount().plan === 'owner';
+  const profile = () => read('kx.profile.v2', { name: '', bio: '', avatar: '', accent: '#ff8a3d', theme: 'dark' });
+  const saveProfile = data => write('kx.profile.v2', { ...profile(), ...data });
 
   const hex = bytes => [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
   const fromHex = h => new Uint8Array((h.match(/../g) || []).map(x => parseInt(x, 16)));
@@ -308,7 +339,9 @@
     view: 'home', tab: 'all', query: '', tag: '', nowTab: 'queue', behindIndex: 0,
     liked: asSet(read('kx.liked.v2', [])), reposted: asSet(read('kx.reposted.v2', [])),
     history: asArray(read('kx.history.v2', [])), shuffled: false, repeating: false,
-    selectedPlan: 'pro', authMode: 'login', eq: { bass: 0, mid: 0, treble: 0 }, pendingAction: null
+    selectedPlan: 'pro', authMode: 'login', eq: { bass: 0, mid: 0, treble: 0 }, pendingAction: null,
+    codeVerified: false, codePending: null, ownerToken: read('kx.owner.token', null),
+    chatMessages: [], videos: [], catalogUpdatedAt: 0, billingNotice: '', adsReady: false
   };
   const persistSets = () => {
     write('kx.liked.v2', [...state.liked]); write('kx.reposted.v2', [...state.reposted]); write('kx.history.v2', state.history);
@@ -467,9 +500,9 @@
 
   /* ------------------------------------------------------------- capas */
   function artInner(track) {
-    if (track.cover === 'radial') return '<span class="art art1"></span><span class="glow"></span><span class="ring"></span><span class="cross"></span><span class="word">PLEASE&nbsp;&nbsp;FORGIVE&nbsp;&nbsp;ME</span>';
-    if (track.cover === 'teal') return '<span class="art art2"></span><span class="tag">SMALLBLACK&nbsp;&nbsp;THNX4</span><span class="tag2">TAMPA</span>';
-    return `<span class="art ${track.cover}"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
+    const custom = track.image || (/^https?:|^data:image\//.test(track.cover || '') ? track.cover : '');
+    if (custom) return `<span class="art art-custom" style="background-image:url('${esc(custom)}')"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
+    return `<span class="art ${esc(track.cover || 'art-remember')}"></span><span class="art-shade"></span><span class="photo-caption">KYROSHIX</span>`;
   }
   function avatarHTML(track, extra = '') {
     return `<span class="avatar ${extra}" style="--face:${track.avatar}">${esc(track.initial)}</span>`;
@@ -483,7 +516,7 @@
     return `<div class="comment" data-comment="${c.id}">
       <span class="avatar" style="--face:linear-gradient(135deg,#5b6cff,#b06bff)">${esc(c.initial || '?')}</span>
       <div class="comment-body">
-        <div class="comment-top"><b>${esc(c.author)}</b><time>${relTime(c.at)}</time>${c.demo ? '<span class="demo">EXEMPLO</span>' : ''}</div>
+        <div class="comment-top"><b>${esc(c.author)}</b><time>${relTime(c.at)}</time></div>
         <p>${esc(c.text)}</p>
         <div class="comment-actions">
           <button type="button" data-action="comment-like" data-id="${track.id}" data-comment-id="${c.id}" class="${liked ? 'on' : ''}">${icon('heart')} ${c.likes || 0}</button>
@@ -511,7 +544,7 @@
           </div>
         </div>
       </div>
-      <div id="comment-list">${roots.length ? roots.map(c => commentHTML(track, c)).join('') : '<p class="field-hint">Nenhum comentário ainda. Seja o primeiro.</p>'}</div>`;
+      <div id="comment-list">${roots.length ? roots.map(c => commentHTML(track, c)).join('') : '<p class="field-hint">Nenhum comentário ainda. Entre na sua conta e seja o primeiro.</p>'}</div>`;
   }
 
   /* ------------------------------------------------------------- feed */
@@ -589,12 +622,12 @@
     </section>`;
     return hero + tilesHTML(recent, 'Get back to it') + tilesHTML(tracks.filter(t => t.group === 'release'), 'Feito para você') +
       `<section class="panel glass"><div class="section-title"><h2>Mais do que você curte</h2>${icon('spark')}</div>
-        <div class="chips">${['#Nightcore', '#Synthwave', '#CASCINE', '#SmallBlack'].map(tag => `<button class="chip ${state.tag === tag ? 'active' : ''}" type="button" data-action="filter-tag" data-tag="${esc(tag)}">${esc(tag)}</button>`).join('')}</div>
+        <div class="chips">${['#Nightcore', '#Synthwave'].map(tag => `<button class="chip ${state.tag === tag ? 'active' : ''}" type="button" data-action="filter-tag" data-tag="${esc(tag)}">${esc(tag)}</button>`).join('')}</div>
         <div style="margin-top:14px">${tilesHTML(tracks.slice(0, 4), 'No seu radar').replace(/^<section class="panel glass">|<\/section>$/g, '')}</div>
       </section>`;
   }
   function discoverHTML() {
-    const tags = ['#Nightcore', '#Synthwave', '#CASCINE', '#SmallBlack'];
+    const tags = ['#Nightcore', '#Synthwave'];
     return `<section class="panel glass">
       <div class="panel-head"><div><p class="eyebrow">DESCOBRIR</p><h1>Bastidores de cada faixa.</h1><p>Toque em uma história para ouvir e comentar.</p></div></div>
       <div class="chips" style="margin-bottom:16px">${tags.map(tag => `<button class="chip ${state.tag === tag ? 'active' : ''}" type="button" data-action="filter-tag" data-tag="${esc(tag)}">${esc(tag)}</button>`).join('')}</div>
@@ -608,18 +641,17 @@
     </section>` + tilesHTML(tracks.slice(2), 'Lançamentos para descobrir');
   }
   function storyBackground(t) {
-    if (t.cover === 'radial') return 'radial-gradient(circle at 50% 42%,#ffb02e,#ff7a2e 22%,#b8a6e8 55%,#8fb8e8)';
-    if (t.cover === 'teal') return 'linear-gradient(150deg,#39c7c7,#7de3d6 45%,#0c5f70)';
-    if (t.cover === 'art-remember') return "url('/assets/hero.webp')";
-    return "url('/assets/covers.webp')";
+    const custom = t.image || (/^https?:|^data:image\//.test(t.cover || '') ? t.cover : '');
+    if (custom) return `url('${esc(custom)}')`;
+    return t.cover === 'art-remember' ? "url('/assets/hero.webp')" : "url('/assets/covers.webp')";
   }
   function libraryHTML() {
     const liked = tracks.filter(t => state.liked.has(t.id));
     const recent = state.history.map(byId);
     const playlists = [
       { name: 'Nightcore Essentials', tag: '#Nightcore', ids: ['remember', 'legends', 'blindfold'] },
-      { name: 'Neon Drive', tag: '#Synthwave', ids: ['darkness', 'tampa'] },
-      { name: 'Spatial Chill', tag: '#CASCINE', ids: ['forgive', 'tampa'] }
+      { name: 'Neon Drive', tag: '#Synthwave', ids: ['darkness', 'blindfold'] },
+      { name: 'KYROSHIX Completo', tag: '#Nightcore', ids: tracks.map(t => t.id) }
     ];
     return `<section class="panel glass"><div class="panel-head"><div><p class="eyebrow">BIBLIOTECA</p><h1>Tudo o que é seu.</h1><p>${esc(VIEWS.library.note)}</p></div></div>
       <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
@@ -645,6 +677,11 @@
     switch (state.view) {
       case 'discover': stage.innerHTML = discoverHTML(); break;
       case 'library': stage.innerHTML = libraryHTML(); break;
+      case 'planos': stage.innerHTML = planosHTML(); break;
+      case 'videos': stage.innerHTML = videosHTML(); break;
+      case 'chat': stage.innerHTML = chatHTML(); renderChatLog(); break;
+      case 'perfil': stage.innerHTML = profileHTML(); break;
+      case 'admin': stage.innerHTML = adminHTML(); break;
       case 'stream': case 'likes': case 'recent': case 'queue':
       case 'playlists': case 'albums': case 'following': case 'stations':
         stage.innerHTML = feedHTML(); break;
@@ -655,7 +692,9 @@
   /* ------------------------------------------------------------- rail */
   const RAIL_MAIN = [
     { view: 'home', icon: 'home', label: 'Início' }, { view: 'discover', icon: 'compass', label: 'Descobrir' },
-    { view: 'stream', icon: 'wave', label: 'Stream' }, { view: 'library', icon: 'library', label: 'Biblioteca' }
+    { view: 'stream', icon: 'wave', label: 'Stream' }, { view: 'videos', icon: 'play', label: 'Vídeos' },
+    { view: 'chat', icon: 'comment', label: 'Chat' }, { view: 'library', icon: 'library', label: 'Biblioteca' },
+    { view: 'perfil', icon: 'user', label: 'Meu perfil' }, { view: 'planos', icon: 'crown', label: 'Assinaturas' }
   ];
   const RAIL_LIBRARY = [
     { view: 'likes', icon: 'heart', label: 'Curtidas' }, { view: 'recent', icon: 'clock', label: 'Recentes' },
@@ -670,8 +709,9 @@
       const t = byId(d.id);
       return `<button class="status-dot" type="button" data-action="play-track" data-id="${d.id}" style="--ring:${d.ring};--face:${d.face}" aria-label="Ouvir ${esc(t.title)}" title="${esc(t.artist)} — ${esc(t.title)}"><i></i></button>`;
     }).join('');
+    $('#rail-main').innerHTML += `<button class="nav-item owner-link ${isOwner() ? 'unlocked' : ''}" type="button" data-action="set-view" data-view="admin">${icon(isOwner() ? 'shield' : 'edit')} Painel do dono ${isOwner() ? '' : '<span class="count">🔒</span>'}</button>`;
     const p = plan();
-    $('#rail-plan').innerHTML = `<div class="pc-kicker">SEU PLANO</div><h4>${esc(PLANS.find(x => x.id === p).name)}${p !== 'free' ? ' ✦' : ''}</h4>
+    $('#rail-plan').innerHTML = `<div class="pc-kicker">SEU PLANO</div><h4>${esc(planName(p))}${p !== 'free' ? ' ✦' : ''}</h4>
       <p>${p === 'free' ? 'Desbloqueie downloads, equalizador e áudio de alta qualidade.' : 'Recursos Pro/Studio ativos na sua conta.'}</p>
       <button type="button" data-action="open-plans">${p === 'free' ? 'Ver planos' : 'Gerenciar plano'}</button>`;
   }
@@ -739,7 +779,7 @@
     if (/coment/.test(q)) return `Existem <b>${num(n.comments)} comentários</b> no catálogo. Você pode responder e reagir em cada faixa.`;
     if (/plano|assinatura|pro|studio|conta/.test(q)) {
       const a = currentAccount();
-      return a ? `Sua conta <b>${esc(a.name)}</b> está no plano <b>${esc(PLANS.find(p => p.id === a.plan).name)}</b>.` : 'Você ainda não entrou. Crie uma conta para escolher um plano.';
+      return a ? `Sua conta <b>${esc(a.name)}</b> está no plano <b>${esc(planName(a.plan))}</b>.` : 'Você ainda não entrou. Crie uma conta para escolher um plano.';
     }
     if (/faixa|catálogo|música|quantas/.test(q)) return `O catálogo tem <b>${tracks.length} faixas</b>, sendo ${tracks.filter(t => t.group === 'release').length} lançamentos oficiais KYROSHIX Records.`;
     return `Resumo atual: <b>${num(n.listeners)}</b> ouvintes, <b>${num(n.plays)}</b> reproduções, <b>${num(n.comments)}</b> comentários e <b>${tracks.length}</b> faixas.`;
@@ -759,7 +799,7 @@
   function renderTopActions() {
     const account = currentAccount();
     $('#account-btn').textContent = account ? account.name : 'Entrar';
-    $('#plan-btn').textContent = account && account.plan !== 'free' ? PLANS.find(p => p.id === account.plan).name.toUpperCase() + ' ✦' : 'VER PLANOS';
+    $('#plan-btn').textContent = account && account.plan !== 'free' ? planName(account.plan).toUpperCase() + ' ✦' : 'VER PLANOS';
     $('#plan-btn').classList.toggle('is-pro', !!account && account.plan !== 'free');
   }
   function renderNow() {
@@ -836,60 +876,282 @@
       </div>`;
   }
 
+  /* ------------------------------------------------------- novas seções */
+  function planosHTML() {
+    const current = plan();
+    const notice = state.billingNotice
+      ? `<div class="notice warn"><b>${icon('info')} Pagamento indisponível</b><span>${esc(state.billingNotice)}</span></div>` : '';
+    return `<section class="panel glass planos-page">
+      <div class="planos-head">
+        <p class="eyebrow">KYROSHIX RECORDS · ASSINATURAS</p>
+        <h1>Som sem limites, <em>do seu jeito</em>.</h1>
+        <p>Pagamento processado pelo Stripe em página segura. Cancele quando quiser; sem fidelidade.</p>
+      </div>
+      ${notice}
+      <div class="plan-grid">${PLANS.map(p => `
+        <article class="plan-tile ${p.badge ? 'featured' : ''} ${current === p.id ? 'current' : ''}">
+          ${p.badge ? `<span class="plan-badge">${esc(p.badge)}</span>` : ''}
+          <h2>${esc(p.name)}</h2>
+          <div class="plan-price"><strong>${esc(p.price)}</strong><small>${esc(p.period)}</small></div>
+          <ul>${p.features.map(f => `<li>${icon('check')} ${esc(f)}</li>`).join('')}</ul>
+          <button class="btn ${p.badge ? 'btn-primary' : 'btn-ghost'}" type="button" data-action="checkout" data-plan="${p.id}">
+            ${current === p.id ? 'Plano atual' : p.id === 'free' ? 'Usar grátis' : 'Assinar ' + esc(p.name)}
+          </button>
+        </article>`).join('')}
+      </div>
+      ${isOwner() ? `<div class="notice ok">${icon('crown')} Você é o dono do site: <b>Premium vitalício</b> ativo, com acesso ao painel administrativo.</div>` : ''}
+      <div class="planos-foot">
+        <div>${icon('shield')}<b>Pagamento seguro</b><span>Cartão processado pelo Stripe. Nenhum dado de cartão passa por este site.</span></div>
+        <div>${icon('refresh')}<b>Ativação imediata</b><span>O webhook confirma o pagamento e libera o plano na hora.</span></div>
+        <div>${icon('card')}<b>Cancelamento simples</b><span>Gerencie ou cancele a assinatura a qualquer momento.</span></div>
+      </div>
+    </section>`;
+  }
+
+  const safeYoutubeId = id => /^[A-Za-z0-9_-]{11}$/.test(String(id || '')) ? String(id) : '';
+  function videoList() {
+    const local = read('kx.videos.v2', null);
+    return Array.isArray(local) ? local : (appConfig.youtube?.videos || []);
+  }
+  function videosHTML() {
+    const list = videoList().filter(v => safeYoutubeId(v.id || v.youtubeId));
+    return `<section class="panel glass">
+      <div class="panel-head"><div><p class="eyebrow">KYROSHIX RECORDS · VÍDEOS</p><h1>Clipes e bastidores.</h1>
+        <p>Reprodução via YouTube com consentimento explícito — nada é carregado antes do seu clique.</p></div></div>
+      <div class="notice info">${icon('info')} <span><b>Sobre DRM:</b> vídeos incorporados do YouTube usam o player e as regras do próprio YouTube. DRM (Widevine/PlayReady/FairPlay) só é aplicável a arquivos próprios empacotados com servidor de licenças; está preparado em <code>drm.js</code> para mídia KYROSHIX.</span></div>
+      ${list.length ? `<div class="video-grid">${list.map(v => {
+        const id = safeYoutubeId(v.id || v.youtubeId);
+        return `<article class="video-card" data-video="${id}">
+          <div class="video-thumb" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')">
+            <span class="video-play">${icon('play','fill')}</span>
+            <span class="video-duration">${esc(v.duration || 'YouTube')}</span>
+          </div>
+          <div class="video-body"><h2>${esc(v.title || 'Vídeo KYROSHIX')}</h2><p>${esc(v.description || 'Clipe oficial')}</p>
+            <button class="btn btn-ghost btn-sm" type="button" data-action="play-video" data-id="${id}">${icon('play')} Assistir</button>
+          </div>
+        </article>`;
+      }).join('')}</div>` : `<div class="empty"><h2>Nenhum vídeo publicado</h2><p>O dono pode adicionar vídeos pelo painel administrativo.</p></div>`}
+    </section>`;
+  }
+
+  function chatHTML() {
+    const account = currentAccount();
+    const rooms = ['geral', 'nightcore', 'bastidores'];
+    return `<section class="chat-wrap glass">
+      <aside class="chat-side">
+        <div class="chat-side-head"><h2>Conversas</h2><span class="real-badge"></span> ao vivo</div>
+        <div class="chat-rooms">${rooms.map((r, i) => `<button class="chat-room ${i === 0 ? 'active' : ''}" type="button" data-action="chat-room" data-room="${r}">
+          <span class="avatar" style="--face:${['linear-gradient(135deg,#ff8a3d,#d23b5c)','linear-gradient(135deg,#7a5cff,#4f7bff)','linear-gradient(135deg,#39c7c7,#2b9f9f)'][i]}">#</span>
+          <span><b>${r === 'geral' ? 'Geral' : r === 'nightcore' ? 'Nightcore' : 'Bastidores'}</b><small>Toque para abrir a sala</small></span></button>`).join('')}</div>
+        <div class="chat-people"><h3>Online agora</h3><p><b>${num(currentNumbers().listeners)}</b> ouvintes conectados</p></div>
+      </aside>
+      <div class="chat-main">
+        <header class="chat-head"><span class="avatar" style="--face:linear-gradient(135deg,#ff8a3d,#d23b5c)">#</span>
+          <div><b id="chat-room-name">Geral</b><small id="chat-status">Mensagens em tempo real</small></div>
+          <button class="icon-btn" type="button" data-action="chat-refresh" aria-label="Atualizar mensagens">${icon('refresh')}</button></header>
+        <ol class="chat-log" id="chat-log" aria-live="polite"></ol>
+        <form class="chat-compose" id="chat-form">
+          <input id="chat-input" maxlength="1000" placeholder="${account ? 'Escreva uma mensagem…' : 'Entre na sua conta para conversar'}" ${account ? '' : 'disabled'} autocomplete="off">
+          <button type="submit" aria-label="Enviar mensagem" ${account ? '' : 'disabled'}>${icon('send')}</button>
+        </form>
+      </div>
+    </section>`;
+  }
+  function renderChatLog() {
+    const log = $('#chat-log'); if (!log) return;
+    const room = state.chatRoom || 'geral';
+    const messages = state.chatMessages.filter(m => (m.room || 'geral') === room);
+    const me = currentAccount()?.name || '';
+    log.innerHTML = messages.length ? messages.map(m => `<li class="bubble ${m.author === me ? 'mine' : ''}">
+      <span class="bubble-author">${esc(m.author)}</span><span class="bubble-text">${esc(m.text)}</span>
+      <time>${new Date(m.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</time></li>`).join('')
+      : '<li class="chat-empty">Nenhuma mensagem nesta sala. Comece a conversa.</li>';
+    log.scrollTop = log.scrollHeight;
+  }
+  async function refreshChat(quiet = true) {
+    const result = await api('/api/chat?room=' + encodeURIComponent(state.chatRoom || 'geral'));
+    if (result?.ok && Array.isArray(result.messages)) {
+      state.chatMessages = result.messages;
+      renderChatLog();
+      const status = $('#chat-status'); if (status) status.textContent = 'Sincronizado agora';
+    } else if (!quiet) {
+      toast('Chat indisponível: configure o KV KX_DATA no Worker.');
+      const status = $('#chat-status'); if (status) status.textContent = 'Sincronização indisponível';
+    }
+  }
+
+  function profileHTML() {
+    const pr = profile(), account = currentAccount();
+    return `<section class="panel glass profile-page">
+      <div class="panel-head"><div><p class="eyebrow">MINHA CONTA</p><h1>Seu perfil.</h1><p>Personalize como você aparece no catálogo e nas conversas.</p></div></div>
+      ${account ? `<div class="account-box"><span class="avatar" style="--face:${esc(pr.avatar ? `url('${pr.avatar}')` : 'linear-gradient(135deg,#ff8a3d,#b06bff)')}">${pr.avatar ? '' : esc(account.name.charAt(0).toUpperCase())}</span>
+        <div><b>${esc(account.name)}</b><span>${esc(account.email)} · plano ${esc(planName(account.plan))}</span></div><span class="plan-tag">${esc(planName(account.plan))}</span></div>` : '<div class="notice warn">Entre na sua conta para salvar seu perfil.</div>'}
+      <form class="form-grid" id="profile-form">
+        <div class="field"><label for="pf-name">Nome de exibição</label><input id="pf-name" maxlength="40" value="${esc(pr.name || account?.name || '')}" placeholder="Como quer ser chamado"></div>
+        <div class="field"><label for="pf-bio">Bio</label><textarea id="pf-bio" rows="3" maxlength="240" placeholder="Conte um pouco sobre você">${esc(pr.bio || '')}</textarea></div>
+        <div class="field"><label for="pf-avatar">Avatar (URL https ou imagem do dispositivo)</label><input id="pf-avatar" type="url" value="${/^https?:/.test(pr.avatar || '') ? esc(pr.avatar) : ''}" placeholder="https://…"><input id="pf-avatar-file" type="file" accept="image/*"></div>
+        <div class="field"><label for="pf-accent">Cor de destaque</label><input id="pf-accent" type="color" value="${esc(pr.accent || '#ff8a3d')}"></div>
+        <div class="field"><label for="pf-theme">Tema</label><select id="pf-theme"><option value="dark" ${pr.theme === 'dark' ? 'selected' : ''}>Escuro espacial</option><option value="darker" ${pr.theme === 'darker' ? 'selected' : ''}>Preto profundo</option><option value="warm" ${pr.theme === 'warm' ? 'selected' : ''}>Âmbar quente</option></select></div>
+        <div class="dlg-actions"><button class="btn btn-primary" type="submit">${icon('check')} Salvar perfil</button></div>
+      </form>
+    </section>`;
+  }
+  function applyProfile() {
+    const pr = profile();
+    document.documentElement.style.setProperty('--accent', pr.accent || '#ff8a3d');
+    document.body.dataset.theme = pr.theme || 'dark';
+  }
+
+  function adminHTML() {
+    if (!isOwner()) return `<section class="panel glass"><div class="panel-head"><div><p class="eyebrow">ACESSO RESTRITO</p><h1>Painel do dono.</h1><p>Área exclusiva de ${esc(OWNER_EMAIL)}.</p></div></div>
+      <div class="notice warn">${icon('shield')} <span>Entre com a conta do dono e confirme o código enviado por e-mail para desbloquear a edição em tempo real.</span></div>
+      <div class="dlg-actions"><button class="btn btn-primary" type="button" data-action="owner-verify">${icon('shield')} Verificar acesso</button></div></section>`;
+    return `<section class="panel glass admin-page">
+      <div class="panel-head"><div><p class="eyebrow">PAINEL DO DONO · ${esc(OWNER_EMAIL)}</p><h1>Editar o site.</h1><p>Alterações publicadas em tempo real para todos os visitantes.</p></div>
+        <span class="plan-tag">PREMIUM ATIVO</span></div>
+      <div id="admin-sync" class="notice ${state.ownerToken ? 'ok' : 'warn'}">${icon('refresh')} <span>${state.ownerToken ? 'Sincronizando catálogo…' : 'Modo local: as alterações valem para este navegador. Configure o Worker + KX_DATA para publicar em tempo real para todos.'}</span></div>
+      <div class="admin-section"><h2>${icon('disc')} Músicas (${tracks.length})</h2>
+        <div class="admin-tracks">${tracks.map(t => `<div class="admin-track" data-track="${esc(t.id)}">
+          <div class="admin-cover">${artInner(t)}</div>
+          <div class="admin-fields">
+            <label>Título<input data-field="title" value="${esc(t.title)}" maxlength="120"></label>
+            <label>Artista<input data-field="artist" value="${esc(t.artist)}" maxlength="160"></label>
+            <label>Descrição<input data-field="description" value="${esc(t.description || t.story || '')}" maxlength="300"></label>
+            <label>Capa (URL https)<input data-field="image" value="${/^https?:/.test(t.image || '') ? esc(t.image) : ''}" placeholder="https://…"></label>
+            <label>Áudio (URL https)<input data-field="audio" value="${esc(t.audio)}"></label>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" data-action="remove-track" data-id="${esc(t.id)}">${icon('trash')} Remover</button>
+        </div>`).join('')}</div>
+        <div class="dlg-actions"><button class="btn btn-primary" type="button" data-action="save-catalog">${icon('check')} Publicar alterações</button></div>
+      </div>
+      <div class="admin-section"><h2>${icon('plus')} Nova faixa</h2>
+        <form class="form-grid" id="new-track-form">
+          <div class="field"><label for="nt-title">Título</label><input id="nt-title" required maxlength="120" placeholder="Nome da faixa"></div>
+          <div class="field"><label for="nt-artist">Artista</label><input id="nt-artist" required maxlength="160" placeholder="Artista"></div>
+          <div class="field"><label for="nt-cover">Capa (obrigatória, URL https)</label><input id="nt-cover" required type="url" placeholder="https://…/capa.webp"></div>
+          <div class="field"><label for="nt-audio">Áudio (URL https)</label><input id="nt-audio" type="url" placeholder="https://…/faixa.mp3"></div>
+          <div class="dlg-actions"><button class="btn btn-primary" type="submit">${icon('plus')} Adicionar</button></div>
+        </form>
+        <p class="field-hint">Faixas sem capa são recusadas automaticamente.</p>
+      </div>
+      <div class="admin-section"><h2>${icon('play')} Vídeos do YouTube</h2>
+        <form class="form-grid" id="new-video-form">
+          <div class="field"><label for="nv-title">Título</label><input id="nv-title" required maxlength="120"></div>
+          <div class="field"><label for="nv-id">ID do vídeo (11 caracteres)</label><input id="nv-id" required maxlength="11" placeholder="dQw4w9WgXcQ"></div>
+          <div class="dlg-actions"><button class="btn btn-primary" type="submit">${icon('plus')} Publicar vídeo</button></div>
+        </form>
+        <div class="admin-videos">${videoList().map((v, i) => `<span class="badge">${esc(v.title || v.id)} <button type="button" data-action="remove-video" data-index="${i}" aria-label="Remover">×</button></span>`).join('') || '<p class="field-hint">Nenhum vídeo.</p>'}</div>
+      </div>
+    </section>`;
+  }
+  async function syncCatalog(quiet = true) {
+    const result = await api('/api/catalog');
+    const note = $('#admin-sync span');
+    if (result?.ok && Array.isArray(result.tracks) && result.tracks.length && result.updatedAt !== state.catalogUpdatedAt) {
+      const clean = result.tracks.filter(hasCover);
+      if (clean.length) {
+        tracks = clean; state.catalogUpdatedAt = result.updatedAt;
+        saveCatalog(); renderAll();
+      }
+    }
+    if (note) note.textContent = result?.ok && Array.isArray(result.tracks) && result.tracks.length
+      ? 'Sincronizado com o servidor — alterações aparecem para todos.' : 'Salvo neste navegador. Vincule KX_DATA no Worker para sincronizar entre dispositivos.';
+    if (!quiet) toast(note ? note.textContent : 'Catálogo atualizado.');
+  }
+
   /* ------------------------------------------------------------- planos / auth */
   function renderPlans() {
-    $('#plan-list').innerHTML = PLANS.map(p => `<button class="plan-option ${state.selectedPlan === p.id ? 'selected' : ''}" type="button" data-action="select-plan" data-plan="${p.id}">
-      <span class="radio"></span><span style="flex:1">
-        <h3>${esc(p.name)} ${p.badge ? `<span class="badge" style="font-size:9px;color:#ffb990">${p.badge}</span>` : ''}<span class="price" style="margin-left:auto">${esc(p.price)} <small style="color:var(--dim)">${esc(p.period)}</small></span></h3>
-        <p>${p.id === 'free' ? 'O essencial para ouvir e participar.' : p.id === 'pro' ? 'Para quem vive o som todos os dias.' : 'Para criadores e fãs que querem tudo.'}</p>
-        <ul>${p.features.map(f => `<li>${icon('check')} ${esc(f)}</li>`).join('')}</ul>
-      </span></button>`).join('');
+    const list = $('#plan-list'); if (!list) return;
+    list.innerHTML = PLANS.map(p => `<button class="plan-option ${state.selectedPlan === p.id ? 'selected' : ''}" type="button" data-action="select-plan" data-plan="${p.id}">
+      <span class="radio"></span><span style="flex:1"><h3>${esc(p.name)} ${p.badge ? `<span class="badge" style="font-size:9px;color:#ffb990">${esc(p.badge)}</span>` : ''}<span class="price" style="margin-left:auto">${esc(p.price)} <small style="color:var(--dim)">${esc(p.period)}</small></span></h3>
+      <ul>${p.features.map(f => `<li>${icon('check')} ${esc(f)}</li>`).join('')}</ul></span></button>`).join('');
   }
   function renderAuth() {
     const account = currentAccount();
-    const guest = $('#auth-guest'), logged = $('#auth-logged');
+    const guest = $('#auth-guest'), logged = $('#auth-logged'), codeStep = $('#auth-code-step');
+    if (state.codePending) {
+      guest.hidden = true; logged.hidden = true; codeStep.hidden = false;
+      $('#auth-title').textContent = 'Confirme seu acesso.';
+      $('#auth-subtitle').textContent = `Enviamos um código de 6 dígitos para ${state.codePending.email}. Ele expira em 10 minutos.`;
+      $('#auth-code-error').hidden = true;
+      return;
+    }
+    codeStep.hidden = true;
     if (account) {
       guest.hidden = true; logged.hidden = false;
       $('#auth-title').textContent = 'Sua conta.';
-      $('#auth-subtitle').textContent = 'Gerencie seu plano e sua sessão local.';
+      $('#auth-subtitle').textContent = 'Gerencie plano, perfil e segurança.';
       logged.innerHTML = `<div class="account-box"><span class="avatar" style="--face:linear-gradient(135deg,#ff8a3d,#b06bff)">${esc(account.name.charAt(0).toUpperCase())}</span>
         <div><b>${esc(account.name)}</b><span>${esc(account.email)} · desde ${new Date(account.createdAt).toLocaleDateString('pt-BR')}</span></div>
-        <span class="plan-tag">${esc(PLANS.find(p => p.id === account.plan).name)}</span></div>
+        <span class="plan-tag">${esc(planName(account.plan))}</span></div>
         <div class="form-grid">
           <div class="ins-card" style="margin:0"><h3>${icon('crown')} Plano atual</h3>
-            <p>${account.plan === 'free' ? 'Free — sem cobrança. Recursos Pro/Studio bloqueados.' : `${esc(PLANS.find(p => p.id === account.plan).name)} ativo desde ${new Date(account.planSince).toLocaleDateString('pt-BR')}.`}</p></div>
+            <p>${account.plan === 'free' ? 'Free — recursos Pro/Studio bloqueados.' : `${esc(planName(account.plan))} ativo${account.planSince ? ' desde ' + new Date(account.planSince).toLocaleDateString('pt-BR') : ''}.`}</p></div>
           <div class="dlg-actions" style="margin-top:4px">
             <button class="btn btn-primary" type="button" data-action="open-plans">Gerenciar plano</button>
-            ${account.plan !== 'free' ? '<button class="btn btn-ghost" type="button" data-action="cancel-plan">Cancelar assinatura</button>' : ''}
+            <button class="btn btn-ghost" type="button" data-action="set-view" data-view="perfil">Meu perfil</button>
+            ${isOwner() ? '<button class="btn btn-ghost" type="button" data-action="set-view" data-view="admin">Painel do dono</button>' : ''}
+            ${account.plan !== 'free' && account.plan !== 'owner' ? '<button class="btn btn-ghost" type="button" data-action="cancel-plan">Cancelar assinatura</button>' : ''}
             <button class="btn btn-dark" type="button" data-action="logout">${icon('logout')} Sair</button>
           </div>
         </div>`;
     } else {
       guest.hidden = false; logged.hidden = true;
-      $('#auth-title').textContent = 'Entre na sua frequência.';
-      $('#auth-subtitle').textContent = 'Conta local, salva apenas neste navegador.';
+      $('#auth-title').textContent = 'Entre na KYROSHIX Records.';
+      $('#auth-subtitle').textContent = 'Conta real com verificação por e-mail.';
       $$('#auth-seg button').forEach(b => b.classList.toggle('active', b.dataset.mode === state.authMode));
       const signup = state.authMode === 'signup';
       $('#auth-name-field').hidden = !signup; $('#auth-confirm-field').hidden = !signup;
       $('#auth-password').autocomplete = signup ? 'new-password' : 'current-password';
       $('#auth-submit').textContent = signup ? 'Criar conta' : 'Entrar';
+      const google = $('#auth-google');
+      if (google) google.hidden = !appConfig.auth?.google;
     }
   }
-  function openPlans() { state.selectedPlan = plan() === 'free' ? 'pro' : plan(); renderPlans(); showPlansStep('choose'); openDialog($('#plans-dialog')); }
+  function openPlans() { setView('planos'); }
   function showPlansStep(step) {
     $('#plans-step-choose').hidden = step !== 'choose';
     $('#plans-step-checkout').hidden = step !== 'checkout';
     if (step === 'checkout') {
-      const p = PLANS.find(x => x.id === state.selectedPlan);
+      const p = planById(state.selectedPlan);
       $('#checkout-summary').innerHTML = `<span class="avatar" style="--face:linear-gradient(135deg,#ff8a3d,#b06bff)">${icon('card')}</span>
-        <div><b>Assinatura ${esc(p.name)}</b><span>${esc(p.price)} ${esc(p.period)} · cobrança demonstrativa</span></div><span class="plan-tag">${esc(p.badge || 'PLANO')}</span>`;
+        <div><b>Assinatura ${esc(p.name)}</b><span>${esc(p.price)} ${esc(p.period)} · pagamento seguro via Stripe</span></div><span class="plan-tag">${esc(p.badge || 'PLANO')}</span>`;
     }
   }
   function requireAccount(after) {
     if (currentAccount()) { after(); return; }
     state.pendingAction = after;
     openDialog($('#auth-dialog')); renderAuth();
-    toast('Crie uma conta ou entre para continuar.');
+    toast('Entre na sua conta para continuar.');
+  }
+  async function startCheckout(planId) {
+    if (planId === 'free') {
+      if (currentAccount()) { setPlan('free'); toast('Plano Free ativado.'); renderAll(); }
+      else requireAccount(() => { setPlan('free'); renderAll(); });
+      return;
+    }
+    if (!currentAccount()) { state.pendingAction = () => startCheckout(planId); openDialog($('#auth-dialog')); renderAuth(); return; }
+    state.billingNotice = '';
+    const result = await api('/api/billing/checkout', { plan: planId, email: currentAccount().email });
+    if (result?.ok && /^https:\/\//.test(result.url || '')) { location.href = result.url; return; }
+    state.billingNotice = result?.reason === 'not_configured'
+      ? 'O Stripe ainda não está configurado no Worker. Defina STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET e os preços dos planos (veja docs/webui-v2.md).'
+      : (result?.detail || result?.reason || 'Não foi possível iniciar o pagamento.');
+    state.view = 'planos'; renderAll();
+    toast('Pagamento indisponível — veja o aviso na página.');
+  }
+  async function confirmCheckout() {
+    const params = new URLSearchParams(location.search);
+    const sessionId = params.get('session_id');
+    if (!sessionId) return;
+    const result = await api('/api/billing/confirm', { sessionId });
+    if (result?.ok && result.plan && currentAccount()) {
+      setPlan(result.plan); toast('Assinatura confirmada. Bem-vindo!');
+    } else if (result?.reason === 'not_configured') {
+      state.billingNotice = 'Confirmação indisponível: configure STRIPE_SECRET_KEY no Worker.';
+    }
+    history.replaceState({}, '', location.pathname + location.hash);
+    renderAll();
   }
 
   /* ------------------------------------------------------------- render all */
@@ -899,6 +1161,9 @@
     $('#clear-search').hidden = !state.query;
     $$('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === state.view));
     initWaves(); renderNow(); renderBehind(); applyEq();
+    applyProfile();
+    if (state.view === 'chat') renderChatLog();
+    if (state.view === 'admin') syncCatalog(true);
   }
 
   /* ------------------------------------------------------------- eventos */
@@ -964,7 +1229,37 @@
       case 'open-comments': openComments(btn.dataset.id); break;
       case 'open-behind': openBehind(btn.dataset.id); break;
       case 'open-player': openPlayerTab(btn.dataset.tab); break;
-      case 'open-plans': closeDialog($('#auth-dialog')); openPlans(); break;
+      case 'open-plans': closeDialog($('#auth-dialog')); setView('planos'); break;
+      case 'checkout': startCheckout(btn.dataset.plan); break;
+      case 'play-video': {
+        const id = safeYoutubeId(btn.dataset.id);
+        const card = btn.closest('.video-card');
+        if (id && card) card.querySelector('.video-thumb').innerHTML =
+          `<iframe title="Vídeo do YouTube" src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+        break;
+      }
+      case 'chat-room': {
+        state.chatRoom = btn.dataset.room;
+        $$('.chat-room').forEach(b => b.classList.toggle('active', b === btn));
+        const names = { geral: 'Geral', nightcore: 'Nightcore', bastidores: 'Bastidores' };
+        const label = $('#chat-room-name'); if (label) label.textContent = names[state.chatRoom] || state.chatRoom;
+        renderChatLog(); refreshChat(false); break;
+      }
+      case 'chat-refresh': refreshChat(false); break;
+      case 'owner-verify': beginOwnerVerification(); break;
+      case 'save-catalog': publishCatalog(); break;
+      case 'remove-track': {
+        if (!isOwner()) break;
+        tracks = tracks.filter(t => t.id !== btn.dataset.id);
+        saveCatalog(); renderAll(); toast('Faixa removida. Publique para aplicar a todos.'); break;
+      }
+      case 'remove-video': {
+        if (!isOwner()) break;
+        const list = videoList(); list.splice(Number(btn.dataset.index), 1);
+        write('kx.videos.v2', list);
+        if (state.ownerToken) api('/api/admin/videos', { token: state.ownerToken, videos: list });
+        renderAll(); break;
+      }
       case 'cancel-plan': setPlan('free'); renderAuth(); toast('Assinatura cancelada. Você voltou ao plano Free.'); break;
       case 'logout': closeDialog($('#auth-dialog')); logout(); break;
       case 'select-plan': state.selectedPlan = btn.dataset.plan; renderPlans(); break;
@@ -1000,6 +1295,59 @@
   // Formulários de comentários (submit) e respostas
   document.addEventListener('submit', event => {
     const form = event.target;
+    if (form.id === 'chat-form') {
+      event.preventDefault();
+      const input = $('#chat-input'); const text = input?.value.trim();
+      if (!text || !currentAccount()) return;
+      api('/api/chat', { author: currentAccount().name, text, room: state.chatRoom || 'geral' }).then(r => {
+        if (r?.ok && Array.isArray(r.messages)) state.chatMessages = r.messages;
+        input.value = ''; renderChatLog();
+      });
+      return;
+    }
+    if (form.id === 'profile-form') {
+      event.preventDefault();
+      const file = $('#pf-avatar-file')?.files?.[0];
+      const done = avatar => {
+        saveProfile({ name: $('#pf-name').value.trim(), bio: $('#pf-bio').value.trim(),
+          avatar: avatar || $('#pf-avatar').value.trim(), accent: $('#pf-accent').value, theme: $('#pf-theme').value });
+        api('/api/profile', { email: currentAccount()?.email, profile: profile() });
+        applyProfile(); renderAll(); toast('Perfil salvo.');
+      };
+      if (file && file.size <= 2 * 1024 * 1024) {
+        const reader = new FileReader(); reader.onload = () => done(reader.result); reader.readAsDataURL(file);
+      } else done();
+      return;
+    }
+    if (form.id === 'new-track-form') {
+      event.preventDefault();
+      if (!isOwner()) return;
+      const cover = $('#nt-cover').value.trim();
+      if (!/^https:\/\//.test(cover)) { toast('Informe uma URL https para a capa.'); return; }
+      const title = $('#nt-title').value.trim(), artist = $('#nt-artist').value.trim();
+      tracks.push({ id: 'track-' + uid().slice(0, 8), initial: title.charAt(0).toUpperCase(), group: 'release',
+        artist, title, who: 'KYROSHIX', action: 'publicou uma faixa', when: 'agora', tag: '#Nightcore',
+        likes: 0, reposts: 0, duration: 180, audio: $('#nt-audio').value.trim() || '/assets/remember.mp3',
+        cover: 'art-custom', image: cover, seed: 97, avatar: 'linear-gradient(135deg,#ff8a3d,#b06bff)',
+        note: 'KYROSHIX · Novo lançamento', color: '#ff8a3d', description: 'Novo lançamento KYROSHIX Records.',
+        credits: 'Publicado por ' + OWNER_EMAIL + '.', story: 'Novo lançamento KYROSHIX Records.' });
+      saveCatalog(); form.reset(); renderAll(); toast('Faixa adicionada. Publique para aplicar a todos.');
+      return;
+    }
+    if (form.id === 'new-video-form') {
+      event.preventDefault();
+      if (!isOwner()) return;
+      const id = safeYoutubeId($('#nv-id').value.trim());
+      if (!id) { toast('ID do YouTube inválido.'); return; }
+      const list = videoList(); list.push({ id, title: $('#nv-title').value.trim(), description: 'Clipe oficial KYROSHIX Records' });
+      write('kx.videos.v2', list);
+      if (state.ownerToken) api('/api/admin/videos', { token: state.ownerToken, videos: list });
+      form.reset(); renderAll(); toast(state.ownerToken ? 'Vídeo publicado.' : 'Vídeo salvo neste navegador.');
+      return;
+    }
+    if (form.id === 'auth-code-form') {
+      event.preventDefault(); verifyAccessCode($('#auth-code').value.trim()); return;
+    }
     if (form.id === 'behind-comment-form') {
       event.preventDefault();
       const input = $('input', form); const text = input.value.trim();
@@ -1035,10 +1383,107 @@
   $('#insights-close').addEventListener('click', () => { $('#insights').classList.remove('open'); $('#ins-scrim').hidden = true; $('#insights-toggle').setAttribute('aria-pressed', 'false'); });
   $('#ins-scrim').addEventListener('click', () => { $('#insights').classList.remove('open'); $('#ins-scrim').hidden = true; $('#insights-toggle').setAttribute('aria-pressed', 'false'); });
 
-  // Conta
+  // Conta, Google, código por e-mail e dono
   $('#account-btn').addEventListener('click', () => { renderAuth(); openDialog($('#auth-dialog')); });
-  $('#plan-btn').addEventListener('click', () => openPlans());
+  $('#plan-btn').addEventListener('click', () => setView('planos'));
+  const profileBtn = $('#profile-btn');
+  if (profileBtn) profileBtn.addEventListener('click', () => setView('perfil'));
   $$('#auth-seg button').forEach(b => b.addEventListener('click', () => { state.authMode = b.dataset.mode; $('#auth-error').hidden = true; renderAuth(); }));
+
+  async function finalizeAccess(pending) {
+    if (pending.mode === 'signup') await createAccount(pending.name, pending.email, pending.password);
+    else if (pending.mode === 'login') await loginAccount(pending.email, pending.password);
+    else if (pending.mode === 'google') {
+      let list = accounts();
+      let account = list.find(a => a.email === pending.email);
+      if (!account) {
+        account = { id: uid(), name: pending.name, email: pending.email, salt: '', hash: '', provider: 'google',
+          plan: 'free', planSince: null, createdAt: Date.now() };
+        list.push(account); saveAccounts(list);
+      }
+      write(SESSION_KEY, { id: account.id, at: Date.now() });
+    }
+    state.codePending = null; state.codeVerified = true;
+    $('#auth-form').reset();
+    closeDialog($('#auth-dialog'));
+    renderAll(); renderAuth();
+    const after = state.pendingAction; state.pendingAction = null;
+    if (typeof after === 'function') after(); else renderAll();
+    toast(pending.mode === 'signup' ? 'Conta criada. Bem-vindo à KYROSHIX Records.' : 'Acesso confirmado.');
+  }
+
+  async function beginAccess(pending) {
+    if (!appConfig.auth?.emailCode) { await finalizeAccess(pending); return; }
+    const result = await api('/api/auth/code', { email: pending.email });
+    if (result?.ok) {
+      state.codePending = pending;
+      $('#auth-code').value = '';
+      renderAuth(); $('#auth-code')?.focus();
+      toast('Código enviado para ' + pending.email + '.');
+      return;
+    }
+    // Sem provedor de e-mail configurado: avisa com clareza e mantém a conta local.
+    const err = $('#auth-error');
+    err.innerHTML = 'Verificação por e-mail indisponível: configure <b>RESEND_API_KEY</b> e <b>EMAIL_FROM</b> no Worker. ' +
+      'Até lá, o acesso fica restrito a este navegador.';
+    err.hidden = false;
+    await finalizeAccess(pending);
+  }
+
+  async function verifyAccessCode(code) {
+    const pending = state.codePending; if (!pending) return;
+    if (!/^\d{6}$/.test(code)) { const e = $('#auth-code-error'); e.textContent = 'Digite os 6 dígitos.'; e.hidden = false; return; }
+    if (pending.mode === 'owner') {
+      const result = await api('/api/admin/verify', { email: pending.email, code });
+      if (!result?.ok || !result.token) {
+        const e = $('#auth-code-error'); e.textContent = result?.detail || result?.reason || 'Código inválido ou expirado.'; e.hidden = false; return;
+      }
+      state.ownerToken = result.token; write('kx.owner.token', result.token);
+      const list = accounts(); const account = list.find(a => a.email === pending.email);
+      if (account) { account.plan = 'owner'; account.planSince = Date.now(); saveAccounts(list); }
+      state.codePending = null; $('#auth-code').value = '';
+      closeDialog($('#auth-dialog')); renderAll(); setView('admin');
+      toast('Acesso de dono confirmado. Premium ativado.');
+      return;
+    }
+    const result = await api('/api/auth/verify', { email: pending.email, code });
+    if (!result?.ok) {
+      const e = $('#auth-code-error'); e.textContent = result?.detail || result?.reason || 'Código inválido ou expirado.'; e.hidden = false; return;
+    }
+    await finalizeAccess(pending);
+  }
+
+  async function googleSignIn() {
+    const err = $('#auth-error'); err.hidden = true;
+    try {
+      const [appMod, authMod] = await Promise.all([
+        import('https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js'),
+        import('https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js')
+      ]);
+      const cfg = await fetch('/auth-config.json', { cache: 'no-store' }).then(r => r.json());
+      if (!cfg?.firebase?.apiKey) throw new Error('Firebase não configurado');
+      const app = appMod.initializeApp(cfg.firebase);
+      const auth = authMod.getAuth(app);
+      const cred = await authMod.signInWithPopup(auth, new authMod.GoogleAuthProvider());
+      const email = cred.user?.email;
+      if (!email) throw new Error('O Google não retornou um e-mail.');
+      await beginAccess({ mode: 'google', email: email.toLowerCase(), name: cred.user.displayName || email.split('@')[0] });
+    } catch (e) {
+      err.textContent = 'Não foi possível entrar com o Google: ' + (e?.code || e?.message || 'erro desconhecido') +
+        '. Confirme o provedor no Firebase e o domínio autorizado.';
+      err.hidden = false;
+    }
+  }
+  const googleBtn = $('#auth-google');
+  if (googleBtn) googleBtn.addEventListener('click', googleSignIn);
+  const resendBtn = $('#auth-code-resend');
+  if (resendBtn) resendBtn.addEventListener('click', async () => {
+    if (!state.codePending) return;
+    const result = await api('/api/auth/code', { email: state.codePending.email });
+    toast(result?.ok ? 'Novo código enviado.' : 'Não foi possível reenviar: configure o provedor de e-mail.');
+  });
+  $('#auth-code-cancel').addEventListener('click', () => { state.codePending = null; renderAuth(); });
+
   $('#auth-form').addEventListener('submit', async event => {
     event.preventDefault();
     const err = $('#auth-error'); err.hidden = true;
@@ -1050,51 +1495,65 @@
       if (name.length < 2) { err.textContent = 'Informe seu nome de exibição.'; err.hidden = false; return; }
       if (password !== $('#auth-confirm').value) { err.textContent = 'As senhas não coincidem.'; err.hidden = false; return; }
       if (accounts().some(a => a.email === email.toLowerCase())) { err.textContent = 'Já existe uma conta com esse e-mail.'; err.hidden = false; return; }
-      await createAccount(name, email, password);
-      toast('Conta criada! Bem-vindo à KYROSHIX Records.');
+      await beginAccess({ mode: 'signup', name, email: email.toLowerCase(), password });
     } else {
       const account = await loginAccount(email, password);
       if (!account) { err.textContent = 'E-mail ou senha incorretos.'; err.hidden = false; return; }
-      toast('Você entrou na sua conta.');
+      // loginAccount já gravou a sessão; o código por e-mail ainda é exigido.
+      localStorage.removeItem(SESSION_KEY);
+      await beginAccess({ mode: 'login', email: email.toLowerCase(), password });
     }
-    $('#auth-form').reset();
-    closeDialog($('#auth-dialog'));
-    renderAll(); renderAuth();
-    const pending = state.pendingAction;
-    state.pendingAction = null;
-    if (typeof pending === 'function') pending(); else renderAll();
   });
-  $('#auth-open-plans').addEventListener('click', () => { closeDialog($('#auth-dialog')); openPlans(); });
+  $('#auth-open-plans').addEventListener('click', () => { closeDialog($('#auth-dialog')); setView('planos'); });
 
-  // Planos
+  async function beginOwnerVerification() {
+    if (!currentAccount() || currentAccount().email !== OWNER_EMAIL) {
+      toast('Entre com ' + OWNER_EMAIL + ' para acessar o painel.');
+      renderAuth(); openDialog($('#auth-dialog')); return;
+    }
+    const result = await api('/api/admin/code', { email: OWNER_EMAIL });
+    if (result?.reason === 'not_configured' || result?.reason === 'offline') {
+      // Sem provedor de e-mail, libera apenas a edição local — as escritas no
+      // servidor continuam exigindo token verificado, então não afeta outros visitantes.
+      const list = accounts(), account = list.find(a => a.email === OWNER_EMAIL);
+      if (account) { account.plan = 'owner'; account.planSince = Date.now(); saveAccounts(list); }
+      state.ownerToken = null; write('kx.owner.token', null);
+      renderAll(); setView('admin');
+      toast('Modo dono local ativado. Configure RESEND_API_KEY para verificar por e-mail e publicar em tempo real.');
+      return;
+    }
+    if (!result?.ok) { toast('Não foi possível enviar o código: ' + (result?.detail || result?.reason || 'erro')); return; }
+    state.codePending = { mode: 'owner', email: OWNER_EMAIL };
+    renderAuth(); openDialog($('#auth-dialog')); $('#auth-code')?.focus();
+  }
+  async function publishCatalog() {
+    if (!isOwner()) { toast('Somente o dono pode publicar alterações.'); return; }
+    for (const row of $$('.admin-track')) {
+      const t = tracks.find(x => x.id === row.dataset.track); if (!t) continue;
+      for (const input of $$('[data-field]', row)) t[input.dataset.field] = input.value.trim();
+      if (!hasCover(t)) { toast('Toda faixa precisa de capa.'); return; }
+    }
+    saveCatalog();
+    if (state.ownerToken) {
+      const result = await api('/api/catalog', { token: state.ownerToken, tracks });
+      if (result?.ok) { state.catalogUpdatedAt = result.updatedAt || Date.now(); toast('Catálogo publicado em tempo real.'); }
+      else toast('Salvo neste navegador. O servidor recusou a publicação: ' + (result?.detail || result?.reason || 'erro'));
+    } else {
+      toast('Salvo neste navegador. Configure RESEND_API_KEY + KX_DATA para publicar em tempo real.');
+    }
+    renderAll();
+  }
+
+  // Planos: diálogo legado agora apenas encaminha para o checkout real.
   $('#plan-continue').addEventListener('click', () => {
-    requireAccount(() => {
-      if (state.selectedPlan === 'free') { setPlan('free'); closeDialog($('#plans-dialog')); toast('Plano Free ativado.'); return; }
-      showPlansStep('checkout');
-    });
+    closeDialog($('#plans-dialog'));
+    startCheckout(state.selectedPlan);
   });
   $('#checkout-back').addEventListener('click', () => showPlansStep('choose'));
-  $('#cc-number').addEventListener('input', e => {
-    const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
-    e.target.value = digits.replace(/(.{4})/g, '$1 ').trim();
-  });
-  $('#cc-exp').addEventListener('input', e => {
-    const d = e.target.value.replace(/\D/g, '').slice(0, 4);
-    e.target.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
-  });
-  $('#cc-cvc').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); });
   $('#checkout-form').addEventListener('submit', event => {
     event.preventDefault();
-    const err = $('#checkout-error'); err.hidden = true;
-    const name = $('#cc-name').value.trim(), number = $('#cc-number').value.replace(/\s/g, '');
-    const exp = $('#cc-exp').value, cvc = $('#cc-cvc').value;
-    if (name.length < 3 || number.length < 16 || !/^\d{2}\/\d{2}$/.test(exp) || cvc.length < 3) {
-      err.textContent = 'Confira os dados do cartão (demonstração).'; err.hidden = false; return;
-    }
-    setPlan(state.selectedPlan);
     closeDialog($('#plans-dialog'));
-    $('#checkout-form').reset();
-    toast(`Plano ${PLANS.find(p => p.id === state.selectedPlan).name} ativado. Nenhum valor foi cobrado.`);
+    startCheckout(state.selectedPlan);
   });
 
   // Player
@@ -1275,9 +1734,43 @@
     if (m && tracks.some(t => t.id === m[1])) loadTrack(byId(m[1]), false);
   };
 
+  // Anúncios: só renderiza quando houver publisher ID aprovado e o plano não for pago.
+  function renderAdSlots() {
+    if (!appConfig.ads?.enabled || !/^ca-pub-\d{16}$/.test(appConfig.ads.publisherId || '')) return;
+    if (can('noads')) return;
+    const host = $('#stage'); if (!host || host.querySelector('.ad-slot')) return;
+    const slot = document.createElement('div');
+    slot.className = 'ad-slot';
+    slot.innerHTML = '<span>Publicidade</span><ins class="adsbygoogle" style="display:block" data-ad-client="' +
+      esc(appConfig.ads.publisherId) + '" data-ad-slot="' + esc(appConfig.ads.slotId || '') + '" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+    host.append(slot);
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch { /* script ainda carregando */ }
+  }
+
   // Início
-  renderAll();
-  renderAuth();
-  updatePlayButton();
-  fromHash();
+  async function boot() {
+    await loadAppConfig();
+    applyProfile();
+    renderAll();
+    renderAuth();
+    updatePlayButton();
+    fromHash();
+    renderAdSlots();
+    await confirmCheckout();
+    const pollMs = Math.max(2000, Number(appConfig.realtime?.pollMs) || 4000);
+    setInterval(() => {
+      if (state.view === 'chat') refreshChat(true);
+      if (state.view === 'admin') syncCatalog(true);
+      else if (appConfig.realtime?.enabled) {
+        api('/api/catalog').then(r => {
+          if (r?.ok && Array.isArray(r.tracks) && r.tracks.length && r.updatedAt !== state.catalogUpdatedAt) {
+            const clean = r.tracks.filter(hasCover);
+            if (clean.length) { tracks = clean; state.catalogUpdatedAt = r.updatedAt; saveCatalog(); renderAll(); }
+          }
+        });
+      }
+    }, pollMs);
+    if (state.view === 'chat') refreshChat(true);
+  }
+  boot();
 })();

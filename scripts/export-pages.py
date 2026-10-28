@@ -51,6 +51,12 @@ with ZipFile(args.output, 'w', compression=ZIP_DEFLATED, compresslevel=6) as arc
 /*.css
   Cache-Control: no-cache
 
+/app-config.json
+  Cache-Control: no-store
+
+/ads-config.json
+  Cache-Control: no-store
+
 /auth-config.json
   Cache-Control: no-store
 

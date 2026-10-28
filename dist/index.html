@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d0b09">
-<meta name="description" content="KYROSHIX Records — Spatial WebUI: stream de música em vidro fosco, player completo, comentários, assinatura e métricas reais de audiência.">
+<meta name="description" content="KYROSHIX Records — Spatial WebUI: stream, vídeos, chat, perfil e assinaturas reais.">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
 <meta property="og:title" content="KYROSHIX Records — Spatial WebUI">
-<meta property="og:description" content="Vidro fosco, luz quente e música flutuando no espaço. Ouça, comente e acompanhe sua audiência em tempo real.">
+<meta property="og:description" content="Vidro fosco, luz quente e música flutuando no espaço.">
 <meta property="og:image" content="https://releases.kyroshixcorp.workers.dev/assets/spatial-room.jpg">
 <meta property="og:url" content="https://releases.kyroshixcorp.workers.dev/">
 <link rel="canonical" href="https://releases.kyroshixcorp.workers.dev/">
@@ -67,6 +67,8 @@
   <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
   <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/></symbol>
   <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 9a8 8 0 1 0 1 6M20 4v5h-5"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9 2 2-3 3 2 2-3 3-2-2-2 2"/></symbol>
+  <symbol id="i-play-box" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m10 9 5 3-5 3z"/></symbol>
 </defs></svg>
 
 <header class="topbar glass">
@@ -77,8 +79,8 @@
   <nav class="topnav" aria-label="Seções principais">
     <button type="button" data-view="home" class="active"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>Home</button>
     <button type="button" data-view="discover"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg>Descobrir</button>
-    <button type="button" data-view="stream"><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg>Stream</button>
-    <button type="button" data-view="library"><svg class="icon" aria-hidden="true"><use href="#i-library"/></svg>Biblioteca</button>
+    <button type="button" data-view="videos"><svg class="icon" aria-hidden="true"><use href="#i-play-box"/></svg>Vídeos</button>
+    <button type="button" data-view="planos"><svg class="icon" aria-hidden="true"><use href="#i-crown"/></svg>Planos</button>
   </nav>
   <form class="search" id="search-form" role="search">
     <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
@@ -87,8 +89,9 @@
   </form>
   <div class="top-actions">
     <button class="icon-btn" id="insights-toggle" type="button" aria-label="Abrir painel de inteligência" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></button>
+    <button class="icon-btn hide-small" id="profile-btn" type="button" aria-label="Meu perfil"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg></button>
     <button class="account-btn" id="account-btn" type="button">Entrar</button>
-    <button class="plan-btn" id="plan-btn" type="button">VER PLANOS</button>
+    <button class="plan-btn" id="plan-btn" type="button">PLANOS</button>
   </div>
 </header>
 
@@ -112,7 +115,7 @@
     <div class="ins-head">
       <svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg>
       <h2>KYROSHIX Intelligence</h2>
-      <button id="simulate" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg> Simular</button>
+      <button id="simulate" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg> Atualizar</button>
     </div>
     <p class="ins-sub">Dados reais de audição, atualizados ao vivo.</p>
     <div class="graph" id="insights-graph" aria-hidden="true"></div>
@@ -133,10 +136,9 @@
 <footer class="sitefoot">
   <span>© <b>KYROSHIX Records</b> · Spatial WebUI — vidro, luz e profundidade.</span>
   <span><a href="/sobre.html">Sobre</a> · <a href="/contato.html">Contato</a> · <a href="/privacidade.html">Privacidade</a> · <a href="/termos.html">Termos</a> · <a href="/direitos-autorais.html">Direitos autorais</a></span>
-  <small>As duas primeiras faixas são referências visuais e usam áudio demonstrativo do catálogo. Comentários, curtidas, reproduções, contas e planos são salvos neste navegador; nenhum pagamento real é processado.</small>
+  <small>Reproduções, ouvintes e comentários são medidos em tempo real. Assinaturas processadas pelo Stripe; anúncios exibidos apenas com conta AdSense aprovada.</small>
 </footer>
 
-<!-- MINI PLAYER -->
 <div class="mini-player glass" role="region" aria-label="Player de música">
   <div class="mp-art" id="mp-art" role="button" tabindex="0" aria-label="Abrir player expandido"></div>
   <div class="mp-info" id="mp-info" role="button" tabindex="0" aria-label="Abrir player expandido">
@@ -165,18 +167,18 @@
 <nav class="mobile-nav glass" aria-label="Navegação do celular">
   <button type="button" data-view="home" class="active"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg>Home</button>
   <button type="button" data-view="discover"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg>Descobrir</button>
-  <button type="button" data-view="stream"><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg>Stream</button>
-  <button type="button" data-view="library"><svg class="icon" aria-hidden="true"><use href="#i-library"/></svg>Biblioteca</button>
+  <button type="button" data-view="videos"><svg class="icon" aria-hidden="true"><use href="#i-play-box"/></svg>Vídeos</button>
+  <button type="button" data-view="chat"><svg class="icon" aria-hidden="true"><use href="#i-comment"/></svg>Chat</button>
+  <button type="button" data-view="perfil"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Perfil</button>
 </nav>
 
 <div class="toast glass" id="toast" role="status" aria-live="polite" hidden></div>
 <div class="ins-scrim" id="ins-scrim" hidden></div>
 
-<!-- CONTA / ASSINATURA -->
 <dialog id="auth-dialog" aria-labelledby="auth-title">
   <div class="dlg-card glass">
     <div class="dlg-head">
-      <div><h2 id="auth-title">Entre na sua frequência.</h2><p id="auth-subtitle">Conta local, salva apenas neste navegador.</p></div>
+      <div><h2 id="auth-title">Entre na KYROSHIX Records.</h2><p id="auth-subtitle">Conta real com verificação por e-mail.</p></div>
       <button class="dlg-close" data-close type="button" aria-label="Fechar"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
     <div id="auth-guest">
@@ -184,54 +186,56 @@
         <button type="button" data-mode="login" class="active">Entrar</button>
         <button type="button" data-mode="signup">Criar conta</button>
       </div>
+      <button class="btn btn-google" id="auth-google" type="button" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.9h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.4z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H3.1a10 10 0 0 0 0 9l3.3-2.6z"/><path fill="#EA4335" d="M12 6c1.5 0 2.8.5 3.8 1.5l2.8-2.8A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.7 9.4 6 12 6z"/></svg>
+        Continuar com Google
+      </button>
+      <div class="auth-divider"><span>ou use seu e-mail</span></div>
       <form class="form-grid" id="auth-form" novalidate>
         <div class="field" id="auth-name-field" hidden><label for="auth-name">Nome de exibição</label><input id="auth-name" type="text" maxlength="40" autocomplete="name" placeholder="Como quer ser chamado"></div>
         <div class="field"><label for="auth-email">E-mail</label><input id="auth-email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required></div>
         <div class="field"><label for="auth-password">Senha</label><input id="auth-password" type="password" autocomplete="current-password" placeholder="Mínimo de 8 caracteres" minlength="8" required></div>
         <div class="field" id="auth-confirm-field" hidden><label for="auth-confirm">Confirmar senha</label><input id="auth-confirm" type="password" autocomplete="new-password" placeholder="Repita a senha"></div>
-        <p class="field-hint">A senha é derivada com PBKDF2 e nunca é armazenada em texto puro. Não há servidor de autenticação nesta demonstração.</p>
+        <p class="field-hint">Senha derivada com PBKDF2. Cada novo acesso exige um código enviado ao seu e-mail quando o provedor estiver configurado.</p>
         <p class="form-error" id="auth-error" role="alert" hidden></p>
         <button class="btn btn-primary" type="submit" id="auth-submit">Entrar</button>
       </form>
-      <div class="dlg-actions"><button class="btn btn-ghost" id="auth-open-plans" type="button">Ver planos sem conta</button></div>
+      <div class="dlg-actions"><button class="btn btn-ghost" id="auth-open-plans" type="button">Ver planos</button></div>
+    </div>
+    <div id="auth-code-step" hidden>
+      <div class="code-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></div>
+      <form class="form-grid" id="auth-code-form" novalidate>
+        <div class="field"><label for="auth-code">Código de acesso</label><input id="auth-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" autocomplete="one-time-code" required></div>
+        <p class="form-error" id="auth-code-error" role="alert" hidden></p>
+        <button class="btn btn-primary" type="submit">Confirmar acesso</button>
+      </form>
+      <div class="dlg-actions"><button class="btn btn-ghost" id="auth-code-resend" type="button">Reenviar código</button><button class="btn btn-dark" id="auth-code-cancel" type="button">Cancelar</button></div>
     </div>
     <div id="auth-logged" hidden></div>
   </div>
 </dialog>
 
-<!-- PLANOS -->
 <dialog id="plans-dialog" aria-labelledby="plans-title">
   <div class="dlg-card glass">
     <div class="dlg-head">
-      <div><h2 id="plans-title">Escolha seu plano.</h2><p id="plans-subtitle">Recursos desbloqueados na hora. Cobrança demonstrativa.</p></div>
+      <div><h2 id="plans-title">Escolha seu plano.</h2><p id="plans-subtitle">Pagamento seguro processado pelo Stripe.</p></div>
       <button class="dlg-close" data-close type="button" aria-label="Fechar"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
     <div id="plans-step-choose">
       <div class="plan-list" id="plan-list"></div>
-      <p class="demo-note">Demonstração: nenhum dado de cartão é enviado e nenhum valor é cobrado. O plano fica salvo na sua conta local.</p>
-      <div class="dlg-actions"><button class="btn btn-primary" id="plan-continue" type="button">Continuar</button></div>
+      <div class="dlg-actions"><button class="btn btn-primary" id="plan-continue" type="button">Continuar para pagamento</button></div>
     </div>
     <div id="plans-step-checkout" hidden>
       <div class="account-box" id="checkout-summary"></div>
       <form class="form-grid" id="checkout-form" novalidate>
-        <div class="field"><label for="cc-name">Nome no cartão</label><input id="cc-name" type="text" autocomplete="cc-name" placeholder="Nome completo"></div>
-        <div class="field"><label for="cc-number">Número do cartão</label><input id="cc-number" type="text" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field"><label for="cc-exp">Validade</label><input id="cc-exp" type="text" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5"></div>
-          <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" type="text" inputmode="numeric" autocomplete="cc-csc" placeholder="000" maxlength="4"></div>
-        </div>
-        <p class="form-error" id="checkout-error" role="alert" hidden></p>
-        <p class="field-hint">Os campos são validados apenas localmente para simular o fluxo de assinatura.</p>
-        <div class="dlg-actions">
-          <button class="btn btn-ghost" id="checkout-back" type="button">Voltar</button>
-          <button class="btn btn-primary" type="submit" id="checkout-submit">Ativar plano</button>
-        </div>
+        <p class="field-hint">Você será redirecionado para a página segura do Stripe. Nenhum dado de cartão é tratado por este site.</p>
+        <div class="dlg-actions"><button class="btn btn-ghost" id="checkout-back" type="button">Voltar</button><button class="btn btn-primary" type="submit">Ir para pagamento seguro</button></div>
       </form>
+      <p class="form-error" id="checkout-error" role="alert" hidden></p>
     </div>
   </div>
 </dialog>
 
-<!-- PLAYER EXPANDIDO -->
 <dialog id="player-dialog" class="player-dlg" aria-labelledby="now-title">
   <div class="dlg-card glass">
     <div class="dlg-head" style="margin-bottom:8px">
@@ -268,7 +272,6 @@
   </div>
 </dialog>
 
-<!-- BASTIDORES -->
 <dialog id="behind-dialog" class="behind-dlg" aria-label="Bastidores da faixa">
   <div class="dlg-card glass" id="behind-card">
     <div class="behind-bg" id="behind-bg"></div>
