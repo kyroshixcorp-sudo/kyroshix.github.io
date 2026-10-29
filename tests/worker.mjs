@@ -78,7 +78,7 @@ try {
     assert.equal((await response.json()).reason,'not_configured', route);
   }
   const previewHealth = await (await worker.fetch(new Request('https://site.test/api/health'),preview)).json();
-  assert.equal(previewHealth.stripe,false); assert.equal(previewHealth.kv,false);
+  assert.equal(previewHealth.stripe,false); assert.equal(previewHealth.kv,false); assert.equal(previewHealth.readOnly,true);
   // /api/health: só booleanos, nunca segredos.
   const health = await worker.fetch(new Request('https://site.test/api/health'),envFull);
   const healthData = await health.json();
@@ -118,6 +118,9 @@ try {
   try {
     const syncNoKv = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),env)).json();
     assert.equal(syncNoKv.ok,true); assert.equal(syncNoKv.ephemeral,true);
+    const previewSync = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),preview)).json();
+    assert.equal(previewSync.ephemeral,true); assert.equal(previewSync.persisted,false);
+    assert.equal(store.has('kx:videos:v1'),false,'preview jamais grava o feed em KV');
     const synced = await worker.fetch(new Request('https://site.test/api/videos/sync'),envFull);
     const syncData = await synced.json();
     assert.equal(syncData.ok,true);
@@ -132,11 +135,42 @@ try {
     let feedCalls = 0;
     globalThis.fetch = async () => { feedCalls++; return {ok:true, status:200, text:async()=>feedXml}; };
     const cached = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),envFull)).json();
-    assert.equal(cached.cached,true);
+    assert.equal(cached.cached,true); assert.equal(cached.persisted,true); assert.equal(cached.ephemeral,false);
+    const cachedEphemeral = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),env)).json();
+    assert.equal(cachedEphemeral.cached,true); assert.equal(cachedEphemeral.ephemeral,true); assert.equal(cachedEphemeral.persisted,false);
     assert.equal(feedCalls,0,'cache do feed deve evitar nova requisição ao YouTube');
     const forced = await (await worker.fetch(new Request('https://site.test/api/videos/sync?force=1'),envFull)).json();
     assert.equal(forced.cached,false);
     assert.equal(feedCalls,1,'force=1 deve buscar o feed novamente');
+    // Se o feed retornar 404, consulta a playlist fixa pela API oficial, sem expor a chave.
+    const fallbackStore = new Map();
+    const fallbackKV = {get:async k=>fallbackStore.get(k)??null,put:async(k,v)=>fallbackStore.set(k,v),delete:async k=>fallbackStore.delete(k)};
+    const fallbackEnv = {...env,KX_DATA:fallbackKV,YOUTUBE_API_KEY:'fake-test-key'};
+    let apiRequests = 0;
+    globalThis.fetch = async url => {
+      if (String(url).startsWith('https://www.youtube.com/')) return {ok:false,status:404};
+      const u = new URL(url); apiRequests++;
+      assert.equal(u.origin,'https://www.googleapis.com'); assert.equal(u.pathname,'/youtube/v3/playlistItems');
+      assert.equal(u.searchParams.get('playlistId'),'PLHMuU4IdndW8');
+      return {ok:true,json:async()=>({items:[
+        {snippet:{title:'Remix <script>alert(1)</script>',description:'Oficial',publishedAt:'2026-10-01',resourceId:{videoId:'6hbfr21jgWU'}}},
+        {snippet:{title:'Private video',resourceId:{videoId:'kRy4L4h2oBE'}}},
+        {snippet:{title:'invalido',resourceId:{videoId:'../../bad'}}}
+      ]})};
+    };
+    const apiFallback = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),fallbackEnv)).json();
+    assert.equal(apiFallback.ok,true); assert.equal(apiFallback.source,'youtube-api'); assert.equal(apiRequests,1);
+    assert.equal(apiFallback.videos.length,1); assert.equal(apiFallback.videos[0].id,'6hbfr21jgWU');
+    assert.equal(/[<>]/.test(apiFallback.videos[0].title),false);
+    assert(!JSON.stringify(apiFallback).includes('fake-test-key'));
+    globalThis.fetch = async () => { throw Error('https://www.googleapis.com/?key=fake-test-key'); };
+    const stale = await (await worker.fetch(new Request('https://site.test/api/videos/sync?force=1'),fallbackEnv)).json();
+    assert.equal(stale.ok,true); assert.equal(stale.cached,true); assert(stale.warning);
+    assert(!JSON.stringify(stale).includes('fake-test-key'));
+    const emptyEnv = {...fallbackEnv,KX_DATA:{get:async()=>null,put:async()=>{throw Error('unexpected write')}}};
+    const failed = await (await worker.fetch(new Request('https://site.test/api/videos/sync'),emptyEnv)).json();
+    assert.equal(failed.ok,false); assert.equal(failed.reason,'feed_error');
+    assert(!JSON.stringify(failed).includes('fake-test-key'));
   } finally { globalThis.fetch = realFetch; }
   // DRM: health e status concordam quando há servidor de licenças.
   const drmEnv = {...envFull, DRM_LICENSE_WIDEVINE:'https://license.example.com/widevine'};

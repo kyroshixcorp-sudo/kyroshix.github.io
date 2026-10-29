@@ -15,6 +15,7 @@ const CODE_TTL_MS = 10 * 60 * 1000;
 const TOKEN_TTL_MS = 8 * 60 * 60 * 1000;
 const PLAN_BY_PRICE = { pro: 'pro', studio: 'studio' };
 const YOUTUBE_CHANNEL_ID = 'UCGzRDl1ps7nPbgQybBv2J4Q';
+const YOUTUBE_PLAYLIST_ID = 'PLHMuU4IdndW8';
 const YOUTUBE_FEED = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + YOUTUBE_CHANNEL_ID;
 
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
@@ -341,9 +342,10 @@ function drmConfig(env) {
   return { licenseServers, enabled: Object.keys(licenseServers).length > 0 };
 }
 function handleHealth(env) {
-  if (env.KX_PREVIEW_READ_ONLY === 'true') env = { ASSETS: env.ASSETS };
+  const readOnly = env.KX_PREVIEW_READ_ONLY === 'true';
+  if (readOnly) env = { ASSETS: env.ASSETS };
   // Só booleanos: nunca devolve segredos, chaves ou valores de config.
-  return json({ ok: true, worker: true, stripe: !!env.STRIPE_SECRET_KEY && !!env.STRIPE_PRICE_PRO,
+  return json({ ok: true, worker: true, readOnly, stripe: !!env.STRIPE_SECRET_KEY && !!env.STRIPE_PRICE_PRO,
     email: !!env.RESEND_API_KEY && !!env.EMAIL_FROM, kv: !!env.KX_DATA,
     metrics: !!env.KX_METRICS, drm: drmConfig(env).enabled, youtubeChannelId: YOUTUBE_CHANNEL_ID,
     ownerEmail: env.ADMIN_EMAIL || 'kyroshixcorp@gmail.com' });
@@ -386,46 +388,72 @@ export function parseYoutubeFeed(xml) {
   return videos;
 }
 
-async function fetchYoutubeVideos(fetcher = fetch) {
-  const response = await fetcher(YOUTUBE_FEED, {
-    headers: { 'User-Agent': 'KYROSHIX-Records/1.0 (+https://releases.kyroshixcorp.workers.dev/)' },
-    signal: AbortSignal.timeout(10000)
-  });
-  if (!response.ok) throw Error('O YouTube recusou o feed (HTTP ' + response.status + ').');
-  const videos = parseYoutubeFeed(await response.text());
-  if (!videos.length) throw Error('O feed do YouTube não trouxe vídeos publicados.');
-  return videos;
+async function fetchYoutubeVideos(env, fetcher = fetch) {
+  try {
+    const response = await fetcher(YOUTUBE_FEED, {
+      headers: { 'User-Agent': 'KYROSHIX-Records/1.0 (+https://releases.kyroshixcorp.workers.dev/)' },
+      signal: AbortSignal.timeout(10000)
+    });
+    if (response.ok) {
+      const videos = parseYoutubeFeed(await response.text());
+      if (videos.length) return { videos, source: 'youtube-feed' };
+    }
+  } catch { /* Tenta a API oficial se houver chave configurada. */ }
+
+  if (!env.YOUTUBE_API_KEY) throw Error('Feed indisponível. Configure a YouTube Data API para sincronizar a playlist oficial.');
+  // Playlist fixa no servidor; não aceite URLs/IDs do cliente nem exponha a chave.
+  const url = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
+  url.search = new URLSearchParams({ part: 'snippet', playlistId: YOUTUBE_PLAYLIST_ID,
+    maxResults: '50', key: env.YOUTUBE_API_KEY }).toString();
+  let response, data;
+  try {
+    response = await fetcher(url.toString(), { signal: AbortSignal.timeout(10000) });
+    if (!response.ok) throw Error('API recusou a consulta');
+    data = await response.json();
+  } catch { throw Error('A YouTube Data API não respondeu ou recusou a consulta. Verifique a chave e a cota.'); }
+  const videos = [];
+  for (const item of Array.isArray(data?.items) ? data.items : []) {
+    const snippet = item?.snippet || {}, id = snippet.resourceId?.videoId;
+    if (!/^[A-Za-z0-9_-]{11}$/.test(String(id || '')) ||
+        ['Private video', 'Deleted video'].includes(snippet.title)) continue;
+    videos.push({ id, title: decodeXml(snippet.title).slice(0, 160),
+      description: decodeXml(snippet.description).slice(0, 240),
+      publishedAt: String(snippet.publishedAt || '').slice(0, 40), duration: '', source: 'youtube-api' });
+  }
+  if (!videos.length) throw Error('A playlist não retornou vídeos públicos pela YouTube Data API.');
+  return { videos, source: 'youtube-api' };
 }
 
 const FEED_CACHE_MS = 10 * 60 * 1000;
 let ephemeralFeed = null, ephemeralFetch = null, ephemeralFailureAt = 0;
 async function handleVideoSync(request, env) {
   if (request.method !== 'GET' && request.method !== 'POST') return json({ ok: false, reason: 'Method not allowed' }, 405);
-  const kv = env.KX_DATA;
+  // Mesmo com um binding acidental, o preview não grava no KV.
+  const kv = env.KX_PREVIEW_READ_ONLY === 'true' ? null : env.KX_DATA;
   const url = new URL(request.url);
   const force = url.searchParams.get('force') === '1';
   const cached = kv ? await readJson(kv, VIDEOS_KEY, {}) : (ephemeralFeed || {});
   const age = Date.now() - (Number(cached?.updatedAt) || 0);
   if ((!force || !kv) && Array.isArray(cached?.videos) && cached.videos.length && age < FEED_CACHE_MS) {
     return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
-      source: cached.source || 'youtube-feed', cached: true });
+      source: cached.source || 'youtube-feed', cached: true, ephemeral: !kv, persisted: !!kv });
   }
   try {
     if (!kv && Date.now() - ephemeralFailureAt < 60000) throw Error('Feed temporariamente indisponível. Tente novamente em um minuto.');
-    if (!kv && !ephemeralFetch) ephemeralFetch = fetchYoutubeVideos().finally(() => { ephemeralFetch = null; });
-    const videos = await (kv ? fetchYoutubeVideos() : ephemeralFetch);
+    if (!kv && !ephemeralFetch) ephemeralFetch = fetchYoutubeVideos(env).finally(() => { ephemeralFetch = null; });
+    const { videos, source } = await (kv ? fetchYoutubeVideos(env) : ephemeralFetch);
     const updatedAt = Date.now();
     // Sem KV (preview) a sincronização ainda é real: lê o feed público e
     // devolve a lista, só não persiste entre dispositivos.
-    if (kv) await kv.put(VIDEOS_KEY, JSON.stringify({ videos, updatedAt, source: 'youtube-feed' }));
-    else ephemeralFeed = { videos, updatedAt, source: 'youtube-feed' };
-    return json({ ok: true, videos, updatedAt, source: 'youtube-feed', cached: false,
+    if (kv) await kv.put(VIDEOS_KEY, JSON.stringify({ videos, updatedAt, source }));
+    else ephemeralFeed = { videos, updatedAt, source };
+    return json({ ok: true, videos, updatedAt, source, cached: false,
       ephemeral: !kv, persisted: !!kv });
   } catch (error) {
     if (!kv) ephemeralFailureAt = Date.now();
     if (Array.isArray(cached?.videos) && cached.videos.length) {
       return json({ ok: true, videos: cached.videos, updatedAt: cached.updatedAt,
-        source: cached.source || 'cache', cached: true,
+        source: cached.source || 'cache', cached: true, ephemeral: !kv, persisted: !!kv,
         warning: publicError(error?.message) || 'Usando último catálogo válido.' });
     }
     return json({ ok: false, reason: 'feed_error',

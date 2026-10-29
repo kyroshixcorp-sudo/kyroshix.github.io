@@ -2,7 +2,7 @@
 
 O `wrangler.jsonc` publica o Worker `kyroshix-preview` com assets de `dist/`, separado de `releases`. Rotas `/api/*` explícitas passam primeiro pelo Worker; as demais usam os assets e fallback SPA. O preview é **somente leitura**: autenticação por código, pagamentos e gravações retornam `not_configured`, mesmo que alguém adicione segredos ou bindings acidentalmente. Os contadores continuam locais sem `KX_METRICS`.
 
-O endpoint `/api/videos/sync` pode consultar o feed público do canal sem KV; o resultado é temporário, não sincronizado entre dispositivos. Quando o feed não estiver acessível, a WebUI conserva a lista publicada em `app-config.json`.
+O endpoint `/api/videos/sync` pode consultar o feed público do canal ou, se o feed falhar e `YOUTUBE_API_KEY` estiver configurada, a YouTube Data API para a playlist oficial. O resultado no preview é temporário, não sincronizado entre dispositivos nem gravado em KV. Sem chave válida ou com a API indisponível, a WebUI avisa e conserva a lista publicada em `app-config.json`. A consulta à API deve ser validada com uma chave real.
 
 ## Opção A — Workers Builds (recomendada, gratuita)
 
