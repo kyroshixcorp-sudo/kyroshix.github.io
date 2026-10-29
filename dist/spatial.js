@@ -386,8 +386,8 @@
     history: asArray(read('kx.history.v2', [])), shuffled: false, repeating: false,
     selectedPlan: 'pro', authMode: 'login', eq: { bass: 0, mid: 0, treble: 0 }, pendingAction: null,
     codeVerified: false, codePending: null, ownerToken: null, ownerVerified: false,
-    chatMessages: [], videos: [], videosSource: 'config', videosUpdatedAt: 0,
-    catalogUpdatedAt: 0, billingNotice: '', adsReady: false,
+    chatMessages: [], videos: [], videosSource: 'config', videosUpdatedAt: 0, videosNotice: '',
+    catalogUpdatedAt: 0, billingNotice: '', ownerNotice: '', adsReady: false,
     backend: { status: 'checking', worker: false, stripe: false, email: false, kv: false, detail: '' },
     drmEnabled: false
   };
@@ -931,7 +931,7 @@
   async function refreshBackendStatus() {
     const result = await api('/api/health');
     if (result?.ok) {
-      state.backend = { status: 'ok', worker: true, stripe: !!result.stripe,
+      state.backend = { status: 'ok', worker: true, readOnly: result.readOnly === true, stripe: !!result.stripe,
         email: !!result.email, kv: !!result.kv, drm: !!result.drm,
         metrics: !!result.metrics, detail: '' };
     } else {
@@ -964,7 +964,8 @@
   }
   function backendSummary() {
     const b = state.backend;
-    if (!b.worker) return 'Worker de APIs não publicado neste endereço. Contas, catálogo e vídeos funcionam localmente; pagamento e código por e-mail exigem o Worker.';
+    if (!b.worker) return 'Worker de APIs indisponível neste endereço. Contas e catálogo ficam locais; pagamentos e códigos não estão disponíveis.';
+    if (b.readOnly) return 'Prévia somente leitura: verificação de dono, pagamentos e publicação estão desativados.';
     return 'Worker ativo · Stripe ' + (b.stripe ? 'configurado' : 'não configurado') +
       ' · e-mail ' + (b.email ? 'configurado' : 'não configurado') +
       ' · KV ' + (b.kv ? 'ativo' : 'ausente') +
@@ -973,14 +974,15 @@
   function backendChecklist() {
     const b = state.backend;
     const items = [];
-    if (!b.worker) items.push(['Publicar o Worker', 'Envie o módulo worker.mjs + patches.mjs e inclua as rotas /api/* em run_worker_first.']);
+    if (b.readOnly) items.push(['Prévia somente leitura', 'Pagamento e publicação permanecem bloqueados mesmo com credenciais.']);
+    if (!b.worker) items.push(['Worker indisponível', 'Verifique a publicação e as rotas /api/* neste endereço.']);
     if (!b.kv) items.push(['Vincular KX_DATA', 'Namespace KV para catálogo, vídeos, chat e assinaturas.']);
     if (!b.stripe) items.push(['Configurar o Stripe', 'Segredos STRIPE_SECRET_KEY, STRIPE_PRICE_PRO, STRIPE_PRICE_STUDIO e STRIPE_WEBHOOK_SECRET.']);
     if (!b.email) items.push(['Configurar o e-mail', 'Segredos RESEND_API_KEY e EMAIL_FROM para o código de acesso.']);
     if (!items.length) return '';
     return `<details class="setup-checklist"><summary>${icon('shield')} Configuração pendente para ativar pagamentos (${items.length})</summary>
       <ol>${items.map(([title, detail]) => `<li><b>${esc(title)}</b><span>${esc(detail)}</span></li>`).join('')}</ol>
-      <p>Passo a passo em <code>docs/webui-v2.md</code>. Nada é simulado: enquanto faltar, o checkout não cobra e avisa o motivo.</p></details>`;
+      <p>Consulte <code>docs/webui-v2.md</code>. Antes de ativar cobrança é necessário corrigir e validar a segurança do servidor; credenciais sozinhas não bastam.</p></details>`;
   }
 
   /* ------------------------------------------------------- novas seções */
@@ -1048,25 +1050,24 @@
     state.lastVideoSync = Date.now();
     const health = state.backend.worker ? await api('/api/videos/sync' + (force ? '?force=1' : '')) : null;
     if (health?.ok && Array.isArray(health.videos) && health.videos.length) {
+      state.videosNotice = health.warning ? 'Não foi possível atualizar. Exibindo a última lista válida: ' + health.warning : '';
       state.videos = health.videos.filter(v => safeYoutubeId(v?.id || v?.videoId));
       state.videosSource = health.ephemeral ? 'feed' : 'server'; state.videosUpdatedAt = health.updatedAt || Date.now();
       if (state.view === 'videos') renderStage();
-      if (!quiet) toast('Vídeos sincronizados do canal oficial (' + state.videos.length + ').');
+      if (!quiet) toast(state.videosNotice || (health.cached ? 'Última lista disponível carregada (' + state.videos.length + ').' : 'Vídeos sincronizados do canal oficial (' + state.videos.length + ').'));
       return state.videosSource;
     }
+    state.videosNotice = 'Não foi possível atualizar os vídeos: ' + (health ? backendLabel(health) : backendLabel({ reason: state.backend.status, detail: state.backend.detail })) + ' Exibindo o catálogo disponível.';
     const result = await api('/api/videos');
     if (result?.ok && Array.isArray(result.videos) && result.videos.length) {
       state.videos = result.videos.filter(v => safeYoutubeId(v?.id || v?.videoId));
       state.videosSource = 'server';
       state.videosUpdatedAt = result.updatedAt || Date.now();
-    } else {
-      state.videos = [];
+    } else if (!state.videos.length) {
       state.videosSource = 'config';
     }
     if (state.view === 'videos') renderStage();
-    if (!quiet) toast(state.videosSource === 'server' || state.videosSource === 'feed'
-      ? 'Vídeos sincronizados com o servidor (' + state.videos.length + ').'
-      : 'Catálogo oficial de vídeos carregado. ' + backendLabel(result));
+    if (!quiet) toast(state.videosNotice);
     return state.videosSource;
   }
   function videosHTML() {
@@ -1080,6 +1081,7 @@
           ${appConfig.youtube?.channel ? `<a href="${esc(appConfig.youtube.channel)}" target="_blank" rel="noopener noreferrer">@KYROSHIXCORP ↗</a>` : ''}</span></div>
         <button class="btn btn-ghost btn-sm" type="button" data-action="sync-videos">${icon('refresh')} Sincronizar</button>
       </div>
+      ${state.videosNotice ? `<div class="notice warn" role="status">${icon('info')} <span>${esc(state.videosNotice)}</span></div>` : ''}
       <div class="notice ${state.drmEnabled ? 'ok' : 'info'}">${icon('shield')} <span><b>DRM:</b> ${state.drmEnabled
         ? 'serviço de licenças ativo para mídia HLS/DASH própria.'
         : 'desativado em <code>video-config.json</code>. Vídeos do YouTube usam o player do próprio YouTube e <b>não podem</b> receber DRM; Widevine/PlayReady/FairPlay só se aplicam a arquivos próprios empacotados com servidor de licenças.'}</span></div>
@@ -1091,7 +1093,7 @@
             <span class="video-duration">${esc(v.duration || 'YouTube')}</span>
           </div>
           <div class="video-body"><h2>${esc(v.title || 'Vídeo KYROSHIX')}</h2><p>${esc(v.description || 'Clipe oficial')}</p>
-            <span class="video-origin">${esc(v.source === 'youtube-feed' ? 'Sincronizado do canal' : 'Catálogo oficial')}</span>
+            <span class="video-origin">${esc(['youtube-feed', 'youtube-api'].includes(v.source) ? 'Sincronizado do canal' : 'Catálogo oficial')}</span>
             <div style="display:flex;gap:7px;flex-wrap:wrap">
               <button class="btn btn-ghost btn-sm" type="button" data-action="play-video" data-id="${id}">${icon('play')} Assistir</button>
               ${v.trackId ? `<button class="btn btn-ghost btn-sm" type="button" data-action="play-track-id" data-id="${esc(v.trackId)}">${icon('wave')} Ouvir faixa</button>` : ''}
@@ -1172,9 +1174,15 @@
   }
 
   function adminHTML() {
-    if (!isOwner()) return `<section class="panel glass"><div class="panel-head"><div><p class="eyebrow">ACESSO RESTRITO</p><h1>Painel do dono.</h1><p>Área exclusiva de ${esc(OWNER_EMAIL)}.</p></div></div>
-      <div class="notice warn">${icon('shield')} <span>Entre com a conta do dono e confirme o código enviado por e-mail para desbloquear a edição em tempo real.</span></div>
+    if (!isOwner()) {
+      const unavailable = state.backend.readOnly
+        ? 'Esta prévia é somente leitura: a verificação de dono e a publicação estão desativadas. Nenhum código foi enviado.'
+        : state.backend.status !== 'checking' && (!state.backend.worker || !state.backend.email || !state.backend.kv)
+          ? 'A verificação de dono está indisponível neste endereço. Nenhum código foi enviado; é necessário um serviço de autenticação seguro configurado e validado.' : '';
+      return `<section class="panel glass"><div class="panel-head"><div><p class="eyebrow">ACESSO RESTRITO</p><h1>Painel do dono.</h1><p>Área exclusiva de ${esc(OWNER_EMAIL)}.</p></div></div>
+      <div class="notice warn" role="status">${icon('shield')} <span>${esc(state.ownerNotice || unavailable || 'A edição exige identidade do dono verificada pelo servidor e confirmação por e-mail.')}</span></div>
       <div class="dlg-actions"><button class="btn btn-primary" type="button" data-action="owner-verify">${icon('shield')} Verificar acesso</button></div></section>`;
+    }
     return `<section class="panel glass admin-page">
       <div class="panel-head"><div><p class="eyebrow">PAINEL DO DONO · ${esc(OWNER_EMAIL)}</p><h1>Editar o site.</h1><p>Alterações publicadas em tempo real para todos os visitantes.</p></div>
         <span class="plan-tag">PREMIUM ATIVO</span></div>
@@ -1305,7 +1313,7 @@
     if (result?.ok && /^https:\/\//.test(result.url || '')) { location.href = result.url; return; }
     state.billingNotice = backendMissing(result)
       ? 'Checkout indisponível: ' + backendLabel(result) +
-        ' O pagamento real exige o Worker publicado com STRIPE_SECRET_KEY, STRIPE_PRICE_PRO e STRIPE_PRICE_STUDIO (veja docs/webui-v2.md).'
+        ' A cobrança exige autenticação e associação segura da assinatura ao usuário, além da configuração do provedor.'
       : (result?.detail || backendLabel(result));
     await refreshBackendStatus();
     state.view = 'planos'; renderAll();
@@ -1706,8 +1714,13 @@
       renderAuth(); openDialog($('#auth-dialog')); return;
     }
     const result = await api('/api/admin/code', { email: OWNER_EMAIL });
-    if (backendMissing(result)) { toast('Não foi possível verificar o dono. ' + backendLabel(result)); return; }
-    if (!result?.ok) { toast('Não foi possível enviar o código: ' + backendLabel(result)); return; }
+    if (!result?.ok) {
+      state.ownerNotice = 'Não foi possível enviar o código. ' + backendLabel(result) + ' Nenhum acesso de dono foi concedido.';
+      if (state.view === 'admin') renderStage();
+      toast('Verificação indisponível — veja o aviso no painel.');
+      return;
+    }
+    state.ownerNotice = '';
     state.codePending = { mode: 'owner', email: OWNER_EMAIL };
     renderAuth(); openDialog($('#auth-dialog')); $('#auth-code')?.focus();
   }
