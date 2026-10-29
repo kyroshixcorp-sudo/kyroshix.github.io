@@ -8,7 +8,7 @@ Estado atual: o proprietário forneceu a configuração pública do projeto `kyr
 2. Crie um projeto chamado **KYROSHIX Releases** ou selecione um projeto seu. Google Analytics não é necessário para este site.
 3. Registre um aplicativo **Web** (`</>`). Copie o objeto público `firebaseConfig` exibido pelo console. Não forneça senha, conta de serviço, chave privada ou segredo OAuth.
 4. Em **Authentication > Sign-in method**, ative **E-mail/senha** e **Google**. No Google, configure o nome público e o e-mail de suporte solicitado pelo console.
-5. Em **Authentication > Settings > Authorized domains**, adicione `releases.kyroshixcorp.workers.dev`.
+5. Em **Authentication > Settings > Authorized domains**, adicione `releases.kyroshixcorp.workers.dev`, o preview estável `kyroshix-preview.kyroshixcorp.workers.dev` e o hostname exato de cada preview por branch (ex.: `arena-6a25f84d-kyroshix-github-io-kyroshix-preview.kyroshixcorp.workers.dev`). Guia: [firebase-preview-domain.md](firebase-preview-domain.md).
 6. Em **Authentication > Templates**, revise o nome e o idioma dos e-mails de confirmação e recuperação. Os links usam as páginas de ação hospedadas pelo Firebase e retornam ao site.
 7. Configure a política de senhas com no mínimo 8 caracteres. O formulário já exige isso em novos cadastros. Habilite a proteção contra enumeração de e-mails quando disponível.
 

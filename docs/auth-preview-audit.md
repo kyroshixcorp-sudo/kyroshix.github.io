@@ -1,5 +1,18 @@
 # Diagnóstico de autenticação — 22/10/2026
 
+> **Atualização 27/10/2026 — preview por branch.** Foi solicitada a autorização de
+> `arena-6a25f84d-kyroshix-github-io-kyroshix-preview.kyroshixcorp.workers.dev`.
+> Nova consulta pública a `identitytoolkit.googleapis.com/v1/projects` confirmou que a lista
+> atual contém `localhost`, `kyroshix-releases.firebaseapp.com`,
+> `kyroshix-releases.web.app`, `releases.kyroshixcorp.workers.dev`,
+> `kyroshix-preview.kyroshixcorp.workers.dev` e os domínios de provedores OAuth —
+> mas **não** o hostname do preview por branch. O preview já serve a WebUI v2 com
+> `auth.google: true`. A alteração depende de credencial administrativa do Firebase;
+> este branch registra o hostname, um script de aplicação via API oficial, testes e o
+> guia em [firebase-preview-domain.md](firebase-preview-domain.md). Nenhuma credencial
+> foi solicitada, armazenada ou usada. Use `npm run check:firebase-domain -- --check`
+> para verificar depois de aplicar.
+
 ## Causa confirmada e alcance
 
 O preview público `https://kyroshix-preview.kyroshixcorp.workers.dev` entrega configuração do Firebase `kyroshix-releases`. A consulta pública somente leitura a `identitytoolkit.googleapis.com/v1/projects` confirmou que **o hostname do preview não está em authorizedDomains**. Isso explica `auth/unauthorized-domain`; o código não pode substituir essa autorização do servidor.

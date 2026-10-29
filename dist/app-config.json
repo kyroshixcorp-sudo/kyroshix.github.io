@@ -5,5 +5,26 @@
   "ads": { "enabled": false, "publisherId": "", "slotId": "" },
   "chat": { "enabled": true },
   "realtime": { "enabled": true, "pollMs": 4000 },
-  "youtube": { "videos": [] }
+  "youtube": {
+    "channel": "https://www.youtube.com/@KYROSHIXCORP",
+    "playlistId": "PLHMuU4IdndW8",
+    "videos": [
+      { "id": "6hbfr21jgWU", "title": "KUURO & Bianca – Snakes & Ladders | NIGHTCORE REMIX", "duration": "2:44", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "kRy4L4h2oBE", "title": "Rival & Cadmium – Willow Tree (feat. Rosendale) | Nightcore Remix", "duration": "2:51", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "c7SSijEGr-A", "title": "Foxela & Britt Lari – No Rules | Nightcore Remix", "duration": "2:12", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "3FXqbNOxuDc", "title": "Arc North - Limbo (ft. Veronica Bravo) [NORTON & Cour Remix] — Nightcore", "duration": "3:30", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "ppOd3La3bCU", "title": "Cheap Thrills (Cour, PACANI & Veronica Bravo) | Nightcore Remix", "duration": "2:10", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "4Yq1Ze-1PYs", "title": "Lost Sky x She Is Jules - Darkness | Nightcore Remix", "duration": "3:21", "description": "KYROSHIX RELEASES · Faixa do catálogo", "trackId": "darkness" },
+      { "id": "bgt-lSvztS0", "title": "All The Things She Said (BLVCK COBRV Cover) | Nightcore Remix", "duration": "2:00", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "7L-Me7Wotk4", "title": "Axol & Levianth - Remember (feat. The Tech Thieves) [Nightcore Remix]", "duration": "2:53", "description": "KYROSHIX RELEASES · Faixa do catálogo", "trackId": "remember" },
+      { "id": "mIqtLrgSgNE", "title": "NewJeans - GODS | League of Legends Worlds 2023 | Nightcore Remix", "duration": "3:19", "description": "KYROSHIX CORP · Playlist oficial" },
+      { "id": "K8AENJ_sMsY", "title": "Legends Never Die (feat. Against The Current) | Nightcore Remix", "duration": "3:29", "description": "KYROSHIX RELEASES · Faixa do catálogo", "trackId": "legends" },
+      { "id": "gt-_L8F_pPU", "title": "PACANI & TEZIS - Lay Low ft. Andreea Flavia | Nightcore Remix", "duration": "2:16", "description": "KYROSHIX CORP · Playlist oficial" },
+      { "id": "12U79xC0Zlw", "title": "Cheri Cheri Lady — PHURS & Andreea Flavia Cover | Nightcore Remix", "duration": "2:14", "description": "KYROSHIX REMIXER · Playlist oficial" },
+      { "id": "hlv88-fpF18", "title": "Warriyo - Mortals (feat. Laura Brehm) | Nightcore Remix", "duration": "3:30", "description": "KYROSHIX CORP Releases · Playlist oficial" },
+      { "id": "oMX0uWmw5ws", "title": "Warriyo - Blindfold (feat. Laura Brehm) | Nightcore Remix", "duration": "3:11", "description": "KYROSHIX RELEASES · Faixa do catálogo", "trackId": "blindfold" },
+      { "id": "FN3F83oOOpc", "title": "TOKYO DRIFT — BENZ BOYZ X ROXANA | Nightcore Remix", "duration": "1:42", "description": "KYROSHIX RELEASES · Playlist oficial" },
+      { "id": "zAnOsGoIszI", "title": "NATHAN DAWE x BEBE REXHA — HEART STILL BEATING | Nightcore Remixer", "duration": "2:27", "description": "KYROSHIX CORP · Playlist oficial" }
+    ]
+  }
 }

@@ -876,3 +876,36 @@ body[data-theme="warm"] .room{filter:sepia(.35) hue-rotate(-12deg) brightness(.8
   .mobile-nav .icon{width:14px;height:14px}
   .hero h1{font-size:21px}
 }
+
+/* ===================== diagnóstico de serviços e selo do dono ============ */
+.backend-status{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.045);margin:0 0 16px}
+.backend-status.ok{border-color:rgba(105,214,154,.32);background:rgba(105,214,154,.08)}
+.backend-status.warn{border-color:rgba(255,138,61,.35);background:rgba(255,138,61,.09)}
+.backend-status.info{border-color:rgba(120,160,255,.3);background:rgba(120,160,255,.08)}
+.backend-status>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.backend-status b{font-size:11.5px}
+.backend-status span:not(.backend-dot){font-size:10.5px;color:var(--muted);line-height:1.45}
+.backend-status a{color:var(--accent-2);text-decoration:underline}
+.backend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--dim);box-shadow:0 0 0 4px rgba(255,255,255,.05)}
+.backend-status.ok .backend-dot{background:var(--good);box-shadow:0 0 10px var(--good)}
+.backend-status.warn .backend-dot{background:#ffb45f;box-shadow:0 0 10px rgba(255,138,61,.7)}
+.backend-status.info .backend-dot{background:#78a0ff;box-shadow:0 0 10px rgba(120,160,255,.6)}
+.owner-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--accent),#ffb45f);
+  color:#1b0d05;font-size:9px;font-weight:900;letter-spacing:.1em;padding:4px 8px;border-radius:999px}
+.account-box .plan-tag.owner{background:linear-gradient(135deg,var(--accent),#ffb45f);color:#1b0d05}
+.video-card .video-origin{font-size:9.5px;color:var(--dim);letter-spacing:.05em;text-transform:uppercase}
+@media(max-width:640px){
+  .backend-status{flex-wrap:wrap;padding:10px 11px;gap:8px}
+  .backend-status .btn{width:100%}
+  .backend-status span:not(.backend-dot){font-size:10px}
+}
+.setup-checklist{margin:0 0 16px;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,138,61,.3);
+  background:rgba(255,138,61,.07);font-size:11.5px}
+.setup-checklist summary{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;color:#ffb990}
+.setup-checklist summary .icon{width:15px;height:15px}
+.setup-checklist ol{margin:12px 0 8px 18px;display:flex;flex-direction:column;gap:8px}
+.setup-checklist li{display:flex;flex-direction:column;gap:2px;color:#fff}
+.setup-checklist li span{color:var(--muted);line-height:1.45;font-size:10.5px}
+.setup-checklist p{color:var(--dim);font-size:10.5px;line-height:1.5}
+.setup-checklist code{background:rgba(0,0,0,.3);padding:1px 5px;border-radius:5px}

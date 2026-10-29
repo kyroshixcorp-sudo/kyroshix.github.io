@@ -1,17 +1,8 @@
 # Preview (staging) na Cloudflare
 
-O arquivo `wrangler.jsonc` publica `dist/` como assets estáticos em um Worker
-separado, `kyroshix-preview`. O Worker de produção `releases` não é alterado.
-A raiz `/` entrega a homepage Spatial UI (`dist/index.html`); as rotas legíveis
-(`/inicio`, `/track/...`) caem no `not_found_handling: single-page-application`
-e recebem a mesma página. `cloudflare/_redirects` documenta os rewrites equivalentes
-para o Worker de produção.
+O `wrangler.jsonc` publica o Worker `kyroshix-preview` com assets de `dist/`, separado de `releases`. Rotas `/api/*` explícitas passam primeiro pelo Worker; as demais usam os assets e fallback SPA. O preview é **somente leitura**: autenticação por código, pagamentos e gravações retornam `not_configured`, mesmo que alguém adicione segredos ou bindings acidentalmente. Os contadores continuam locais sem `KX_METRICS`.
 
-Este preview publica **somente assets estáticos** (`wrangler.jsonc` não define
-`main`). Portanto `/api/metrics` não existe aqui e a Spatial WebUI usa os
-contadores reais medidos no navegador. Para agregação entre dispositivos, vincule
-o KV `KX_METRICS` ao Worker de produção; veja
-[spatial-webui.md](spatial-webui.md).
+O endpoint `/api/videos/sync` pode consultar o feed público do canal sem KV; o resultado é temporário, não sincronizado entre dispositivos. Quando o feed não estiver acessível, a WebUI conserva a lista publicada em `app-config.json`.
 
 ## Opção A — Workers Builds (recomendada, gratuita)
 
@@ -42,11 +33,35 @@ Sem essa proteção, trate a URL de preview como pública.
 Workers Free: 100.000 requisições/dia; requisições a assets estáticos não
 contam como invocação quando não há script. Nada aqui exige plano pago.
 
+## Rotas /api/* no preview
+
+`/api/health`, `/api/drm/status` e os endpoints de leitura respondem JSON. O preview não processa cobrança, códigos de acesso nem edição compartilhada. **Não é um ambiente de teste de pagamentos reais.** Para testes de produção são necessários autenticação server-side, políticas seguras, bindings e um provedor configurado.
+
 ## Firebase
 
 Para login Google no preview, adicione o domínio do preview em Firebase
 Authentication → Settings → Authorized domains. Sem isso, a escuta pública
 funciona e o login Google falha com `auth/unauthorized-domain`.
+O hostname estável `kyroshix-preview.kyroshixcorp.workers.dev` já está
+autorizado; previews por branch precisam do hostname exato. Consulte
+[firebase-preview-domain.md](firebase-preview-domain.md) e o script
+`npm run authorize:firebase`.
+
+## Quando o Workers Builds falha sem logs
+
+O check `Workers Builds: kyroshix-preview` é executado pela Cloudflare e o log
+completo fica no dashboard (exige login na conta). O `gh` só devolve o Build ID.
+Para separar problema de código de falha de infraestrutura:
+
+```sh
+npx wrangler deploy --dry-run          # valida wrangler.jsonc + 72 assets
+npx wrangler versions upload --dry-run
+python3 scripts/export-pages.py /tmp/site.zip
+python3 scripts/export-worker.py /tmp/site.zip /tmp/worker
+npm run test:worker
+```
+
+O resultado local não prova a causa de uma falha remota; consulte o log do build no dashboard antes de concluir se é falha de configuração ou infraestrutura. O Worker do preview tem seu próprio módulo e não altera `releases`.
 
 ## Rollback
 

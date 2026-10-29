@@ -4,3 +4,5 @@ qa/
 
 node_modules/
 .test-artifacts/
+
+.wrangler/

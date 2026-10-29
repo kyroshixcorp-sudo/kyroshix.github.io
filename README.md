@@ -1,3 +1,5 @@
+> **Correção de segurança:** a versão anterior concedia modo dono ao digitar o e-mail no navegador. Isso não verifica identidade. Esse atalho foi removido: é necessária verificação pelo servidor. O preview é somente leitura; cobrança, envio de código, publicação compartilhada e DRM comercial não estão ativos ou validados. As seções históricas abaixo podem descrever implementações anteriores e não devem ser tratadas como confirmação de operação em produção.
+
 # KYROSHIX RELEASES — versão 4.5 · Contas
 
 A versão 4.5 refaz o acesso com um cartão de duas colunas, arte KYROSHIX e formulário que acompanha o tema claro/escuro. Na primeira visita anônima deste navegador, o cadastro abre depois da restauração da sessão. Há opções de Google, Facebook, GitHub, telefone/SMS, Instagram e X, com disponibilidade explícita. Google e e-mail continuam configurados; os outros métodos dependem das etapas de ativação em [docs/acesso-4.5.md](docs/acesso-4.5.md). Continuar sem conta mantém a escuta pública.
@@ -69,6 +71,10 @@ A homepage (`/`) é uma **Spatial WebUI** independente, sem build e sem framewor
 Toda a configuração de segredos, KV, Stripe, Resend, Firebase, AdSense e DRM está em [docs/webui-v2.md](docs/webui-v2.md). Configuração pública (sem segredos): `dist/app-config.json`.
 
 O SPA anterior foi preservado em `dist/legacy.html` apenas para rollback/testes. `cloudflare/_redirects` é injetado no ZIP por `scripts/export-pages.py`; `wrangler.jsonc` usa `not_found_handling: single-page-application` no preview. Ao publicar pelo módulo com `keep_assets: true`, envie **primeiro o ZIP completo** para criar `spatial.css`, `spatial.js`, `app-config.json` e `ads.js` nos assets, e vincule os namespaces KV `KX_DATA` e `KX_METRICS`.
+
+### Correções de serviço (branch atual)
+
+O `api()` agora detecta o **SPA fallback** do preview (`/api/*` devolvendo HTML 200) e classifica como `worker_missing`, em vez de falhar silenciosamente. A conta `kyroshixcorp@gmail.com` recebe **Premium vitalício no login** (com painel do dono em modo local quando não há Worker); a página de planos mostra um **diagnóstico** vindo de `/api/health` com o checklist do que falta; e a página de vídeos carrega os **16 vídeos reais** do canal `@KYROSHIXCORP`, sincronizados pelo feed Atom público via `/api/videos/sync`. Detalhes em [docs/webui-v2.md](docs/webui-v2.md#11-diagnóstico-por-que-o-donoassinaturavídeos-falhavam-corrigido).
 
 ## Estrutura
 
